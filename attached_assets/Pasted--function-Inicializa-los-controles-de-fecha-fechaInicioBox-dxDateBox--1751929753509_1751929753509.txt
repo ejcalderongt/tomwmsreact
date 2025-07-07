@@ -1,0 +1,156 @@
+$(function () {
+    // Inicializa los controles de fecha
+    $("#fechaInicioBox").dxDateBox({
+        type: "date",
+        value: new Date(),
+        displayFormat: "dd/MM/yyyy"
+    });
+
+    $("#fechaFinBox").dxDateBox({
+        type: "date",
+        value: new Date(),
+        displayFormat: "dd/MM/yyyy"
+    });
+
+    // Botón de filtrar
+    $("#btnFiltrar").dxButton({
+        text: "Filtrar",
+        type: "default",
+        icon: "search",
+        onClick: function () {
+            cargarDocumentosIngreso();
+        }
+    });
+
+    // Inicializa el DataGrid UNA sola vez
+    var dataGrid = $("#gridContainer").dxDataGrid({
+        showBorders: true,
+        columnAutoWidth: true,
+        columnsAutoGenerate: false,
+        noDataText: "No se encontraron documentos de ingreso",
+        filterRow: { visible: true },
+        paging: { pageSize: 10 },
+        pager: {
+            showPageSizeSelector: true,
+            allowedPageSizes: [5, 10, 20],
+            showInfo: true
+        },
+        // Aquí está la magia: stateStoring de DevExtreme
+        stateStoring: {
+            enabled: true,
+            type: "localStorage",
+            storageKey: "DocumentosIngresoGridLayout"
+        },
+        toolbar: {
+            items: [
+                {
+                    location: "before",
+                    widget: "dxButton",
+                    options: {
+                        icon: "columnchooser",
+                        hint: "Columnas",
+                        onClick: function () {
+                            dataGrid.showColumnChooser();
+                        }
+                    }
+                },
+                {
+                    location: "after",
+                    widget: "dxButton",
+                    options: {
+                        icon: "export",
+                        hint: "Exportar XLSX",
+                        onClick: function () {
+                            exportarAExcel();
+                        }
+                    }
+                },
+                {
+                    location: "after",
+                    widget: "dxButton",
+                    options: {
+                        text: "Restablecer Layout",
+                        onClick: function () {
+                            localStorage.removeItem("DocumentosIngresoGridLayout");
+                            location.reload();
+                        }
+                    }
+                }
+            ]
+        },
+        columns: [
+            { dataField: "codigo", caption: "Código" }, 
+            { dataField: "bodega", caption: "Bodega" }, 
+            { dataField: "propietario", caption: "Propietario" }, 
+            { dataField: "proveedor", caption: "Proveedor" }, 
+            { dataField: "tipoIngreso", caption: "Tipo Ingreso" }, 
+            { dataField: "estado", caption: "Estado" }, 
+            { dataField: "noDocumento", caption: "No. Documento" }, 
+            { dataField: "referencia", caption: "Referencia" }, 
+            { dataField: "procedencia", caption: "Procedencia" },                   
+            { dataField: "fecha", caption: "Fecha", dataType: "date" },
+            { dataField: "es_devolucion", caption: "Es Devolución", dataType: "boolean" }, 
+            { dataField: "enviado_A_ERP", caption: "Enviado a ERP", dataType: "boolean" }, 
+            { dataField: "noPoliza", caption: "No. Póliza" },
+            { dataField: "noOrden", caption: "No. Orden" },
+            { dataField: "no_Documento_Recepcion_ERP", caption: "No. Documento Recepción ERP" },
+            { dataField: "no_Documento_Devolucion", caption: "No. Documento Devolución" },
+            { dataField: "no_Documento_Ubicacion_ERP", caption: "No. Documento Ubicación ERP" },
+            { dataField: "no_Ticket_TMS", caption: "No. Ticket TMS" },
+            { dataField: "no_Marchamo", caption: "No. Marchamo" },
+            { dataField: "activo", caption: "Activo", dataType: "boolean" },
+        ],
+        onRowClick: function (e) {
+            const IdOrdenCompraEnc = e.data.codigo;
+            if (IdOrdenCompraEnc) {
+                window.location.href = `/DocumentosIngreso/Detalle/${IdOrdenCompraEnc}`;
+            } else {
+                DevExpress.ui.notify("ID no disponible", "warning", 2000);
+            }
+        }
+    }).dxDataGrid("instance");
+
+    // Carga inicial de datos
+    cargarDocumentosIngreso();
+
+    // Función para cargar datos del servidor (NO re-crea el grid, solo actualiza dataSource)
+    function cargarDocumentosIngreso() {
+        var fechaInicio = $("#fechaInicioBox").dxDateBox("instance").option("value");
+        var fechaFin = $("#fechaFinBox").dxDateBox("instance").option("value");
+        var idPropietario = $("#idPropietarioHidden").val();
+
+        $.ajax({
+            url: $("meta[name='api-base-url']").attr("content") + "sync/ingresos/documentos-ingreso/listar",
+            method: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+                FechaInicio: fechaInicio,
+                FechaFin: fechaFin,
+                IdPropietario: idPropietario,
+                IdBodega: 0
+            }),
+            success: function (data) {
+                // Solo actualiza la data, el layout persiste gracias a stateStoring
+                dataGrid.option("dataSource", data);
+            },
+            error: function () {
+                DevExpress.ui.notify("Error al cargar los datos", "error", 3000);
+            }
+        });
+    }
+
+    // Función para exportar a XLSX
+    function exportarAExcel() {
+        var workbook = new ExcelJS.Workbook();
+        var worksheet = workbook.addWorksheet("DocumentosIngreso");
+
+        DevExpress.excelExporter.exportDataGrid({
+            component: dataGrid,
+            worksheet: worksheet
+        }).then(function () {
+            workbook.xlsx.writeBuffer().then(function (buffer) {
+                saveAs(new Blob([buffer], { type: "application/octet-stream" }), "DocumentosIngreso.xlsx");
+            });
+        });
+    }
+});
