@@ -1,4 +1,5 @@
-const { createServer } = require('vite');
+
+import { createServer } from 'vite';
 
 async function startServer() {
   try {
