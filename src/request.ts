@@ -1,6 +1,6 @@
 
-// API Configuration
-const API_BASE_URL = 'https://52.41.114.122:8091';
+// API Configuration - Use relative URLs to leverage Vite proxy
+const API_BASE_URL = '';
 
 export async function apiRequest(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
@@ -8,7 +8,7 @@ export async function apiRequest(path: string, options: RequestInit = {}) {
     ...options.headers,
   };
 
-  // Build full URL
+  // Build full URL - always use relative paths to hit the proxy
   const fullUrl = path.startsWith('http') ? path : `${API_BASE_URL}${path}`;
 
   try {
