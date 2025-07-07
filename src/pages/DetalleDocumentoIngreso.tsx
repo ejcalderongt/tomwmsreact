@@ -59,8 +59,10 @@ function DetalleDocumentoIngreso() {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        toast.error('No hay sesión activa');
-        navigate('/login');
+        toast.error('Redirigiendo a login');
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 1500);
         return;
       }
 

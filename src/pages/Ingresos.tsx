@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import { ArrowRightOnRectangleIcon, MagnifyingGlassIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
@@ -40,7 +39,7 @@ function Ingresos() {
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,9 +53,12 @@ function Ingresos() {
     try {
       const token = localStorage.getItem('token');
       const user = localStorage.getItem('user');
-      
+
       if (!token || !user) {
-        toast.error('No hay sesión activa');
+        toast.error('Redirigiendo a login');
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 1500);
         return;
       }
 
@@ -87,7 +89,7 @@ function Ingresos() {
       toast.error('Por favor seleccione las fechas de inicio y fin');
       return;
     }
-    
+
     if (new Date(fechaInicio) > new Date(fechaFin)) {
       toast.error('La fecha de inicio debe ser menor o igual a la fecha fin');
       return;
@@ -144,7 +146,7 @@ function Ingresos() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
-            
+
             <div className="flex-1 min-w-48">
               <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-2">
                 Fecha Fin
@@ -157,7 +159,7 @@ function Ingresos() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
               />
             </div>
-            
+
             <div>
               <button
                 onClick={handleFiltrar}
