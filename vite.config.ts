@@ -1,3 +1,4 @@
+// vite.config.ts
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -15,13 +16,16 @@ export default defineConfig({
     strictPort: true,
     hmr: {
       port: 5001,
-      host: "0.0.0.0"
+      host: "0.0.0.0",
+      clientPort: 443,
     },
+    allowedHosts: true,
     proxy: {
       "/api": {
         target: "http://52.41.114.122:8091",
         changeOrigin: true,
         secure: false,
+        ws: false,
       },
     },
   },
