@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { setCurrentUser } from "@/lib/auth";
 import { LoginRequest } from "@shared/schema";
 
 export default function Login() {
@@ -23,10 +24,16 @@ export default function Login() {
       return response.json();
     },
     onSuccess: (data) => {
-      localStorage.setItem("user", JSON.stringify(data.user));
+      setCurrentUser(data.user, data.token);
       toast({
         title: "Inicio de sesión exitoso",
-        description: `Bienvenido, ${data.user.name}`,
+        description: `Bienvenido, ${data.user.name}${data.user.nombrePropietario ? ` - ${data.user.nombrePropietario}` : ''}`,
+      });
+      console.log("Usuario autenticado:", {
+        id: data.user.id,
+        name: data.user.name,
+        idPropietario: data.user.idPropietario,
+        nombrePropietario: data.user.nombrePropietario
       });
       setLocation("/dashboard");
     },

@@ -13,9 +13,10 @@ import {
 } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Search, ArrowDown, Plus, Filter, Download, Package } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { DateRangeFilter } from "@/components/date-range-filter";
 
 interface IncomingOrder {
   id: number;
@@ -30,10 +31,28 @@ interface IncomingOrder {
 
 export default function Incoming() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [startDate, setStartDate] = useState<Date | undefined>();
+  const [endDate, setEndDate] = useState<Date | undefined>();
+  
+  const queryKey = useMemo(() => {
+    const params = ['/api/incoming-orders'];
+    if (startDate || endDate) {
+      const queryParams = new URLSearchParams();
+      if (startDate) queryParams.append('startDate', startDate.toISOString().split('T')[0]);
+      if (endDate) queryParams.append('endDate', endDate.toISOString().split('T')[0]);
+      params.push(`?${queryParams.toString()}`);
+    }
+    return params;
+  }, [startDate, endDate]);
   
   const { data: orders, isLoading, error } = useQuery<IncomingOrder[]>({
-    queryKey: ['/api/incoming-orders'],
+    queryKey,
   });
+
+  const handleDateChange = (newStartDate?: Date, newEndDate?: Date) => {
+    setStartDate(newStartDate);
+    setEndDate(newEndDate);
+  };
 
   const filteredOrders = orders?.filter(order =>
     order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -168,7 +187,13 @@ export default function Incoming() {
               </Button>
             </div>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <DateRangeFilter
+              startDate={startDate}
+              endDate={endDate}
+              onDateChange={handleDateChange}
+              className="w-full sm:w-auto"
+            />
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input

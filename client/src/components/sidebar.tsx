@@ -58,12 +58,17 @@ export default function Sidebar() {
 
       <div className="p-4 border-t border-border">
         <div className="flex items-center mb-3">
-          <div className="w-8 h-8 bg-warehouse-primary rounded-full flex items-center justify-center text-white text-sm font-medium">
+          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
             {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
           </div>
-          <div className="ml-3">
+          <div className="ml-3 flex-1">
             <p className="text-sm font-medium text-foreground">{user?.name || 'Usuario'}</p>
             <p className="text-xs text-muted-foreground">{user?.role || 'user'}</p>
+            {user?.idPropietario && (
+              <p className="text-xs text-blue-600 font-medium">
+                ID: {user.idPropietario} {user.nombrePropietario && `- ${user.nombrePropietario}`}
+              </p>
+            )}
           </div>
         </div>
         <Button 
