@@ -1,3 +1,4 @@
+
 // src/pages/Index.tsx
 
 import { useNavigate } from "react-router-dom";
@@ -53,16 +54,26 @@ function Index() {
         </aside>
 
         <section className="flex-1 p-6">
-          <h1 className="text-2xl font-semibold">Bienvenido al sistema TOMWMSUX</h1>
-          <p className="mt-2 text-gray-700">
-            Selecciona una opción del menú lateral para continuar.
-          </p>
+          <div className="max-w-7xl mx-auto">
+            <h1 className="text-3xl font-bold text-gray-900 mb-8">
+              Bienvenido a TOMWMSUX
+            </h1>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {menuItems.map((item) => (
+                <div
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg cursor-pointer transition-shadow border border-gray-200"
+                >
+                  <div className="text-4xl mb-4">{item.icon}</div>
+                  <h3 className="text-lg font-semibold text-gray-900">{item.text}</h3>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
       </main>
-
-      <footer className="bg-gray-100 text-sm text-center py-2 border-t">
-        Copyright © 2000–2024 Developer Express Inc. | Todos los derechos reservados.
-      </footer>
     </div>
   );
 }
