@@ -1,0 +1,137 @@
+@page "/DocumentosIngreso/Detalle/{IdOrdenCompraEnc}"
+@model TOMWMSUX.Pages.DetalleDocumentoIngresoModel
+@{
+    ViewData["Title"] = $"Detalle Documento de Ingreso {Model.IdOrdenCompraEnc}";
+}
+
+<h2>Detalle del Documento: @Model.IdOrdenCompraEnc</h2>
+
+<div style="margin-top: 20px;">
+    <div id="tabsContainer"></div>
+    <div id="tabContent" style="margin-top: 20px;"></div>    
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $("#tabsContainer").dxTabs({
+                dataSource: [
+                    { text: "Detalle Orden de Compra" },
+                    { text: "Recepciones" }
+                ],
+                selectedIndex: 0,
+                onItemClick: function (e) {
+                    var index = e.itemIndex;
+                    cargarTab(index);
+                }
+            });
+
+            function cargarTab(index) {
+                switch (index) {
+                    case 0:
+                        console.log("clic en oc")
+                        cargarDetalleOC();
+                        break;
+                    case 1:
+                        console.log("clic en rec")
+                        cargarRecepciones();
+                        break;
+                }
+            }
+
+            function cargarDetalleOC() {                
+                var baseUrl = $("meta[name='api-base-url']").attr("content");
+                var url = baseUrl + "sync/ingresos/" + @Model.IdOrdenCompraEnc + "/detalle-oc";
+
+                $("#tabContent").dxDataGrid({
+                    dataSource: DevExpress.data.AspNet.createStore({
+                        loadUrl: url,
+                        loadMode: "raw"
+                    }),
+                    showBorders: true,                    
+                    columns: [
+                        { dataField: "no_Linea", caption: "No_Linea" },
+                        { dataField: "codigo_producto", caption: "Codigo" },
+                        { dataField: "nombre_producto", caption: "Producto" },
+                        { dataField: "nombre_unidad_medida_basica", caption: "UmBas" },
+                        {
+                            dataField: "cantidad",
+                            caption: "Cantidad",
+                            dataType: "number",
+                            format: { type: "fixedPoint", precision: 2 }
+                        },
+                        { dataField: "costo", caption: "Costo", visible: false }
+                    ]
+                });
+            }
+
+            function cargarRecepciones() {
+            console.log("cargarRecepciones() fue llamado");
+            var baseUrl = $("meta[name='api-base-url']").attr("content");      
+            var url = baseUrl + "sync/ingresos/" + '@Model.IdOrdenCompraEnc' + "/recepciones";
+
+            console.log("URL generada:", url);
+
+            $.get(url)
+                .done(function (data) {
+                    console.log("Respuesta directa de la API (GET manual):", data);
+
+                    $("#tabContent").dxDataGrid({
+                        dataSource: data,
+                            width: "100%",
+                            showBorders: true,                            
+                        scrolling: {
+                            mode: "standard",
+                            useNative: true,
+                            showScrollbar: "always"
+                        },
+                        columns: [
+                            { dataField: "idRecepcion", caption: "Recepción"},
+                            { dataField: "fechaRecepcion", caption: "Fecha", dataType: "date"},
+                            { dataField: "usuario", caption: "Usuario"}
+                        ],
+                        masterDetail: {
+                            enabled: true,
+                            template: function (container, options) {
+                                var detalles = options.data.detalles || [];
+                                container.css("padding", "10px");
+                                container.css("background-color", "#f9f9f9");
+                                container.css("border-radius", "4px");
+                                $("<div>").dxDataGrid({
+                                    dataSource: detalles,
+                                    width: "100%",
+                                    showBorders: true,
+                                    columnAutoWidth: true,                                    
+                                    scrolling: {
+                                        mode: "standard",
+                                        useNative: true,
+                                        showScrollbar: "always"
+                                    },
+                                    columns: [
+                                        { dataField: "no_Linea", caption: "No. Línea", width: 80 },
+                                        { dataField: "codigo_producto", caption: "Código", width: 200 },
+                                        { dataField: "nombre_producto", caption: "Producto", width: 250 },
+                                        { dataField: "cantidad_recibida", caption: "Recibido", dataType: "number", format: "#,##0.00", width: 100 },
+                                        { dataField: "nombre_unidad_medida", caption: "UmBas", width: 80 },
+                                        { dataField: "nombre_producto_estado", caption: "Estado", width: 150 },
+                                        { dataField: "lote", caption: "Lote", width: 120 },
+                                        { dataField: "fecha_vence", caption: "Vence", dataType: "date", width: 120 },
+                                        { dataField: "fecha_ingreso", caption: "Ingreso", dataType: "date", width: 120 },
+                                        { dataField: "peso", caption: "Peso", dataType: "number", width: 80 },
+                                        { dataField: "lic_plate", caption: "Licencia", width: 150 }
+                                    ],
+                                    noDataText: "No se encontraron detalles para esta recepción."
+                                }).appendTo(container);
+                            }
+                        },
+                        noDataText: "No se encontraron recepciones para esta orden de compra."
+                    });
+                })
+                .fail(function (error) {
+                    console.error("Error directo de la API (GET manual):", error);
+                });
+        }        
+        cargarDetalleOC();
+        });
+    </script>
+}
