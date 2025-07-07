@@ -56,30 +56,25 @@ function DetalleDocumentoIngreso() {
   const cargarTab = async (index: number) => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      // Validación temporalmente deshabilitada
-      // if (!token) {
-      //   toast.error('Redirigiendo a login');
-      //   setTimeout(() => {
-      //     navigate('/login', { replace: true });
-      //   }, 1500);
-      //   return;
-      // }
-
+      // Usar las claves correctas del localStorage
+      const token = localStorage.getItem('wms_token') || localStorage.getItem('token') || '';
+      
       const id = parseInt(IdOrdenCompraEnc || '0');
       if (!id) {
         toast.error('ID de documento inválido');
         return;
       }
 
+      console.log(`Cargando tab ${index} con ID: ${id} y token: ${token ? 'presente' : 'ausente'}`);
+
       switch (index) {
         case 0:
           console.log("clic en oc");
-          await cargarDetalleOC(id, token || '');
+          await cargarDetalleOC(id, token);
           break;
         case 1:
           console.log("clic en rec");
-          await cargarRecepciones(id, token || '');
+          await cargarRecepciones(id, token);
           break;
       }
     } catch (error) {
@@ -92,40 +87,33 @@ function DetalleDocumentoIngreso() {
 
   const cargarDetalleOC = async (id: number, token: string) => {
     try {
+      console.log(`Cargando detalle OC para ID: ${id}`);
       const data = await ingresosAPI.obtenerDetalle(id, token);
+      console.log("Respuesta detalle OC:", data);
       setDetalleOC(data || []);
+      
+      if (!data || data.length === 0) {
+        toast.info('No se encontró detalle para esta orden de compra');
+      }
     } catch (error) {
         console.error('Error al cargar detalle:', error);
-        // Validación temporalmente deshabilitada
-        // if (error instanceof Error && error.message === 'Unauthorized') {
-        //   toast.error('Sesión expirada');
-        //   setTimeout(() => {
-        //     toast.success('Redirigiendo a login...');
-        //     navigate('/login');
-        //   }, 1000);
-        // } else {
-          toast.error('Error al cargar el detalle');
-        // }
+        toast.error('Error al cargar el detalle de la orden');
       }
   };
 
   const cargarRecepciones = async (id: number, token: string) => {
     try {
+      console.log(`Cargando recepciones para ID: ${id}`);
       const data = await ingresosAPI.obtenerRecepciones(id, token);
       console.log("Respuesta directa de la API (recepciones):", data);
       setRecepciones(data || []);
+      
+      if (!data || data.length === 0) {
+        toast.info('No se encontraron recepciones para esta orden de compra');
+      }
     } catch (error) {
           console.error('Error al cargar recepciones:', error);
-          // Validación temporalmente deshabilitada  
-          // if (error instanceof Error && error.message === 'Unauthorized') {
-          //   toast.error('Sesión expirada');
-          //   setTimeout(() => {
-          //     toast.success('Redirigiendo a login...');
-          //     navigate('/login');
-          //   }, 1000);
-          // } else {
-            toast.error('Error al cargar las recepciones');
-          // }
+          toast.error('Error al cargar las recepciones');
         }
   };
 
