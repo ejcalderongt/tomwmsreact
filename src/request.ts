@@ -1,12 +1,18 @@
 
+// API Configuration
+const API_BASE_URL = 'http://52.41.114.122:8091';
+
 export async function apiRequest(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options.headers,
   };
 
+  // Build full URL
+  const fullUrl = path.startsWith('http') ? path : `${API_BASE_URL}${path}`;
+
   try {
-    const response = await fetch(path, {
+    const response = await fetch(fullUrl, {
       ...options,
       headers,
       // Prevent browser from showing basic auth dialog
