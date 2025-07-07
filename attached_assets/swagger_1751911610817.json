@@ -1,0 +1,5278 @@
+{
+  "openapi": "3.0.4",
+  "info": {
+    "title": "WMSWebAPI",
+    "version": "V1"
+  },
+  "servers": [
+  {
+    "url": "http://52.41.114.122:8091"
+  }
+],
+  "paths": {
+    "/api/Auth/login-propietario": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Productos/sincronizar": {
+      "post": {
+        "tags": [
+          "Productos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ProductoTransDto"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ProductoTransDto"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ProductoTransDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Productos/sincronizar_single": {
+      "post": {
+        "tags": [
+          "Productos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductoDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductoDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProductoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/sync/ingresos/documento-ingreso": {
+      "post": {
+        "tags": [
+          "SyncIngresos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OrdenCompraDto"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OrdenCompraDto"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/OrdenCompraDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/sync/ingresos/documentos-ingreso/listar": {
+      "post": {
+        "tags": [
+          "SyncIngresos"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentoIngresoFiltroDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentoIngresoFiltroDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/DocumentoIngresoFiltroDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/sync/ingresos/{IdOrdenCompraEnc}/detalle-oc": {
+      "get": {
+        "tags": [
+          "SyncIngresos"
+        ],
+        "parameters": [
+          {
+            "name": "IdOrdenCompraEnc",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/sync/ingresos/{IdOrdenCompraEnc}/recepciones": {
+      "get": {
+        "tags": [
+          "SyncIngresos"
+        ],
+        "parameters": [
+          {
+            "name": "IdOrdenCompraEnc",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/sync/salidas/documento-salida": {
+      "post": {
+        "tags": [
+          "SyncSalidas"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SalidaTransDto"
+                }
+              }
+            },
+            "text/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SalidaTransDto"
+                }
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SalidaTransDto"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/TestAuth": {
+      "get": {
+        "tags": [
+          "TestAuth"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BodegaMuelleDto": {
+        "type": "object",
+        "properties": {
+          "idMuelle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "codigo_Barra": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "color": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imagen": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "entrada": {
+            "type": "boolean"
+          },
+          "salida": {
+            "type": "boolean"
+          },
+          "idUbicacionDefecto": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ClienteDto": {
+        "type": "object",
+        "properties": {
+          "idCliente": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idEmpresa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idTipoCliente": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacionManufactura": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_comercial": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_contacto": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "nit": {
+            "type": "string",
+            "nullable": true
+          },
+          "direccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "correo_electronico": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "realiza_manufactura": {
+            "type": "boolean"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "despachar_lotes_completos": {
+            "type": "boolean"
+          },
+          "sistema": {
+            "type": "string",
+            "nullable": true
+          },
+          "es_bodega_recepcion": {
+            "type": "boolean"
+          },
+          "es_bodega_traslado": {
+            "type": "boolean"
+          },
+          "idubicacionvirtual": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "referencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "control_ultimo_lote": {
+            "type": "boolean"
+          },
+          "control_calidad": {
+            "type": "boolean"
+          },
+          "idUbicacionAbastecerCon": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodegaAreaSAP": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "es_proveedor": {
+            "type": "boolean"
+          },
+          "codigo_Empresa_ERP": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "DocumentoIngresoFiltroDto": {
+        "type": "object",
+        "properties": {
+          "fechaInicio": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fechaFin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "MovimientosDto": {
+        "type": "object",
+        "properties": {
+          "idMovimiento": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idEmpresa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodegaOrigen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idTransaccion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacionOrigen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacionDestino": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPresentacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idEstadoOrigen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idEstadoDestino": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUnidadMedida": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idTipoTarea": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodegaDestino": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantidad": {
+            "type": "number",
+            "format": "double"
+          },
+          "serie": {
+            "type": "string",
+            "nullable": true
+          },
+          "peso": {
+            "type": "number",
+            "format": "double"
+          },
+          "lote": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_vence": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "barra_pallet": {
+            "type": "string",
+            "nullable": true
+          },
+          "hora_ini": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hora_fin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "usuario_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "cantidad_hist": {
+            "type": "number",
+            "format": "double"
+          },
+          "peso_hist": {
+            "type": "number",
+            "format": "double"
+          },
+          "lic_plate": {
+            "type": "string",
+            "nullable": true
+          },
+          "idOperadorBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idDespachoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idDespachoDet": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OperadorBodegaDto": {
+        "type": "object",
+        "properties": {
+          "idOperadorBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperador": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OperadorDto": {
+        "type": "object",
+        "properties": {
+          "idOperador": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idEmpresa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRolOperador": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idJornada": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombres": {
+            "type": "string",
+            "nullable": true
+          },
+          "apellidos": {
+            "type": "string",
+            "nullable": true
+          },
+          "direccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "clave": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "costo_hora": {
+            "type": "number",
+            "format": "double"
+          },
+          "usa_hh": {
+            "type": "boolean"
+          },
+          "foto": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "recibe": {
+            "type": "boolean"
+          },
+          "ubica": {
+            "type": "boolean"
+          },
+          "transporta": {
+            "type": "boolean"
+          },
+          "pickea": {
+            "type": "boolean"
+          },
+          "verifica": {
+            "type": "boolean"
+          },
+          "montacarga": {
+            "type": "boolean"
+          },
+          "sistema": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrdenCompraDetDto": {
+        "type": "object",
+        "properties": {
+          "idOrdenCompraEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOrdenCompraDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idArancel": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idPresentacion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idUnidadMedidaBasica": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idMotivoDevolucion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "no_Linea": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "nombre_Producto": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_Presentacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_Arancel": {
+            "type": "string",
+            "nullable": true
+          },
+          "porcentaje_Arancel": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "nombre_Unidad_Medida_Basica": {
+            "type": "string",
+            "nullable": true
+          },
+          "cantidad": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "cantidad_Recibida": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "costo": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "total_Linea": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "peso": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "peso_Recibido": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "atributo_Variante_1": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigo_Producto": {
+            "type": "string",
+            "nullable": true
+          },
+          "valor_Aduana": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "valor_FOB": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "valor_IVA": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "valor_DAI": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "valor_Seguro": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "valor_Flete": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "peso_Neto": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "peso_Bruto": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "nombre_Propietario": {
+            "type": "string",
+            "nullable": true
+          },
+          "idOrdenCompraDetPadre": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idEmbarcador": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "productoBodega": {
+            "$ref": "#/components/schemas/ProductoBodegaDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrdenCompraDto": {
+        "type": "object",
+        "properties": {
+          "encabezado": {
+            "$ref": "#/components/schemas/OrdenCompraEncDto"
+          },
+          "detalle": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrdenCompraDetDto"
+            },
+            "nullable": true
+          },
+          "polizas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrdenCompraPolizaDto"
+            },
+            "nullable": true
+          },
+          "tipoIngreso": {
+            "$ref": "#/components/schemas/TipoIngresoOcDto"
+          },
+          "recepciones": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecepcionDto"
+            },
+            "nullable": true
+          },
+          "stockRec": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockRecDto"
+            },
+            "nullable": true
+          },
+          "stock": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockDto"
+            },
+            "nullable": true
+          },
+          "movimientos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MovimientosDto"
+            },
+            "nullable": true
+          },
+          "proveedores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProveedorDto"
+            },
+            "nullable": true
+          },
+          "proveedoresBodega": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProveedorBodegaDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrdenCompraEncDto": {
+        "type": "object",
+        "properties": {
+          "idOrdenCompraEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProveedorBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idTipoIngresoOC": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idEstadoOC": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idMotivoDevolucion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "fecha_Creacion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "hora_Creacion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "no_Documento": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "procedencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "no_Marchamo": {
+            "type": "string",
+            "nullable": true
+          },
+          "referencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "observacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "control_Poliza": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "fecha_Recepcion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "hora_Inicio_Recepcion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "hora_Fin_Recepcion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "idMuelleRecepcion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "programar_Recepcion": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "idMotivoAnulacionBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "enviado_A_ERP": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "serie": {
+            "type": "string",
+            "nullable": true
+          },
+          "correlativo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idDespachoEnc": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "no_Ticket_Tms": {
+            "type": "string",
+            "nullable": true
+          },
+          "idNoDocumentoRef": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idAcuerdoComercial": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idOperadorBodegaDefecto": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "no_Documento_Recepcion_Erp": {
+            "type": "string",
+            "nullable": true
+          },
+          "no_Documento_Devolucion": {
+            "type": "string",
+            "nullable": true
+          },
+          "idPedidoEncDevolucion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "push_To_Nav": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "no_Documento_Ubicacion_Erp": {
+            "type": "string",
+            "nullable": true
+          },
+          "putAway_Registrado": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "codigo_Empresa_ERP": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "OrdenCompraPolizaDto": {
+        "type": "object",
+        "properties": {
+          "idOrdenCompraPol": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOrdenCompraEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bl_No": {
+            "type": "string",
+            "nullable": true
+          },
+          "noPoliza": {
+            "type": "string",
+            "nullable": true
+          },
+          "pto_Descarga": {
+            "type": "string",
+            "nullable": true
+          },
+          "viaje_No": {
+            "type": "string",
+            "nullable": true
+          },
+          "buque_No": {
+            "type": "string",
+            "nullable": true
+          },
+          "remitente": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_Abordaje": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "destino": {
+            "type": "string",
+            "nullable": true
+          },
+          "dir_Destino": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "po_Number": {
+            "type": "string",
+            "nullable": true
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "piezas": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "total_Kgs": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "cbm": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "dua": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_Poliza": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "pais_Procede": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipo_Cambio": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "total_ValorAduana": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "total_Lineas": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "total_Bultos": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "total_Bultos_Peso": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "total_Usd": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "total_Flete": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "total_Seguro": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "codigo_Poliza": {
+            "type": "string",
+            "nullable": true
+          },
+          "ticket": {
+            "type": "string",
+            "nullable": true
+          },
+          "numero_Orden": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_Aceptacion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fecha_Llegada": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "total_Otros": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "idRegimen": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "total_Bultos_Peso_Neto": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "clave_Aduana": {
+            "type": "string",
+            "nullable": true
+          },
+          "nit_Imp_Exp": {
+            "type": "string",
+            "nullable": true
+          },
+          "clase": {
+            "type": "string",
+            "nullable": true
+          },
+          "mod_Transporte": {
+            "type": "string",
+            "nullable": true
+          },
+          "total_Liquidar": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "total_General": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "codigo_Barra": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PickingDetDto": {
+        "type": "object",
+        "properties": {
+          "idPickingDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantidad": {
+            "type": "number",
+            "format": "double"
+          },
+          "cliente_dias": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantidad_recibida": {
+            "type": "number",
+            "format": "double"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PickingDto": {
+        "type": "object",
+        "properties": {
+          "encabezado": {
+            "$ref": "#/components/schemas/PickingEncDto"
+          },
+          "detalle": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PickingDetDto"
+            },
+            "nullable": true
+          },
+          "pickingUbic": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PickingUbicDto"
+            },
+            "nullable": true
+          },
+          "pickingUbicStock": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PickingUbicStockDto"
+            },
+            "nullable": true
+          },
+          "pickingImg": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PickingImgDto"
+            },
+            "nullable": true
+          },
+          "pickingOperadores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PickingOpDto"
+            },
+            "nullable": true
+          },
+          "prioridad": {
+            "$ref": "#/components/schemas/PickingPrioridadDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PickingEncDto": {
+        "type": "object",
+        "properties": {
+          "idPickingEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacionPicking": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fecha_picking": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hora_ini": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hora_fin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "estado": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "detalle_operador": {
+            "type": "boolean"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "verifica_auto": {
+            "type": "boolean"
+          },
+          "procesado_bof": {
+            "type": "boolean"
+          },
+          "requiere_preparacion": {
+            "type": "boolean"
+          },
+          "tipo_preparacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "estado_preparacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_inicio_preparacion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_fin_preparacion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "referencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "fotografia_verificacion": {
+            "type": "boolean"
+          },
+          "idBodegaMuelle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPrioridadPicking": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idTipoPicking": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PickingImgDto": {
+        "type": "object",
+        "properties": {
+          "idImagen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imagen": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "observacion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PickingOpDto": {
+        "type": "object",
+        "properties": {
+          "idOperadorPicking": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PickingPrioridadDto": {
+        "type": "object",
+        "properties": {
+          "idPrioridadPicking": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "codigo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activo": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PickingUbicDto": {
+        "type": "object",
+        "properties": {
+          "idPickingUbic": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idStock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoEstado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPresentacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUnidadMedida": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacionAnterior": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lote": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_vence": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_minima": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "lic_plate": {
+            "type": "string",
+            "nullable": true
+          },
+          "acepto": {
+            "type": "boolean"
+          },
+          "peso_solicitado": {
+            "type": "number",
+            "format": "double"
+          },
+          "peso_recibido": {
+            "type": "number",
+            "format": "double"
+          },
+          "peso_verificado": {
+            "type": "number",
+            "format": "double"
+          },
+          "peso_despachado": {
+            "type": "number",
+            "format": "double"
+          },
+          "cantidad_solicitada": {
+            "type": "number",
+            "format": "double"
+          },
+          "cantidad_recibida": {
+            "type": "number",
+            "format": "double"
+          },
+          "cantidad_verificada": {
+            "type": "number",
+            "format": "double"
+          },
+          "encontrado": {
+            "type": "boolean"
+          },
+          "dañado_verificacion": {
+            "type": "boolean"
+          },
+          "fecha_real_vence": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "no_packing": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_picking": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_verificado": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_packing": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_despachado": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cantidad_despachada": {
+            "type": "number",
+            "format": "double"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "idPedidoDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "dañado_picking": {
+            "type": "boolean"
+          },
+          "idStockRes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lic_plate_reemplazo": {
+            "type": "string",
+            "nullable": true
+          },
+          "idUbicacion_reemplazo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idStock_reemplazo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega_Pickeo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega_Verifico": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "no_encontrado": {
+            "type": "boolean"
+          },
+          "idUbicacionTemporal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega_Asignado": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PickingUbicStockDto": {
+        "type": "object",
+        "properties": {
+          "idPickingUbicStock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingUbic": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idStock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idStockRes": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoEstado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPresentacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUnidadMedida": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacionAnterior": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idpickingenc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega_Pickeo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega_Verifico": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lote": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_vence": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_minima": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "licencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "cantidad_recibida": {
+            "type": "number",
+            "format": "double"
+          },
+          "cantidad_verificada": {
+            "type": "number",
+            "format": "double"
+          },
+          "fecha_picking": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_verificado": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_despachado": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "cantidad_despachada": {
+            "type": "number",
+            "format": "double"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "idUbicacionTemporal": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega_Asignado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantidad_pickeada": {
+            "type": "number",
+            "format": "double"
+          },
+          "host": {
+            "type": "string",
+            "nullable": true
+          },
+          "idMovimiento": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoBodegaDto": {
+        "type": "object",
+        "properties": {
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProducto": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "sistema": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoClasificacionDto": {
+        "type": "object",
+        "properties": {
+          "idClasificacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "sistema": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "propietario": {
+            "$ref": "#/components/schemas/PropietarioDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoDto": {
+        "type": "object",
+        "properties": {
+          "idProducto": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idClasificacion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idFamilia": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idMarca": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoProducto": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idUnidadMedidaBasica": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idCamara": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoRotacion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idPerfilSerializado": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idIndiceRotacion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idSimbologia": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idArancel": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigo_Barra": {
+            "type": "string",
+            "nullable": true
+          },
+          "precio": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "existencia_Min": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "existencia_Max": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "costo": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "peso_Referencia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "peso_Tolerancia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "temperatura_Referencia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "temperatura_Tolerancia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "serializado": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "genera_Lote": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "genera_Lp_Old": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "control_Vencimiento": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "control_Lote": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "peso_Recepcion": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "peso_Despacho": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "temperatura_Recepcion": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "temperatura_Despacho": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "materia_Prima": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kit": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "tolerancia": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ciclo_Vida": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "noSerie": {
+            "type": "string",
+            "nullable": true
+          },
+          "noParte": {
+            "type": "string",
+            "nullable": true
+          },
+          "fechaManufactura": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "capturar_Aniada": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "control_Peso": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "captura_Arancel": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "es_Hardware": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "largo": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "alto": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "ancho": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "idUnidadMedidaCobro": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoEtiqueta": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "dias_Inventario_Promedio": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idproductoparametroa": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idproductoparametrob": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoManufactura": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "imagen": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoEstadoDto": {
+        "type": "object",
+        "properties": {
+          "idEstado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "idUbicacionDefecto": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "utilizable": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dañado": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "codigo_Bodega_Erp": {
+            "type": "string",
+            "nullable": true
+          },
+          "sistema": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "dias_Vencimiento_Clasificacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "tolerancia_Dias_Vencimiento": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoFamiliaDto": {
+        "type": "object",
+        "properties": {
+          "idFamilia": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "propietario": {
+            "$ref": "#/components/schemas/PropietarioDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoMarcaDto": {
+        "type": "object",
+        "properties": {
+          "idMarca": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "propietario": {
+            "$ref": "#/components/schemas/PropietarioDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoParametroADto": {
+        "type": "object",
+        "properties": {
+          "idProductoParametroA": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoParametroBDto": {
+        "type": "object",
+        "properties": {
+          "idProductoParametroB": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoTipoDto": {
+        "type": "object",
+        "properties": {
+          "idTipoProducto": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombreTipoProducto": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "propietario": {
+            "$ref": "#/components/schemas/PropietarioDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProductoTransDto": {
+        "type": "object",
+        "properties": {
+          "idProducto": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idClasificacion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idFamilia": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idMarca": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoProducto": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idUnidadMedidaBasica": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idCamara": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoRotacion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idPerfilSerializado": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idIndiceRotacion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idSimbologia": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idArancel": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigo_Barra": {
+            "type": "string",
+            "nullable": true
+          },
+          "precio": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "existencia_Min": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "existencia_Max": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "costo": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "peso_Referencia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "peso_Tolerancia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "temperatura_Referencia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "temperatura_Tolerancia": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "serializado": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "genera_Lote": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "genera_Lp_Old": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "control_Vencimiento": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "control_Lote": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "peso_Recepcion": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "peso_Despacho": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "temperatura_Recepcion": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "temperatura_Despacho": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "materia_Prima": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "kit": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "tolerancia": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "ciclo_Vida": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "noSerie": {
+            "type": "string",
+            "nullable": true
+          },
+          "noParte": {
+            "type": "string",
+            "nullable": true
+          },
+          "fechaManufactura": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "capturar_Aniada": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "control_Peso": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "captura_Arancel": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "es_Hardware": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "largo": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "alto": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "ancho": {
+            "type": "number",
+            "format": "float",
+            "nullable": true
+          },
+          "idUnidadMedidaCobro": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoEtiqueta": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "dias_Inventario_Promedio": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idproductoparametroa": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idproductoparametrob": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoManufactura": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "imagen": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "marca": {
+            "$ref": "#/components/schemas/ProductoMarcaDto"
+          },
+          "tipoProducto": {
+            "$ref": "#/components/schemas/ProductoTipoDto"
+          },
+          "familia": {
+            "$ref": "#/components/schemas/ProductoFamiliaDto"
+          },
+          "clasificacion": {
+            "$ref": "#/components/schemas/ProductoClasificacionDto"
+          },
+          "parametroA": {
+            "$ref": "#/components/schemas/ProductoParametroADto"
+          },
+          "parametroB": {
+            "$ref": "#/components/schemas/ProductoParametroBDto"
+          },
+          "propietario": {
+            "$ref": "#/components/schemas/PropietarioDto"
+          },
+          "propietarioBodega": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PropietarioBodegaDto"
+            },
+            "nullable": true
+          },
+          "productoBodega": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductoBodegaDto"
+            },
+            "nullable": true
+          },
+          "productoEstado": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProductoEstadoDto"
+            },
+            "nullable": true
+          },
+          "unidadMedida": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnidadMedidaDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PropietarioBodegaDto": {
+        "type": "object",
+        "properties": {
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PropietarioDto": {
+        "type": "object",
+        "properties": {
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idEmpresa": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoActualizacionCosto": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "contacto": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_Comercial": {
+            "type": "string",
+            "nullable": true
+          },
+          "imagen": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "direccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "actualiza_Costo_Oc": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "color": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "sistema": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "nit": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigo_Acceso": {
+            "type": "string",
+            "nullable": true
+          },
+          "clave_Acceso": {
+            "type": "string",
+            "nullable": true
+          },
+          "idBodegaAreaSAP": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "es_Consolidador": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProveedorBodegaDto": {
+        "type": "object",
+        "properties": {
+          "idAsignacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProveedor": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "idAreaOrigen": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ProveedorDto": {
+        "type": "object",
+        "properties": {
+          "idEmpresa": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProveedor": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "telefono": {
+            "type": "string",
+            "nullable": true
+          },
+          "nit": {
+            "type": "string",
+            "nullable": true
+          },
+          "direccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "contacto": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "muestra_Precio": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "actualiza_Costo_OC": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "idUbicacionVirtual": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "es_Bodega_Recepcion": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "es_Bodega_Traslado": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "referencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "sistema": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "idConfiguracionBarraPallet": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "es_Proveedor_Servicio": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "idBodegaAreaSAP": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idPais": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "codigo_Empresa_ERP": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecepcionDetDto": {
+        "type": "object",
+        "properties": {
+          "idRecepcionDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPresentacion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idUnidadMedida": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idProductoEstado": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idOperadorBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idMotivoDevolucion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "no_Linea": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "cantidad_Recibida": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "nombre_Producto": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_Presentacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_Unidad_Medida": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_Producto_Estado": {
+            "type": "string",
+            "nullable": true
+          },
+          "lote": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_Vence": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fecha_Ingreso": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "peso": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "peso_Estadistico": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "peso_Minimo": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "peso_Maximo": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "peso_Unitario": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "observacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "añada": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "costo": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "costo_OC": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "costo_Estadistico": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "atributo_Variante_1": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigo_Producto": {
+            "type": "string",
+            "nullable": true
+          },
+          "lic_Plate": {
+            "type": "string",
+            "nullable": true
+          },
+          "pallet_No_Estandar": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "idOrdenCompraEnc": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idOrdenCompraDet": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idJornadaSistema": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecepcionDto": {
+        "type": "object",
+        "properties": {
+          "encabezado": {
+            "$ref": "#/components/schemas/RecepcionEncDto"
+          },
+          "detalle": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecepcionDetDto"
+            },
+            "nullable": true
+          },
+          "ocsRelacionadas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecepcionOcDto"
+            },
+            "nullable": true
+          },
+          "operadoresRec": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecepcionOperadorDto"
+            },
+            "nullable": true
+          },
+          "operadores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperadorDto"
+            },
+            "nullable": true
+          },
+          "operadorBodega": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperadorBodegaDto"
+            },
+            "nullable": true
+          },
+          "facturas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecepcionFacturaDto"
+            },
+            "nullable": true
+          },
+          "imagenes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecepcionImagenDto"
+            },
+            "nullable": true
+          },
+          "tipoRec": {
+            "$ref": "#/components/schemas/TipoRecDto"
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecepcionEncDto": {
+        "type": "object",
+        "properties": {
+          "idRecepcionEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idMuelle": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idUbicacionRecepcion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idTipoTransaccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_Recepcion": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "hora_Ini_Pc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "hora_Fin_Pc": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "muestra_Precio": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "estado": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "fecha_Tarea": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "tomar_Fotos": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "escanear_Rec_Ubic": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "para_Por_Codigo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "observacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "firma_Piloto": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "noGuia": {
+            "type": "string",
+            "nullable": true
+          },
+          "correoEnviado": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "revision_Inconsistencia": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "bloqueada": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "bloqueada_Por": {
+            "type": "string",
+            "nullable": true
+          },
+          "idUsuarioBloqueo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idMotivoAnulacionBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "habilitar_Stock": {
+            "type": "boolean"
+          },
+          "idVehiculo": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "idPiloto": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "no_Marchamo": {
+            "type": "string",
+            "nullable": true
+          },
+          "mostrar_Cantidad_Esperada": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "carta_Cupo": {
+            "type": "string",
+            "nullable": true
+          },
+          "idEstado_Defecto_Recepcion": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "no_Contenedor": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecepcionFacturaDto": {
+        "type": "object",
+        "properties": {
+          "idFacturaRecepcion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionEnc": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "orden": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "noFactura": {
+            "type": "string",
+            "nullable": true
+          },
+          "observacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "completa": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecepcionImagenDto": {
+        "type": "object",
+        "properties": {
+          "idImagen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "imagen": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "observacion": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecepcionOcDto": {
+        "type": "object",
+        "properties": {
+          "idRecepcionOc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOrdenCompraEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recepcion_Ciega": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "recepcion_Manual": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "no_Docto": {
+            "type": "string",
+            "nullable": true
+          },
+          "hora_Ini_Hh": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "hora_Fin_Hh": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "firma_Operador": {
+            "type": "string",
+            "format": "byte",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "RecepcionOperadorDto": {
+        "type": "object",
+        "properties": {
+          "idOperadorRec": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOperadorBodega": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "SalidaTransDto": {
+        "type": "object",
+        "properties": {
+          "tipoPedido": {
+            "$ref": "#/components/schemas/TransPeTipoDto"
+          },
+          "encabezado": {
+            "$ref": "#/components/schemas/TransPeEncDto"
+          },
+          "detalle": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransPeDetDto"
+            },
+            "nullable": true
+          },
+          "poliza": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TransPePolDto"
+            },
+            "nullable": true
+          },
+          "picking": {
+            "$ref": "#/components/schemas/PickingDto"
+          },
+          "bodegaMuelle": {
+            "$ref": "#/components/schemas/BodegaMuelleDto"
+          },
+          "cliente": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClienteDto"
+            },
+            "nullable": true
+          },
+          "operadores": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperadorDto"
+            },
+            "nullable": true
+          },
+          "operadorBodega": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperadorBodegaDto"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StockDto": {
+        "type": "object",
+        "properties": {
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idStock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoEstado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPresentacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUnidadMedida": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacion_anterior": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idDespachoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lote": {
+            "type": "string",
+            "nullable": true
+          },
+          "lic_plate": {
+            "type": "string",
+            "nullable": true
+          },
+          "serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "cantidad": {
+            "type": "number",
+            "format": "double"
+          },
+          "fecha_ingreso": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_vence": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uds_lic_plate": {
+            "type": "number",
+            "format": "double"
+          },
+          "no_bulto": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fecha_manufactura": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "añada": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "peso": {
+            "type": "number",
+            "format": "double"
+          },
+          "temperatura": {
+            "type": "number",
+            "format": "double"
+          },
+          "atributo_variante_1": {
+            "type": "string",
+            "nullable": true
+          },
+          "pallet_no_estandar": {
+            "type": "boolean"
+          },
+          "idPickingUbicStock": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingUbic": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoDet": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StockRecDto": {
+        "type": "object",
+        "properties": {
+          "idStockRec": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoEstado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPresentacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUnidadMedida": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUbicacion_anterior": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idRecepcionDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idDespachoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lote": {
+            "type": "string",
+            "nullable": true
+          },
+          "lic_plate": {
+            "type": "string",
+            "nullable": true
+          },
+          "serial": {
+            "type": "string",
+            "nullable": true
+          },
+          "cantidad": {
+            "type": "number",
+            "format": "double"
+          },
+          "fecha_ingreso": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_vence": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uds_lic_plate": {
+            "type": "number",
+            "format": "double"
+          },
+          "no_bulto": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fecha_manufactura": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "añada": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "peso": {
+            "type": "number",
+            "format": "double"
+          },
+          "temperatura": {
+            "type": "number",
+            "format": "double"
+          },
+          "regularizado": {
+            "type": "boolean"
+          },
+          "fecha_regularizacion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "no_linea": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "atributo_variante_1": {
+            "type": "string",
+            "nullable": true
+          },
+          "impreso": {
+            "type": "boolean"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pallet_no_estandar": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TipoIngresoOcDto": {
+        "type": "object",
+        "properties": {
+          "idTipoIngresoOC": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "es_Devolucion": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "user_Agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Agr": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "user_Mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_Mod": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "control_Poliza": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "requerir_Documento_Ref": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "es_Poliza_Consolidada": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "genera_Tarea_Ingreso": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "requerir_Proveedor_Es_Bodega_Wms": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "requerir_Documento_Ref_Wms": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "requerir_Ubic_Rec_Ingreso": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "exigir_Campo_Referencia": {
+            "type": "boolean"
+          },
+          "marcar_Registros_Enviados_Mi3": {
+            "type": "boolean"
+          },
+          "preguntar_En_Backorder": {
+            "type": "boolean"
+          },
+          "bloquear_Lotes": {
+            "type": "boolean"
+          },
+          "permitir_Excedente_Lotes": {
+            "type": "boolean"
+          },
+          "permitir_Vencido_Ingreso": {
+            "type": "boolean"
+          },
+          "es_Importacion": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TipoRecDto": {
+        "type": "object",
+        "properties": {
+          "idTipoTransaccion": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "funcionalidad": {
+            "type": "string",
+            "nullable": true
+          },
+          "usaHH": {
+            "type": "boolean"
+          },
+          "descDev": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipoTrans": {
+            "type": "string",
+            "nullable": true
+          },
+          "conRef": {
+            "type": "boolean"
+          },
+          "activo": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TransPeDetDto": {
+        "type": "object",
+        "properties": {
+          "idPedidoDet": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idProductoBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idEstado": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPresentacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idUnidadMedidaBasica": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cantidad": {
+            "type": "number",
+            "format": "double"
+          },
+          "peso": {
+            "type": "number",
+            "format": "double"
+          },
+          "precio": {
+            "type": "number",
+            "format": "double"
+          },
+          "no_recepcion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "ndias": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cant_despachada": {
+            "type": "number",
+            "format": "double"
+          },
+          "codigo_producto": {
+            "type": "string",
+            "nullable": true
+          },
+          "nombre_producto": {
+            "type": "string",
+            "nullable": true
+          },
+          "nom_presentacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "nom_unid_med": {
+            "type": "string",
+            "nullable": true
+          },
+          "nom_estado": {
+            "type": "string",
+            "nullable": true
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_especifica": {
+            "type": "boolean"
+          },
+          "roadDes": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadDesMon": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadTotal": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadPrecioDoc": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadVAL1": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadVAL2": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadCantProc": {
+            "type": "number",
+            "format": "double"
+          },
+          "peso_despachado": {
+            "type": "number",
+            "format": "double"
+          },
+          "no_linea": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "atributo_variante_1": {
+            "type": "string",
+            "nullable": true
+          },
+          "idStockEspecifico": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "esPadre": {
+            "type": "boolean"
+          },
+          "idPedidoDetPadre": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "peso_Bruto": {
+            "type": "number",
+            "format": "double"
+          },
+          "peso_Neto": {
+            "type": "number",
+            "format": "double"
+          },
+          "costo": {
+            "type": "number",
+            "format": "double"
+          },
+          "valor_aduana": {
+            "type": "number",
+            "format": "double"
+          },
+          "valor_fob": {
+            "type": "number",
+            "format": "double"
+          },
+          "valor_iva": {
+            "type": "number",
+            "format": "double"
+          },
+          "valor_dai": {
+            "type": "number",
+            "format": "double"
+          },
+          "valor_seguro": {
+            "type": "number",
+            "format": "double"
+          },
+          "valor_flete": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_linea": {
+            "type": "number",
+            "format": "double"
+          },
+          "idCliente": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TransPeEncDto": {
+        "type": "object",
+        "properties": {
+          "idPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idCliente": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idMuelle": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietarioBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idTipoPedido": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPickingEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fecha_Pedido": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hora_ini": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "hora_fin": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ubicacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "estado": {
+            "type": "string",
+            "nullable": true
+          },
+          "no_despacho": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "no_documento": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "local": {
+            "type": "boolean"
+          },
+          "pallet_primero": {
+            "type": "boolean"
+          },
+          "dias_cliente": {
+            "type": "number",
+            "format": "double"
+          },
+          "anulado": {
+            "type": "boolean"
+          },
+          "roadKilometraje": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadFechaEntr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "roadDirEntrega": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadTotal": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadDesMonto": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadImpMonto": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadPeso": {
+            "type": "number",
+            "format": "double"
+          },
+          "roadBandera": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadStatCom": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadCalcoBJ": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadImpres": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roadADD1": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadADD2": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadADD3": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadStatProc": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadRechazado": {
+            "type": "boolean"
+          },
+          "roadRazon_Rechazado": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadInformado": {
+            "type": "boolean"
+          },
+          "roadSucursal": {
+            "type": "string",
+            "nullable": true
+          },
+          "roadIdDespacho": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roadIdFacturacion": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roadIdRuta": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roadIdVendedor": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roadIdRutaDespacho": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "roadIdVendedorDespacho": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "observacion": {
+            "type": "string",
+            "nullable": true
+          },
+          "pedidoRoad": {
+            "type": "boolean"
+          },
+          "horaEntregaDesde": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "horaEntregaHasta": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "referencia": {
+            "type": "string",
+            "nullable": true
+          },
+          "idMotivoAnulacionBodega": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "enviado_A_ERP": {
+            "type": "boolean"
+          },
+          "control_ultimo_lote": {
+            "type": "boolean"
+          },
+          "serie": {
+            "type": "string",
+            "nullable": true
+          },
+          "correlativo": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "referencia_Documento_Ingreso_Bodega_Destino": {
+            "type": "string",
+            "nullable": true
+          },
+          "sync_mi3": {
+            "type": "boolean"
+          },
+          "no_Picking_ERP": {
+            "type": "string",
+            "nullable": true
+          },
+          "no_documento_externo": {
+            "type": "string",
+            "nullable": true
+          },
+          "requiere_tarimas": {
+            "type": "boolean"
+          },
+          "fecha_preparacion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "idTipoManufactura": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bodega_origen": {
+            "type": "string",
+            "nullable": true
+          },
+          "bodega_destino": {
+            "type": "string",
+            "nullable": true
+          },
+          "idMotivoDevolucion": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TransPePolDto": {
+        "type": "object",
+        "properties": {
+          "idOrdenPedidoPol": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idOrdenPedidoEnc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "bl_no": {
+            "type": "string",
+            "nullable": true
+          },
+          "noPoliza": {
+            "type": "string",
+            "nullable": true
+          },
+          "pto_descarga": {
+            "type": "string",
+            "nullable": true
+          },
+          "viaje_no": {
+            "type": "string",
+            "nullable": true
+          },
+          "buque_no": {
+            "type": "string",
+            "nullable": true
+          },
+          "remitente": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_abordaje": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "destino": {
+            "type": "string",
+            "nullable": true
+          },
+          "dir_destino": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "po_number": {
+            "type": "string",
+            "nullable": true
+          },
+          "cantidad": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "piezas": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total_kgs": {
+            "type": "number",
+            "format": "double"
+          },
+          "cbm": {
+            "type": "number",
+            "format": "double"
+          },
+          "dua": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_poliza": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "pais_procede": {
+            "type": "string",
+            "nullable": true
+          },
+          "tipo_cambio": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_valoraduana": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_lineas": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total_bultos": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "total_bultos_peso": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_usd": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_flete": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_seguro": {
+            "type": "number",
+            "format": "double"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "clave_aduana": {
+            "type": "string",
+            "nullable": true
+          },
+          "nit_imp_exp": {
+            "type": "string",
+            "nullable": true
+          },
+          "clase": {
+            "type": "string",
+            "nullable": true
+          },
+          "mod_transporte": {
+            "type": "string",
+            "nullable": true
+          },
+          "total_liquidar": {
+            "type": "number",
+            "format": "double"
+          },
+          "total_general": {
+            "type": "number",
+            "format": "double"
+          },
+          "codigo_poliza": {
+            "type": "string",
+            "nullable": true
+          },
+          "ticket": {
+            "type": "string",
+            "nullable": true
+          },
+          "numero_orden": {
+            "type": "string",
+            "nullable": true
+          },
+          "fecha_aceptacion": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "fecha_llegada": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "total_otros": {
+            "type": "number",
+            "format": "double"
+          },
+          "idRegimen": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "total_bultos_peso_neto": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TransPeTipoDto": {
+        "type": "object",
+        "properties": {
+          "idTipoPedido": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "descripcion": {
+            "type": "string",
+            "nullable": true
+          },
+          "preparar": {
+            "type": "boolean"
+          },
+          "verificar": {
+            "type": "boolean"
+          },
+          "reservaStock": {
+            "type": "boolean"
+          },
+          "imprimeBarrasPicking": {
+            "type": "boolean"
+          },
+          "imprimeBarrasPacking": {
+            "type": "boolean"
+          },
+          "control_poliza": {
+            "type": "boolean"
+          },
+          "generar_pedido_ingreso_bodega_destino": {
+            "type": "boolean"
+          },
+          "idTipoIngresoOC": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "requerir_documento_ref": {
+            "type": "boolean"
+          },
+          "trasladar_lotes_doc_ingreso": {
+            "type": "boolean"
+          },
+          "requerir_cliente_es_bodega_wms": {
+            "type": "boolean"
+          },
+          "marcar_registros_enviados_mi3": {
+            "type": "boolean"
+          },
+          "generar_recepcion_auto_bodega_destino": {
+            "type": "boolean"
+          },
+          "recibir_producto_auto_bodega_destino": {
+            "type": "boolean"
+          },
+          "control_Cliente_En_Detalle": {
+            "type": "boolean"
+          },
+          "permitir_despacho_parcial": {
+            "type": "boolean"
+          },
+          "permitir_despacho_multiple": {
+            "type": "boolean"
+          },
+          "fotografia_verificacion": {
+            "type": "boolean"
+          },
+          "es_devolucion": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "UnidadMedidaDto": {
+        "type": "object",
+        "properties": {
+          "idUnidadMedida": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "idPropietario": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "nombre": {
+            "type": "string",
+            "nullable": true
+          },
+          "activo": {
+            "type": "boolean"
+          },
+          "fec_agr": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_mod": {
+            "type": "string",
+            "nullable": true
+          },
+          "fec_mod": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user_agr": {
+            "type": "string",
+            "nullable": true
+          },
+          "codigo": {
+            "type": "string",
+            "nullable": true
+          },
+          "es_um_cobro": {
+            "type": "boolean"
+          },
+          "factor": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "apiKey",
+        "description": "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ]
+}
