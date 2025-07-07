@@ -1,6 +1,6 @@
 
 // API Configuration
-const API_BASE_URL = 'http://52.41.114.122:8091';
+const API_BASE_URL = 'https://52.41.114.122:8091';
 
 export async function apiRequest(path: string, options: RequestInit = {}) {
   const headers: Record<string, string> = {
