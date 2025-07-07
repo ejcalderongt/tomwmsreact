@@ -1,243 +1,215 @@
+import { useState, useEffect } from 'react';
+import Layout from '@/components/Layout';
+import { CubeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { getUser } from '@/utils/auth';
+import toast from 'react-hot-toast';
 
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { logout, getUser } from "@/utils/auth";
-
-const menuItems = [
-  { text: "Inicio", path: "/existencias", icon: "🏠" },
-  { text: "Documentos de Ingreso", path: "/ingresos", icon: "📥" },
-  { text: "Documentos de Salida", path: "/salidas", icon: "📤" },
-];
+interface Stock {
+  id: number;
+  producto: string;
+  cantidad: number;
+  ubicacion: string;
+  lote: string;
+  fechaVencimiento: string;
+}
 
 function Existencias() {
-  const navigate = useNavigate();
+  const [stocks, setStocks] = useState<Stock[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
   const user = getUser();
 
   useEffect(() => {
-    document.title = "Existencias - TOMWMSUX";
+    document.title = 'TOMWMSUX - Existencias';
+    // Simular carga de datos
+    setTimeout(() => {
+      setStocks([
+        {
+          id: 1,
+          producto: 'Producto A',
+          cantidad: 150,
+          ubicacion: 'A-01-01',
+          lote: 'LOT001',
+          fechaVencimiento: '2024-12-31'
+        },
+        {
+          id: 2,
+          producto: 'Producto B',
+          cantidad: 75,
+          ubicacion: 'B-02-03',
+          lote: 'LOT002',
+          fechaVencimiento: '2024-11-15'
+        },
+        {
+          id: 3,
+          producto: 'Producto C',
+          cantidad: 200,
+          ubicacion: 'C-01-05',
+          lote: 'LOT003',
+          fechaVencimiento: '2025-03-20'
+        }
+      ]);
+      setLoading(false);
+      toast.success('Datos de existencias cargados correctamente');
+    }, 1000);
   }, []);
 
+  const filteredStocks = stocks.filter(stock =>
+    stock.producto.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    stock.ubicacion.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    stock.lote.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg">
-        <div className="flex justify-between items-center px-6 py-4">
-          <div className="flex items-center space-x-4">
-            <button className="lg:hidden text-white hover:bg-white/10 p-2 rounded-lg transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <div className="flex items-center space-x-3">
-              <div className="h-8 w-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <svg className="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-              </div>
-              <span className="font-bold text-xl">TOMWMSUX</span>
+    <Layout>
+      <div className="space-y-6">
+        {/* Header */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <CubeIcon className="h-6 w-6 text-blue-600" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900">Existencias</h1>
+              <p className="text-gray-600">Gestión de inventario y stock disponible</p>
             </div>
           </div>
-          <div className="flex items-center space-x-4">
-            <div className="hidden sm:flex items-center space-x-2">
-              <div className="h-8 w-8 bg-white/20 rounded-full flex items-center justify-center">
-                <svg className="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
+
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1">
+              <div className="relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Buscar por producto, ubicación o lote..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
               </div>
-              <span className="text-sm">{user?.username || 'Usuario'}</span>
             </div>
-            <button
-              onClick={() => {
-                logout();
-                navigate("/login");
-              }}
-              className="bg-white/10 text-white px-4 py-2 rounded-lg hover:bg-white/20 transition-colors font-medium border border-white/20"
-            >
-              Salir
-            </button>
+          </div>
+        </div>
+
+        {/* Welcome message */}
+        <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-sm p-6 text-white">
+          <h2 className="text-xl font-semibold mb-2">¡Bienvenido, {user.username}!</h2>
+          <p className="opacity-90">Tienes acceso completo al sistema de gestión de inventarios</p>
+        </div>
+
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <CubeIcon className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Productos</p>
+                <p className="text-2xl font-bold text-gray-900">{stocks.length}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <CubeIcon className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Stock Total</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stocks.reduce((sum, stock) => sum + stock.cantidad, 0)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-yellow-100 rounded-lg">
+                <CubeIcon className="h-6 w-6 text-yellow-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Ubicaciones</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {new Set(stocks.map(s => s.ubicacion)).size}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </header>
 
-      {/* Main Layout */}
-      <main className="flex flex-1">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white shadow-md border-r border-gray-200">
-          <nav className="p-4">
-            <ul className="space-y-2">
-              {menuItems.map((item) => (
-                <li key={item.path}>
-                  <button
-                    onClick={() => navigate(item.path)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-xl transition-colors ${
-                      item.path === "/existencias"
-                        ? "bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 font-medium border border-blue-200"
-                        : "text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    <span className="text-base">{item.icon}</span>
-                    <span className="text-sm font-medium">{item.text}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </aside>
-
-        {/* Main Content */}
-        <section className="flex-1 p-8">
-          <div className="max-w-6xl mx-auto">
-            {/* Welcome Section */}
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-8 text-white mb-8 shadow-lg">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h1 className="text-3xl font-bold mb-2">
-                    ¡Bienvenido de vuelta, {user?.username || 'Usuario'}!
-                  </h1>
-                  <p className="text-blue-100 text-lg">
-                    Sistema de gestión de inventarios y documentos
-                  </p>
-                  <p className="text-blue-200 text-sm mt-2">
-                    Administra tus operaciones de manera eficiente
-                  </p>
-                </div>
-                <div className="hidden md:block">
-                  <div className="h-20 w-20 bg-white/20 rounded-2xl flex items-center justify-center">
-                    <svg className="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-4">
-                  <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Nuevo Ingreso</h4>
-                    <p className="text-sm text-gray-600">Registrar entrada de productos</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-4">
-                  <div className="h-12 w-12 bg-red-100 rounded-lg flex items-center justify-center">
-                    <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Nueva Salida</h4>
-                    <p className="text-sm text-gray-600">Registrar salida de productos</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-4">
-                  <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-gray-900">Reportes</h4>
-                    <p className="text-sm text-gray-600">Generar informes y estadísticas</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Productos</p>
-                    <p className="text-2xl font-bold text-gray-900">--</p>
-                  </div>
-                  <div className="h-12 w-12 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <svg className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Ingresos Mes</p>
-                    <p className="text-2xl font-bold text-gray-900">--</p>
-                  </div>
-                  <div className="h-12 w-12 bg-green-50 rounded-lg flex items-center justify-center">
-                    <svg className="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Salidas Mes</p>
-                    <p className="text-2xl font-bold text-gray-900">--</p>
-                  </div>
-                  <div className="h-12 w-12 bg-red-50 rounded-lg flex items-center justify-center">
-                    <svg className="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H3" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Valor Total</p>
-                    <p className="text-2xl font-bold text-gray-900">--</p>
-                  </div>
-                  <div className="h-12 w-12 bg-purple-50 rounded-lg flex items-center justify-center">
-                    <svg className="h-6 w-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div className="bg-white rounded-xl border border-gray-100 shadow-sm">
-              <div className="p-6 border-b border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900">Actividad Reciente</h3>
-              </div>
-              <div className="p-6 text-center text-gray-500">
-                <div className="text-4xl mb-4">📊</div>
-                <p className="text-lg">No hay actividad reciente</p>
-                <p className="text-sm mt-2">Los movimientos de inventario aparecerán aquí</p>
-              </div>
-            </div>
+        {/* Table */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-medium text-gray-900">
+              Lista de Existencias ({filteredStocks.length})
+            </h3>
           </div>
-        </section>
-      </main>
 
-      {/* Modern Footer */}
-      <footer className="bg-white border-t border-gray-200 text-center py-6">
-        <div className="text-sm text-gray-600">
-          <p>© 2024 TOMWMSUX | Sistema de Gestión de Inventarios</p>
-          <p className="text-xs text-gray-500 mt-1">Desarrollado con tecnología moderna y segura</p>
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Cargando existencias...</span>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Producto
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cantidad
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Ubicación
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Lote
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Vencimiento
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredStocks.map((stock) => (
+                    <tr key={stock.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {stock.producto}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          stock.cantidad > 100 
+                            ? 'bg-green-100 text-green-800' 
+                            : stock.cantidad > 50 
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {stock.cantidad}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {stock.ubicacion}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {stock.lote}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {stock.fechaVencimiento}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
-      </footer>
-    </div>
+      </div>
+    </Layout>
   );
 }
 

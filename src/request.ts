@@ -1,25 +1,28 @@
-import { getUser } from "@/utils/auth";
 
 export async function apiRequest(path: string, options: RequestInit = {}) {
-  const user = getUser();
-  const token = user?.token;
-
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
+    ...options.headers,
   };
 
-  const response = await fetch(path, {
-    ...options,
-    headers,
-  });
+  try {
+    const response = await fetch(path, {
+      ...options,
+      headers,
+    });
 
-  if (!response.ok) {
-    if (response.status === 401) {
-      console.warn("Token inválido o expirado.");
+    if (!response.ok) {
+      if (response.status === 401) {
+        console.warn("Token inválido o expirado.");
+        throw new Error('Unauthorized');
+      }
+      throw new Error(`API Error: ${response.status}`);
     }
-    throw new Error(`API Error: ${response.status}`);
-  }
 
-  return response.json();
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
 }

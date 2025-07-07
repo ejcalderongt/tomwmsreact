@@ -1,6 +1,4 @@
 
-// src/App.tsx
-
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "@/pages/Login";
 import Ingresos from "@/pages/Ingresos";
@@ -10,10 +8,12 @@ import SessionExpired from "@/pages/SessionExpired";
 import DetalleDocumentoIngreso from "@/pages/DetalleDocumentoIngreso";
 import Index from "@/index";
 import PrivateRoute from "@/routes/PrivateRoute";
+import ToastProvider from "@/components/ToastProvider";
 
 function App() {
   return (
     <Router>
+      <ToastProvider />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/session-expired" element={<SessionExpired />} />

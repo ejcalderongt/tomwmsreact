@@ -1,6 +1,5 @@
-import { apiRequest } from "@/request";
 
-const API_BASE_URL = '/api';
+import { apiRequest } from "@/request";
 
 export interface LoginCredentials {
   username: string;
@@ -22,100 +21,107 @@ export interface User {
 // Auth API
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<User> => {
-    const response = await apiRequest(`/api/Auth/login-propietario`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(credentials),
-    });
-    
-    if (!response.ok) {
+    try {
+      const data = await apiRequest(`/api/Auth/login-propietario`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+      
+      console.log('API Response:', data);
+      return data;
+    } catch (error) {
+      console.error('Login API Error:', error);
       throw new Error('Login failed');
     }
-    
-    return response.json();
   },
   
   testAuth: async (token: string) => {
-    const response = await apiRequest(`/api/TestAuth`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
-    if (!response.ok) {
+    try {
+      const data = await apiRequest(`/api/TestAuth`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Test Auth Error:', error);
       throw new Error('Auth test failed');
     }
-    
-    return response.json();
   }
 };
 
 // Ingresos API
 export const ingresosAPI = {
   listarDocumentos: async (filtro: DocumentoIngresoFiltro, token: string) => {
-    const response = await apiRequest(`/api/sync/ingresos/documentos-ingreso/listar`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(filtro),
-    });
-    
-    if (!response.ok) {
+    try {
+      const data = await apiRequest(`/api/sync/ingresos/documentos-ingreso/listar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(filtro),
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Ingresos API Error:', error);
       throw new Error('Failed to fetch documents');
     }
-    
-    return response.json();
   },
   
   obtenerDetalle: async (idOrdenCompraEnc: number, token: string) => {
-    const response = await apiRequest(`/api/sync/ingresos/${idOrdenCompraEnc}/detalle-oc`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
-    if (!response.ok) {
+    try {
+      const data = await apiRequest(`/api/sync/ingresos/${idOrdenCompraEnc}/detalle-oc`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Detalle API Error:', error);
       throw new Error('Failed to fetch detail');
     }
-    
-    return response.json();
   },
   
   obtenerRecepciones: async (idOrdenCompraEnc: number, token: string) => {
-    const response = await apiRequest(`/api/sync/ingresos/${idOrdenCompraEnc}/recepciones`, {
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-    });
-    
-    if (!response.ok) {
+    try {
+      const data = await apiRequest(`/api/sync/ingresos/${idOrdenCompraEnc}/recepciones`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Recepciones API Error:', error);
       throw new Error('Failed to fetch receptions');
     }
-    
-    return response.json();
   }
 };
 
 // Productos API
 export const productosAPI = {
   sincronizar: async (productos: any[], token: string) => {
-    const response = await apiRequest(`/api/Productos/sincronizar`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-      },
-      body: JSON.stringify(productos),
-    });
-    
-    if (!response.ok) {
+    try {
+      const data = await apiRequest(`/api/Productos/sincronizar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(productos),
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Productos API Error:', error);
       throw new Error('Failed to sync products');
     }
-    
-    return response.json();
   }
 };
