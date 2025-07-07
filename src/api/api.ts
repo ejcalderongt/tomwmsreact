@@ -1,5 +1,5 @@
 
-const API_BASE_URL = 'http://52.41.114.122:8091/api';
+const API_BASE_URL = '/api';
 
 export interface LoginCredentials {
   username: string;

@@ -15,5 +15,11 @@ export default defineConfig({
     allowedHosts: [
       "1da7a6d0-45be-4c44-bd76-6384ef21d0f0-00-1zyv481h72tzi.riker.replit.dev",
     ],
+    proxy: {
+      "/api": {
+        target: "http://52.41.114.122:8091",
+        changeOrigin: true,      
+      },
+    },
   },
 });
