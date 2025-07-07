@@ -42,19 +42,19 @@ function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 px-4">
-      <div className="max-w-md w-full space-y-8">
+      <div className="max-w-md w-full">
         <div className="bg-white/95 backdrop-blur-sm p-8 rounded-2xl shadow-2xl border border-white/20">
-          <div className="text-center mb-8">
-            <div className="mx-auto h-20 w-20 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mb-6 shadow-lg">
-              <svg className="h-10 w-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="text-center mb-6">
+            <div className="mx-auto h-12 w-12 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mb-4 shadow-lg">
+              <svg className="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
             </div>
-            <h2 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">TOMWMSUX</h2>
-            <p className="text-gray-600 mt-2 font-medium">Sistema de Gestión de Inventarios</p>
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">TOMWMSUX</h2>
+            <p className="text-gray-600 mt-1 text-sm font-medium">Sistema de Gestión de Inventarios</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="username" className="block text-sm font-semibold text-gray-700 mb-2">
                 Usuario
@@ -117,7 +117,7 @@ function Login() {
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="mt-6 pt-4 border-t border-gray-200">
             <p className="text-xs text-center text-gray-500 font-medium">
               © 2024 TOMWMSUX. Todos los derechos reservados.
             </p>
