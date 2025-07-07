@@ -1,3 +1,4 @@
+import { apiRequest } from "@/request";
 
 const API_BASE_URL = '/api';
 
@@ -21,7 +22,7 @@ export interface User {
 // Auth API
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<User> => {
-    const response = await fetch(`${API_BASE_URL}/Auth/login-propietario`, {
+    const response = await apiRequest(`/api/Auth/login-propietario`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,7 +38,7 @@ export const authAPI = {
   },
   
   testAuth: async (token: string) => {
-    const response = await fetch(`${API_BASE_URL}/TestAuth`, {
+    const response = await apiRequest(`/api/TestAuth`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -54,7 +55,7 @@ export const authAPI = {
 // Ingresos API
 export const ingresosAPI = {
   listarDocumentos: async (filtro: DocumentoIngresoFiltro, token: string) => {
-    const response = await fetch(`${API_BASE_URL}/sync/ingresos/documentos-ingreso/listar`, {
+    const response = await apiRequest(`/api/sync/ingresos/documentos-ingreso/listar`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -71,7 +72,7 @@ export const ingresosAPI = {
   },
   
   obtenerDetalle: async (idOrdenCompraEnc: number, token: string) => {
-    const response = await fetch(`${API_BASE_URL}/sync/ingresos/${idOrdenCompraEnc}/detalle-oc`, {
+    const response = await apiRequest(`/api/sync/ingresos/${idOrdenCompraEnc}/detalle-oc`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -85,7 +86,7 @@ export const ingresosAPI = {
   },
   
   obtenerRecepciones: async (idOrdenCompraEnc: number, token: string) => {
-    const response = await fetch(`${API_BASE_URL}/sync/ingresos/${idOrdenCompraEnc}/recepciones`, {
+    const response = await apiRequest(`/api/sync/ingresos/${idOrdenCompraEnc}/recepciones`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
@@ -102,7 +103,7 @@ export const ingresosAPI = {
 // Productos API
 export const productosAPI = {
   sincronizar: async (productos: any[], token: string) => {
-    const response = await fetch(`${API_BASE_URL}/Productos/sincronizar`, {
+    const response = await apiRequest(`/api/Productos/sincronizar`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
