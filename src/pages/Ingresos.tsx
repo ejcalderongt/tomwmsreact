@@ -4,6 +4,7 @@ import { ArrowRightOnRectangleIcon, MagnifyingGlassIcon, DocumentArrowDownIcon }
 import toast from 'react-hot-toast';
 import { ingresosAPI, DocumentoIngresoFiltro } from '@/api/api';
 import { useNavigate } from 'react-router-dom';
+import { getToken, getUser } from '@/utils/auth';
 
 interface DocumentoIngreso {
   codigo: string;
@@ -51,18 +52,16 @@ function Ingresos() {
   const cargarDocumentosIngreso = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
+      const token = getToken();
+      const userData = getUser();
 
-      if (!token || !user) {
-        toast.error('Redirigiendo a login');
+      if (!token || !userData.username) {
+        toast.error('No hay sesión activa');
         setTimeout(() => {
           navigate('/login', { replace: true });
         }, 1500);
         return;
       }
-
-      const userData = JSON.parse(user);
       const idPropietario = userData.propietario?.idPropietario || 1;
 
       const filtro: DocumentoIngresoFiltro = {
