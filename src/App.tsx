@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "@/pages/Login";
 import Ingresos from "@/pages/Ingresos";
 import Existencias from "@/pages/Existencias";
-// import Salidas from "@/pages/Salidas";
+import Salidas from "@/pages/Salidas";
 import SessionExpired from "@/pages/SessionExpired";
 import DetalleDocumentoIngreso from "@/pages/DetalleDocumentoIngreso";
 import PrivateRoute from "@/routes/PrivateRoute";
