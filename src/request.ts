@@ -36,6 +36,9 @@ export async function apiRequest(path: string, options: RequestInit = {}) {
 
       if (response.status === 401) {
         console.warn("Token inválido o expirado.");
+        // Limpiar token inválido del localStorage
+        localStorage.removeItem('wms_token');
+        localStorage.removeItem('wms_user');
         throw new Error('Unauthorized');
       }
       

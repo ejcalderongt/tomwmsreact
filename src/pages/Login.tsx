@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authAPI } from "@/api/api";
-import { saveUser, isAuthenticated } from "@/utils/auth";
+import { saveUser, isAuthenticated, getToken } from "@/utils/auth";
 import toast from "react-hot-toast";
 
 function Login() {
@@ -13,9 +13,26 @@ function Login() {
 
   useEffect(() => {
     document.title = "TOMWMSUX - Iniciar Sesión";
-    if (isAuthenticated()) {
-      navigate("/existencias");
-    }
+    
+    // Verificar si hay un token válido
+    const checkToken = async () => {
+      if (isAuthenticated()) {
+        try {
+          const token = getToken();
+          if (token) {
+            await authAPI.testAuth(token);
+            navigate("/existencias");
+          }
+        } catch (error) {
+          console.log('Token inválido, permaneciendo en login');
+          // Token inválido, limpiar y permanecer en login
+          localStorage.removeItem('wms_token');
+          localStorage.removeItem('wms_user');
+        }
+      }
+    };
+    
+    checkToken();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -32,6 +32,11 @@ export const isAuthenticated = (): boolean => {
   return token !== null && token !== '';
 };
 
+export const clearInvalidToken = (): void => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+};
+
 export const logout = (): void => {
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem(USER_KEY);

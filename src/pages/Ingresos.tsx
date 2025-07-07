@@ -77,8 +77,15 @@ function Ingresos() {
       toast.success(`${data?.length || 0} documentos cargados correctamente`);
     } catch (error) {
       console.error('Error al cargar documentos:', error);
-      toast.error('Error al cargar los documentos de ingreso');
-      setDocumentos([]);
+      if (error instanceof Error && error.message === 'Unauthorized') {
+        toast.error('Sesión expirada');
+        setTimeout(() => {
+          toast.success('Redirigiendo a login...');
+          navigate('/login');
+        }, 1000);
+      } else {
+        toast.error('Error al cargar los documentos');
+      }
     } finally {
       setLoading(false);
     }

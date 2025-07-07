@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Layout from '@/components/Layout';
@@ -95,10 +94,17 @@ function DetalleDocumentoIngreso() {
       const data = await ingresosAPI.obtenerDetalle(id, token);
       setDetalleOC(data || []);
     } catch (error) {
-      console.error('Error al cargar detalle OC:', error);
-      toast.error('Error al cargar detalle de orden de compra');
-      setDetalleOC([]);
-    }
+        console.error('Error al cargar detalle:', error);
+        if (error instanceof Error && error.message === 'Unauthorized') {
+          toast.error('Sesión expirada');
+          setTimeout(() => {
+            toast.success('Redirigiendo a login...');
+            navigate('/login');
+          }, 1000);
+        } else {
+          toast.error('Error al cargar el detalle');
+        }
+      }
   };
 
   const cargarRecepciones = async (id: number, token: string) => {
@@ -107,10 +113,17 @@ function DetalleDocumentoIngreso() {
       console.log("Respuesta directa de la API (recepciones):", data);
       setRecepciones(data || []);
     } catch (error) {
-      console.error('Error al cargar recepciones:', error);
-      toast.error('Error al cargar recepciones');
-      setRecepciones([]);
-    }
+          console.error('Error al cargar recepciones:', error);
+          if (error instanceof Error && error.message === 'Unauthorized') {
+            toast.error('Sesión expirada');
+            setTimeout(() => {
+              toast.success('Redirigiendo a login...');
+              navigate('/login');
+            }, 1000);
+          } else {
+            toast.error('Error al cargar las recepciones');
+          }
+        }
   };
 
   const handleTabClick = (index: number) => {
