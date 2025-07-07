@@ -57,13 +57,14 @@ function DetalleDocumentoIngreso() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      if (!token) {
-        toast.error('Redirigiendo a login');
-        setTimeout(() => {
-          navigate('/login', { replace: true });
-        }, 1500);
-        return;
-      }
+      // Validación temporalmente deshabilitada
+      // if (!token) {
+      //   toast.error('Redirigiendo a login');
+      //   setTimeout(() => {
+      //     navigate('/login', { replace: true });
+      //   }, 1500);
+      //   return;
+      // }
 
       const id = parseInt(IdOrdenCompraEnc || '0');
       if (!id) {
@@ -74,11 +75,11 @@ function DetalleDocumentoIngreso() {
       switch (index) {
         case 0:
           console.log("clic en oc");
-          await cargarDetalleOC(id, token);
+          await cargarDetalleOC(id, token || '');
           break;
         case 1:
           console.log("clic en rec");
-          await cargarRecepciones(id, token);
+          await cargarRecepciones(id, token || '');
           break;
       }
     } catch (error) {
@@ -95,15 +96,16 @@ function DetalleDocumentoIngreso() {
       setDetalleOC(data || []);
     } catch (error) {
         console.error('Error al cargar detalle:', error);
-        if (error instanceof Error && error.message === 'Unauthorized') {
-          toast.error('Sesión expirada');
-          setTimeout(() => {
-            toast.success('Redirigiendo a login...');
-            navigate('/login');
-          }, 1000);
-        } else {
+        // Validación temporalmente deshabilitada
+        // if (error instanceof Error && error.message === 'Unauthorized') {
+        //   toast.error('Sesión expirada');
+        //   setTimeout(() => {
+        //     toast.success('Redirigiendo a login...');
+        //     navigate('/login');
+        //   }, 1000);
+        // } else {
           toast.error('Error al cargar el detalle');
-        }
+        // }
       }
   };
 
@@ -114,15 +116,16 @@ function DetalleDocumentoIngreso() {
       setRecepciones(data || []);
     } catch (error) {
           console.error('Error al cargar recepciones:', error);
-          if (error instanceof Error && error.message === 'Unauthorized') {
-            toast.error('Sesión expirada');
-            setTimeout(() => {
-              toast.success('Redirigiendo a login...');
-              navigate('/login');
-            }, 1000);
-          } else {
+          // Validación temporalmente deshabilitada  
+          // if (error instanceof Error && error.message === 'Unauthorized') {
+          //   toast.error('Sesión expirada');
+          //   setTimeout(() => {
+          //     toast.success('Redirigiendo a login...');
+          //     navigate('/login');
+          //   }, 1000);
+          // } else {
             toast.error('Error al cargar las recepciones');
-          }
+          // }
         }
   };
 
