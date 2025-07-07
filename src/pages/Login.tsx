@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authAPI } from "@/api/api";
@@ -23,12 +22,12 @@ function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       console.log('Attempting login with:', { username, password });
       const user = await authAPI.login({ username, password });
       console.log('Login response:', user);
-      
+
       saveUser(user);
       toast.success('¡Bienvenido! Sesión iniciada correctamente');
       navigate("/existencias");
@@ -50,7 +49,7 @@ function Login() {
           backgroundSize: '20px 20px'
         }}></div>
       </div>
-      
+
       <div className="relative z-10 w-full max-w-md">
         {/* Main login card */}
         <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
@@ -142,12 +141,7 @@ function Login() {
                     Iniciando sesión...
                   </div>
                 ) : (
-                  <span className="flex items-center justify-center">
-                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
-                    </svg>
-                    Iniciar sesión
-                  </span>
+                  "Iniciar sesión"
                 )}
               </button>
             </form>
