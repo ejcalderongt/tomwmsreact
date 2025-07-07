@@ -8,11 +8,20 @@ channel = "stable-24_05"
 run = ["sh", "-c", "npm run dev"]
 
 [workflows]
-runButton = "Start React App"
+runButton = "Start Development"
 
 [[workflows.workflow]]
 name = "Start React App"
 author = 44594929
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npm run dev"
+
+[[workflows.workflow]]
+name = "Start Development"
+author = 33738084
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
