@@ -55,13 +55,14 @@ function Ingresos() {
       const token = getToken();
       const userData = getUser();
 
-      if (!token || !userData.username) {
-        toast.error('No hay sesión activa');
-        setTimeout(() => {
-          navigate('/login', { replace: true });
-        }, 1500);
-        return;
-      }
+      // Validación temporalmente deshabilitada
+      // if (!token || !userData.username) {
+      //   toast.error('No hay sesión activa');
+      //   setTimeout(() => {
+      //     navigate('/login', { replace: true });
+      //   }, 1500);
+      //   return;
+      // }
       const idPropietario = userData.propietario?.idPropietario || 1;
 
       const filtro: DocumentoIngresoFiltro = {
@@ -76,15 +77,16 @@ function Ingresos() {
       toast.success(`${data?.length || 0} documentos cargados correctamente`);
     } catch (error) {
       console.error('Error al cargar documentos:', error);
-      if (error instanceof Error && error.message === 'Unauthorized') {
-        toast.error('Sesión expirada');
-        setTimeout(() => {
-          toast.success('Redirigiendo a login...');
-          navigate('/login');
-        }, 1000);
-      } else {
-        toast.error('Error al cargar los documentos');
-      }
+      // Manejo de errores temporalmente deshabilitado para evitar redirects
+      // if (error instanceof Error && error.message === 'Unauthorized') {
+      //   toast.error('Sesión expirada');
+      //   setTimeout(() => {
+      //     toast.success('Redirigiendo a login...');
+      //     navigate('/login');
+      //   }, 1000);
+      // } else {
+        toast.error('Error al cargar los documentos - Validación deshabilitada temporalmente');
+      // }
     } finally {
       setLoading(false);
     }
