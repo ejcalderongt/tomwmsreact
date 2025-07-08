@@ -203,6 +203,8 @@ function DetalleDocumentoIngreso() {
     { text: "Póliza", icon: DocumentTextIcon }
   ];
 
+  const activeTab = tabs.findIndex((tab, index) => index === selectedTab)
+
   return (
     <Layout>
       <div className="space-y-6">
@@ -296,7 +298,7 @@ function DetalleDocumentoIngreso() {
                   </table>
                 )}
               </div>
-            ) : (
+            ) : selectedTab === 1 ? (
               /* Recepciones con Master-Detail */
               <div className="space-y-4">
                 {recepciones.length === 0 ? (
@@ -383,7 +385,7 @@ function DetalleDocumentoIngreso() {
                   ))
                 )}
               </div>
-            ) : (
+            ) : activeTab === 2 ? (
               /* Póliza */
               <div className="space-y-4">
                 {!poliza ? (
@@ -409,7 +411,7 @@ function DetalleDocumentoIngreso() {
                         </div>
                       )}
                     </div>
-                    
+
                     {poliza.detalle && poliza.detalle.length > 0 && (
                       <div className="mt-6">
                         <h4 className="text-md font-medium text-gray-900 mb-2">Detalle de Póliza</h4>
@@ -438,7 +440,7 @@ function DetalleDocumentoIngreso() {
                   </div>
                 )}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
