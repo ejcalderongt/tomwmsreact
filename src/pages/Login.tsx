@@ -14,20 +14,17 @@ function Login() {
     document.title = "TOMWMSUX - Iniciar Sesión";
 
     // Solo verificar si hay un token válido al cargar la página
-    const checkToken = async () => {
+    const checkToken = () => {
       try {
         if (isAuthenticated()) {
           const token = getToken();
           if (token && token !== 'undefined') {
-            console.log('Checking existing token...');
-            await authAPI.testAuth(token);
-            console.log('Token valid, redirecting to existencias');
+            console.log('Token found, redirecting to existencias');
             navigate("/existencias", { replace: true });
           }
         }
       } catch (error) {
-        console.log('Token validation failed, staying on login');
-        // Token inválido, limpiar y permanecer en login
+        console.log('Authentication check failed, staying on login');
         logout();
       }
     };

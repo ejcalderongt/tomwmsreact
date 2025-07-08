@@ -31,8 +31,6 @@ const clearAuthAndRedirect = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('wms_token');
     localStorage.removeItem('wms_user');
-    localStorage.removeItem('wms_idPropietario');
-    localStorage.removeItem('wms_username');
   }
   
   // Clear request cache
@@ -140,11 +138,19 @@ export const authAPI = {
 
       console.log('Login API Response:', data);
       
-      // Ensure we return the expected format
-      return {
+      // Ensure we return the expected format with propietario data
+      const user = {
         username: credentials.username,
-        token: data.token || data.accessToken || data
+        token: data.token || data.accessToken || data,
+        propietario: data.propietario
       };
+
+      // Store propietario info for later use
+      if (data.propietario?.idPropietario) {
+        localStorage.setItem('wms_idPropietario', data.propietario.idPropietario.toString());
+      }
+
+      return user;
     } catch (error) {
       console.error('Login API Error:', error);
       throw new Error('Usuario o contraseña incorrectos');
@@ -153,7 +159,8 @@ export const authAPI = {
 
   testAuth: async (token: string) => {
     try {
-      const data = await apiRequest(`/TestAuth`, {
+      // Instead of calling TestAuth, try a simple request to verify token
+      const data = await apiRequest(`/Bodegas/listar`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

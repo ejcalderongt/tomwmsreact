@@ -4,6 +4,11 @@ const USER_KEY = 'wms_user';
 export interface User {
   username: string;
   token: string;
+  propietario?: {
+    idPropietario: number;
+    nombre_comercial: string;
+    activo: boolean;
+  };
 }
 
 export const saveUser = (user: User) => {

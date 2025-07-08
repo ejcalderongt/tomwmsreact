@@ -10,6 +10,7 @@ const PrivateRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
+  console.log('User authenticated, rendering protected route');
   return <Outlet />;
 };
 
