@@ -13,14 +13,15 @@ function Login() {
   useEffect(() => {
     document.title = "TOMWMSUX - Iniciar Sesión";
 
-    // Verificar si hay un token válido
+    // Solo verificar si hay un token válido al cargar la página
     const checkToken = async () => {
       if (isAuthenticated()) {
         try {
           const token = getToken();
           if (token) {
+            // Verificar que el token sea válido antes de redirigir
             await authAPI.testAuth(token);
-            navigate("/existencias");
+            navigate("/existencias", { replace: true });
           }
         } catch (error) {
           console.log('Token inválido, permaneciendo en login');
@@ -31,8 +32,9 @@ function Login() {
       }
     };
 
+    // Solo ejecutar la verificación una vez al montar el componente
     checkToken();
-  }, [navigate]);
+  }, []); // Remover navigate de las dependencias para evitar bucles
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,7 +44,8 @@ function Login() {
       const user = await authAPI.login({ username, password });
       saveUser(user);
       toast.success("¡Bienvenido! Sesión iniciada correctamente");
-      navigate("/existencias");
+      // Usar replace para evitar que el usuario regrese al login con el botón atrás
+      navigate("/existencias", { replace: true });
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Usuario o contraseña incorrectos");

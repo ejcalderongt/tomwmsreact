@@ -30,6 +30,7 @@ const clearAuthAndRedirect = () => {
   // Clear localStorage
   if (typeof window !== 'undefined') {
     localStorage.removeItem('wms_token');
+    localStorage.removeItem('wms_user');
     localStorage.removeItem('wms_idPropietario');
     localStorage.removeItem('wms_username');
   }
@@ -37,10 +38,17 @@ const clearAuthAndRedirect = () => {
   // Clear request cache
   requestCache.clear();
   
-  // Redirect to login
+  // Only redirect if not already on login page
+  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+    setTimeout(() => {
+      window.location.href = '/login';
+    }, 100);
+  }
+  
+  // Reset redirecting flag after timeout
   setTimeout(() => {
-    window.location.href = '/login';
-  }, 100);
+    isRedirecting = false;
+  }, 1000);
 };
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
