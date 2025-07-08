@@ -19,8 +19,6 @@ export interface User {
 }
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
-  const user = getUser();
-
   const config: RequestInit = {
     ...options,
     credentials: 'omit', // Evita el popup de autenticación básica
@@ -30,12 +28,15 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     },
   };
 
-  // Solo agregar token si existe
-  if (user.token) {
-    config.headers = {
-      ...config.headers,
-      'Authorization': `Bearer ${user.token}`,
-    };
+  // Para login, no agregar token
+  if (!endpoint.includes('/Auth/login-propietario')) {
+    const user = getUser();
+    if (user.token) {
+      config.headers = {
+        ...config.headers,
+        'Authorization': `Bearer ${user.token}`,
+      };
+    }
   }
 
   const response = await fetch(`/api${endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint}`, config);
