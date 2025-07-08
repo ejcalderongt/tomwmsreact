@@ -7,6 +7,7 @@ packages = ["lsof"]
 
 [deployment]
 run = ["sh", "-c", "npm run dev"]
+deploymentTarget = "cloudrun"
 
 [workflows]
 runButton = "Start Development"
