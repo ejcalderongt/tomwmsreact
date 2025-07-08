@@ -1,4 +1,3 @@
-
 import { apiRequest } from "@/request";
 
 export interface LoginCredentials {
@@ -29,7 +28,7 @@ export const authAPI = {
         },
         body: JSON.stringify(credentials),
       });
-      
+
       console.log('API Response:', data);
       return data;
     } catch (error) {
@@ -37,7 +36,7 @@ export const authAPI = {
       throw new Error('Login failed');
     }
   },
-  
+
   testAuth: async (token: string) => {
     try {
       const data = await apiRequest(`/api/TestAuth`, {
@@ -45,7 +44,7 @@ export const authAPI = {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       return data;
     } catch (error) {
       console.error('Test Auth Error:', error);
@@ -66,14 +65,14 @@ export const ingresosAPI = {
         },
         body: JSON.stringify(filtro),
       });
-      
+
       return data;
     } catch (error) {
       console.error('Ingresos API Error:', error);
       throw new Error('Failed to fetch documents');
     }
   },
-  
+
   obtenerDetalle: async (idOrdenCompraEnc: number, token: string) => {
     try {
       const url = `/api/sync/ingresos/${idOrdenCompraEnc}/detalle-oc`;
@@ -83,14 +82,14 @@ export const ingresosAPI = {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       return data;
     } catch (error) {
       console.error('Detalle API Error:', error);
       throw new Error('Failed to fetch detail');
     }
   },
-  
+
   obtenerRecepciones: async (idOrdenCompraEnc: number, token: string) => {
     try {
       const url = `/api/sync/ingresos/${idOrdenCompraEnc}/recepciones`;
@@ -100,7 +99,7 @@ export const ingresosAPI = {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       return data;
     } catch (error) {
       console.error('Recepciones API Error:', error);
@@ -121,14 +120,14 @@ export const salidasAPI = {
         },
         body: JSON.stringify(filtro),
       });
-      
+
       return data;
     } catch (error) {
       console.error('Salidas API Error:', error);
       throw new Error('Failed to fetch salidas documents');
     }
   },
-  
+
   obtenerDetallePE: async (idPedidoEnc: number, token: string) => {
     try {
       const url = `/api/sync/salidas/${idPedidoEnc}/detalle-pe`;
@@ -138,14 +137,14 @@ export const salidasAPI = {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       return data;
     } catch (error) {
       console.error('Detalle PE API Error:', error);
       throw new Error('Failed to fetch detalle PE');
     }
   },
-  
+
   obtenerDespachos: async (idOrdenSalidaEnc: number, token: string) => {
     try {
       const url = `/api/sync/salidas/${idOrdenSalidaEnc}/despachos`;
@@ -155,7 +154,7 @@ export const salidasAPI = {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       return data;
     } catch (error) {
       console.error('Despachos API Error:', error);
@@ -175,7 +174,7 @@ export const polizasAPI = {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       return data;
     } catch (error) {
       console.error('Póliza API Error:', error);
@@ -196,7 +195,7 @@ export const existenciasAPI = {
         },
         body: JSON.stringify(filtro),
       });
-      
+
       return data;
     } catch (error) {
       console.error('Existencias API Error:', error);
@@ -214,7 +213,7 @@ export const bodegasAPI = {
           'Authorization': `Bearer ${token}`,
         },
       });
-      
+
       return data;
     } catch (error) {
       console.error('Bodegas API Error:', error);
@@ -235,7 +234,7 @@ export const productosAPI = {
         },
         body: JSON.stringify(productos),
       });
-      
+
       return data;
     } catch (error) {
       console.error('Productos API Error:', error);
@@ -243,3 +242,60 @@ export const productosAPI = {
     }
   }
 };
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
+
+const getUser = () => {
+  try {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : { token: '' };
+  } catch (error) {
+    console.error("Failed to parse user from localStorage", error);
+    return { token: '' };
+  }
+};
+
+const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
+  const user = getUser();
+
+  const config: RequestInit = {
+    ...options,
+    credentials: 'omit', // Evita el popup de autenticación básica
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  };
+
+  // Solo agregar token si existe
+  if (user.token) {
+    config.headers = {
+      ...config.headers,
+      'Authorization': `Bearer ${user.token}`,
+    };
+  }
+
+  const response = await fetch(`${BASE_URL}${endpoint}`, config);
+
+  if (!response.ok) {
+    console.error(`API request failed for ${endpoint}:`, response.status, response.statusText);
+    try {
+        const errorBody = await response.json();
+        console.error("Error details:", errorBody);
+        throw new Error(errorBody.message || `Request failed with status ${response.status}`);
+    } catch (parseError) {
+        console.error("Failed to parse error body:", parseError);
+        throw new Error(`Request failed with status ${response.status}`);
+    }
+  }
+  
+  try {
+      const data = await response.json();
+      return data;
+  } catch (jsonError) {
+      console.error("Failed to parse JSON response:", jsonError);
+      throw new Error("Failed to parse JSON response");
+  }
+};
+
+export { apiRequest };
