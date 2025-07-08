@@ -106,13 +106,27 @@ function Existencias() {
 
   const cargarExistencias = async () => {
     // Prevent multiple simultaneous requests
-    if (isLoadingExistencias) return;
+    if (isLoadingExistencias) {
+      console.log('Request already in progress, skipping...');
+      return;
+    }
     
     setIsLoadingExistencias(true);
     setLoading(true);
+    
+    console.log('=== STARTING EXISTENCIAS LOAD ===');
+    console.log('Current state:');
+    console.log('  - bodegaSeleccionada:', bodegaSeleccionada);
+    console.log('  - paginaActual:', paginaActual);
+    console.log('  - tamanoPagina:', tamanoPagina);
+    
     try {
       const token = getToken();
       const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
+
+      console.log('Authentication check:');
+      console.log('  - token exists:', !!token);
+      console.log('  - idPropietario:', idPropietario);
 
       if (!token || !idPropietario) {
         console.log('Missing authentication data, redirecting to login');
@@ -128,9 +142,13 @@ function Existencias() {
         tamanoPagina
       };
 
-      console.log('Cargando existencias con filtro:', filtro);
+      console.log('=== CALLING EXISTENCIAS API ===');
+      console.log('Filter object:', filtro);
+      
       const data: ExistenciasResponse = await existenciasAPI.listar(filtro, token);
-      console.log('Existencias cargadas:', data);
+      
+      console.log('=== EXISTENCIAS API COMPLETED ===');
+      console.log('Response data:', data);
 
       setExistencias(data.existencias || []);
       setTotalRegistros(data.totalRegistros || 0);

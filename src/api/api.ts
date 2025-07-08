@@ -52,7 +52,16 @@ const clearAuthAndRedirect = () => {
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
   // Create cache key for deduplication (exclude login requests)
   const isLoginRequest = endpoint.includes('/Auth/login-propietario');
-  const cacheKey = !isLoginRequest ? `${endpoint}:${JSON.stringify(options)}` : null;
+  
+  // For GET requests, create a simpler cache key based on URL only
+  let cacheKey = null;
+  if (!isLoginRequest) {
+    if (options.method === 'GET' || !options.method) {
+      cacheKey = `GET:${endpoint}`;
+    } else {
+      cacheKey = `${endpoint}:${JSON.stringify(options)}`;
+    }
+  }
   
   // Return existing promise if same request is already in progress
   if (cacheKey && requestCache.has(cacheKey)) {
@@ -316,30 +325,57 @@ export const existenciasAPI = {
         tamanoPagina: filtro.tamanoPagina.toString()
       });
 
-      console.log('Stock API Request Params:', params.toString());
+      const endpoint = `/Stock/listar?${params.toString()}`;
+      
+      console.log('=== EXISTENCIAS API REQUEST DEBUG ===');
+      console.log('Endpoint:', endpoint);
+      console.log('Full URL will be:', `/api${endpoint}`);
+      console.log('Request Parameters:');
+      console.log('  - idBodega:', filtro.idBodega || 0);
+      console.log('  - idPropietario:', filtro.idPropietario);
+      console.log('  - pagina:', filtro.pagina);
+      console.log('  - tamanoPagina:', filtro.tamanoPagina);
+      console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+      console.log('Query String:', params.toString());
+      console.log('=====================================');
 
-      const data = await apiRequest(`/Stock/listar?${params.toString()}`, {
+      const data = await apiRequest(endpoint, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
 
-      console.log('Stock API Response:', data);
+      console.log('=== EXISTENCIAS API RESPONSE DEBUG ===');
+      console.log('Response received:', data);
+      console.log('Response type:', typeof data);
+      console.log('Is array:', Array.isArray(data));
+      if (data) {
+        console.log('Response keys:', Object.keys(data));
+        if (data.existencias) {
+          console.log('Existencias count:', data.existencias.length);
+        }
+      }
+      console.log('======================================');
 
       // Handle the response format - wrap in expected structure if needed
       if (Array.isArray(data)) {
-        return {
+        const response = {
           existencias: data,
           totalRegistros: data.length,
           totalPaginas: Math.ceil(data.length / filtro.tamanoPagina),
           paginaActual: filtro.pagina
         };
+        console.log('Wrapped array response:', response);
+        return response;
       }
 
       return data;
     } catch (error) {
-      console.error('Stock API Error:', error);
+      console.error('=== EXISTENCIAS API ERROR ===');
+      console.error('Error details:', error);
+      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('============================');
       throw new Error('Failed to fetch stock data');
     }
   }
