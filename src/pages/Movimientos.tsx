@@ -151,7 +151,9 @@ function Movimientos() {
       
       // Distinguir entre "sin resultados" vs éxito con datos
       if (!data || data.length === 0) {
-        toast.info('No se encontraron movimientos con los filtros seleccionados');
+        toast('No se encontraron movimientos con los filtros seleccionados', {
+          icon: 'ℹ️',
+        });
       } else {
         toast.success(`${data.length} movimientos cargados correctamente`);
       }
