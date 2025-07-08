@@ -86,11 +86,14 @@ function Movimientos() {
   }, []);
 
   useEffect(() => {
-    // Only load movements after bodegas are loaded
-    if (!loadingBodegas) {
+    // Only load movements after bodegas are loaded and when user explicitly searches
+    // Remove automatic loading to prevent infinite requests
+    if (!loadingBodegas && movimientos.length === 0) {
+      // Only auto-load on initial mount, not on every filter change
+      console.log('Auto-loading movements on initial mount');
       cargarMovimientos();
     }
-  }, [loadingBodegas, bodegaSeleccionada, fechaInicio, fechaFin]);
+  }, [loadingBodegas]); // Remove other dependencies to prevent auto-reload
 
   const cargarBodegas = async () => {
     setLoadingBodegas(true);
@@ -115,8 +118,12 @@ function Movimientos() {
   };
 
   const cargarMovimientos = async () => {
-    if (loading || loadingRef.current) return; // Prevent duplicate requests
+    if (loading || loadingRef.current) {
+      console.log('Movimientos request blocked: already loading');
+      return; // Prevent duplicate requests
+    }
     
+    console.log('Starting cargarMovimientos...');
     setLoading(true);
     loadingRef.current = true;
     
@@ -158,8 +165,11 @@ function Movimientos() {
   };
 
   const handleBuscar = () => {
-    if (!loading) {
+    if (!loading && !loadingRef.current) {
+      console.log('Manual search triggered');
       cargarMovimientos();
+    } else {
+      console.log('Search blocked: already loading');
     }
   };
 
@@ -354,6 +364,16 @@ function Movimientos() {
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               <span className="ml-2 text-gray-600">Cargando movimientos...</span>
             </div>
+          ) : movimientos.length === 0 && !loading ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <MagnifyingGlassIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No hay movimientos</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  Utiliza el botón "Buscar" para cargar movimientos con los filtros seleccionados
+                </p>
+              </div>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
@@ -425,7 +445,7 @@ function Movimientos() {
                   {movimientosFiltrados.length === 0 ? (
                     <tr>
                       <td colSpan={20} className="px-6 py-12 text-center text-gray-500">
-                        No se encontraron movimientos para los filtros seleccionados
+                        No se encontraron movimientos que coincidan con la búsqueda
                       </td>
                     </tr>
                   ) : (
