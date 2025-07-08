@@ -304,33 +304,43 @@ export const polizasAPI = {
   }
 };
 
-// Existencias API
+// Stock API (Existencias)
 export const existenciasAPI = {
   listar: async (filtro: { idBodega?: number; idPropietario: number; pagina: number; tamanoPagina: number }, token: string) => {
     try {
-      // Ensure idBodega is always included, defaulting to 0 if undefined
-      const requestBody = {
-        idBodega: filtro.idBodega || 0,
-        idPropietario: filtro.idPropietario,
-        pagina: filtro.pagina,
-        tamanoPagina: filtro.tamanoPagina
-      };
+      // Build query parameters for GET request
+      const params = new URLSearchParams({
+        idBodega: (filtro.idBodega || 0).toString(),
+        idPropietario: filtro.idPropietario.toString(),
+        pagina: filtro.pagina.toString(),
+        tamanoPagina: filtro.tamanoPagina.toString()
+      });
 
-      console.log('Existencias API Request Body:', requestBody);
+      console.log('Stock API Request Params:', params.toString());
 
-      const data = await apiRequest(`/Existencias/listar`, {
-        method: 'POST',
+      const data = await apiRequest(`/Stock/listar?${params.toString()}`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(requestBody),
       });
+
+      console.log('Stock API Response:', data);
+
+      // Handle the response format - wrap in expected structure if needed
+      if (Array.isArray(data)) {
+        return {
+          existencias: data,
+          totalRegistros: data.length,
+          totalPaginas: Math.ceil(data.length / filtro.tamanoPagina),
+          paginaActual: filtro.pagina
+        };
+      }
 
       return data;
     } catch (error) {
-      console.error('Existencias API Error:', error);
-      throw new Error('Failed to fetch existencias');
+      console.error('Stock API Error:', error);
+      throw new Error('Failed to fetch stock data');
     }
   }
 };

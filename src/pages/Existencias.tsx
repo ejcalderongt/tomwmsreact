@@ -159,8 +159,12 @@ function Existencias() {
         return;
       }
       
-      toast.error('Error al cargar las existencias');
+      // Show more specific error message
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar las existencias';
+      toast.error(`Error: ${errorMessage}`);
       setExistencias([]);
+      setTotalRegistros(0);
+      setTotalPaginas(1);
     } finally {
       setLoading(false);
       setIsLoadingExistencias(false);
