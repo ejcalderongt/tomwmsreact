@@ -149,15 +149,38 @@ function Movimientos() {
       console.log('Movimientos cargados:', data);
       setMovimientos(data || []);
       
+      // Distinguir entre "sin resultados" vs éxito con datos
       if (!data || data.length === 0) {
-        toast.info('No se encontraron movimientos para los filtros seleccionados');
+        toast.info('No se encontraron movimientos con los filtros seleccionados');
       } else {
-        toast.success(`${data.length} movimientos cargados`);
+        toast.success(`${data.length} movimientos cargados correctamente`);
       }
     } catch (error) {
       console.error('Error cargando movimientos:', error);
-      toast.error('Error al cargar los movimientos');
       setMovimientos([]);
+      
+      // Mostrar el error específico de la API
+      let errorMessage = 'Error al cargar los movimientos';
+      
+      if (error instanceof Error) {
+        // Si el error contiene información específica, mostrarla
+        if (error.message.includes('401') || error.message.includes('403')) {
+          errorMessage = 'Error de autenticación - Sesión expirada';
+        } else if (error.message.includes('404')) {
+          errorMessage = 'Servicio no disponible - Endpoint no encontrado';
+        } else if (error.message.includes('500')) {
+          errorMessage = 'Error interno del servidor';
+        } else if (error.message.includes('Network')) {
+          errorMessage = 'Error de conexión - Verifique su conexión a internet';
+        } else if (error.message.includes('timeout')) {
+          errorMessage = 'Tiempo de espera agotado - Intente nuevamente';
+        } else if (error.message && error.message !== 'Failed to fetch movimientos data') {
+          // Mostrar el mensaje específico del error si no es el genérico
+          errorMessage = `Error: ${error.message}`;
+        }
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
       loadingRef.current = false;
