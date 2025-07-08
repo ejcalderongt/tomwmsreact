@@ -47,10 +47,40 @@ export const getToken = (): string | null => {
 
 export const isAuthenticated = (): boolean => {
   try {
-    const token = getToken();
-    return token !== null && token !== '' && token !== 'undefined';
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.log('No token found in localStorage');
+      return false;
+    }
+
+    console.log('Token found, validating...');
+
+    // Check if token has correct format
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      console.log('Invalid token format');
+      localStorage.removeItem('token');
+      return false;
+    }
+
+    // Check if token is expired
+    const payload = JSON.parse(atob(parts[1]));
+    const currentTime = Date.now() / 1000;
+
+    console.log('Token expiry:', new Date(payload.exp * 1000));
+    console.log('Current time:', new Date(currentTime * 1000));
+
+    if (payload.exp < currentTime) {
+      console.log('Token expired, removing from localStorage');
+      localStorage.removeItem('token');
+      return false;
+    }
+
+    console.log('Token is valid');
+    return true;
   } catch (error) {
     console.error('Error checking authentication:', error);
+    localStorage.removeItem('token');
     return false;
   }
 };

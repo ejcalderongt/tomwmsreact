@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
@@ -77,6 +76,7 @@ function ResumenExistencias() {
   // Filtros
   const [bodegaSeleccionada, setBodegaSeleccionada] = useState<number>(0);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = 'TOMWMSUX - Resumen de Existencias';
@@ -104,13 +104,13 @@ function ResumenExistencias() {
       setBodegas(data || []);
     } catch (error) {
       console.error('Error al cargar bodegas:', error);
-      
+
       if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
         logout();
         navigate('/login', { replace: true });
         return;
       }
-      
+
       toast.error('Error al cargar las bodegas');
       setBodegas([]);
     } finally {
@@ -120,7 +120,8 @@ function ResumenExistencias() {
 
   const cargarExistencias = async () => {
     setLoading(true);
-    
+    setError(null);
+
     try {
       const token = getToken();
       const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
@@ -149,7 +150,7 @@ function ResumenExistencias() {
         console.log(`Cargando página ${paginaActual} con filtro:`, filtro);
         const data: ExistenciasResponse = await existenciasAPI.listar(filtro, token);
         console.log(`Datos recibidos página ${paginaActual}:`, data);
-        
+
         if (data && data.existencias && Array.isArray(data.existencias)) {
           todasExistencias = [...todasExistencias, ...data.existencias];
           totalPaginas = data.totalPaginas || 1;
@@ -157,14 +158,14 @@ function ResumenExistencias() {
           console.warn('No se recibieron existencias válidas:', data);
           break;
         }
-        
+
         paginaActual++;
-        
+
       } while (paginaActual <= totalPaginas);
 
       console.log('Total existencias cargadas:', todasExistencias.length);
       setExistenciasDetalle(todasExistencias);
-      
+
       if (todasExistencias.length > 0) {
         generarResumen(todasExistencias);
         toast.success(`Se procesaron ${todasExistencias.length} existencias para el resumen`);
@@ -173,20 +174,21 @@ function ResumenExistencias() {
         setFilteredResumen([]);
         toast.info('No se encontraron existencias con los filtros seleccionados');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error al cargar existencias:', error);
-      
+
       if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
         logout();
         navigate('/login', { replace: true });
         return;
       }
-      
+
       const errorMessage = error instanceof Error ? error.message : 'Error al cargar las existencias';
       toast.error(`Error: ${errorMessage}`);
       setExistenciasDetalle([]);
       setResumenProductos([]);
       setFilteredResumen([]);
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -197,10 +199,10 @@ function ResumenExistencias() {
 
     existencias.forEach(existencia => {
       const key = `${existencia.codigo}-${existencia.nombre}`;
-      
+
       if (productosMap.has(key)) {
         const producto = productosMap.get(key)!;
-        
+
         // Sum quantities
         producto.cantidad_UMBas_Total += existencia.cantidad_UMBas || 0;
         producto.disponible_UMBas_Total += existencia.disponible_UMBas || 0;
@@ -209,16 +211,16 @@ function ResumenExistencias() {
         producto.disponible_Presentacion_Total += existencia.disponible_Presentacion || 0;
         producto.cantidad_Reservada_Pres_Total += existencia.cantidad_Reservada_Pres || 0;
         producto.valor_total_Total += existencia.valor_total || 0;
-        
+
         // Collect unique values
         if (existencia.bodega && !producto.bodegas.includes(existencia.bodega)) {
           producto.bodegas.push(existencia.bodega);
         }
-        
+
         // Count unique locations and lots (simplified approach)
         producto.ubicaciones += 1;
         producto.lotes += 1;
-        
+
       } else {
         // Create new product summary
         const nuevoProducto: ResumenProducto = {
@@ -240,7 +242,7 @@ function ResumenExistencias() {
           ubicaciones: 1,
           lotes: 1,
         };
-        
+
         productosMap.set(key, nuevoProducto);
       }
     });
@@ -250,7 +252,7 @@ function ResumenExistencias() {
       const existenciasProducto = existencias.filter(e => 
         e.codigo === producto.codigo && e.nombre === producto.nombre
       );
-      
+
       const totalCosto = existenciasProducto.reduce((sum, e) => sum + (e.costo || 0), 0);
       producto.costo_Promedio = existenciasProducto.length > 0 ? totalCosto / existenciasProducto.length : 0;
     });
@@ -265,7 +267,7 @@ function ResumenExistencias() {
     if (!term.trim()) {
       return resumen;
     }
-    
+
     const searchLower = term.toLowerCase().trim();
     return resumen.filter(producto => 
       producto.codigo?.toLowerCase().includes(searchLower) ||
@@ -401,6 +403,20 @@ function ResumenExistencias() {
                 )}
               </span>
               <span>Total registros detalle: {existenciasDetalle.length}</span>
+            </div>
+          </div>
+        )}
+        {error && (
+          <div className="p-6">
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+              <h3 className="font-bold mb-2">Error al cargar el resumen</h3>
+              <p className="mb-3">{error}</p>
+              <button
+                onClick={cargarExistencias}
+                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+              >
+                Reintentar
+              </button>
             </div>
           </div>
         )}
