@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { authAPI } from "@/api/api";
@@ -13,7 +12,7 @@ function Login() {
 
   useEffect(() => {
     document.title = "TOMWMSUX - Iniciar Sesión";
-    
+
     // Verificar si hay un token válido
     const checkToken = async () => {
       if (isAuthenticated()) {
@@ -31,7 +30,7 @@ function Login() {
         }
       }
     };
-    
+
     checkToken();
   }, [navigate]);
 

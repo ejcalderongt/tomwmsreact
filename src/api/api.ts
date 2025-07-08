@@ -109,6 +109,66 @@ export const ingresosAPI = {
   }
 };
 
+// Salidas API
+export const salidasAPI = {
+  listarDocumentos: async (filtro: DocumentoIngresoFiltro, token: string) => {
+    try {
+      const data = await apiRequest(`/api/sync/salidas/documentos-salida/listar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(filtro),
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Salidas API Error:', error);
+      throw new Error('Failed to fetch salidas documents');
+    }
+  }
+};
+
+// Existencias API
+export const existenciasAPI = {
+  listar: async (filtro: { idBodega?: number; idPropietario: number; pagina: number; tamanoPagina: number }, token: string) => {
+    try {
+      const data = await apiRequest(`/api/Existencias/listar`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(filtro),
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Existencias API Error:', error);
+      throw new Error('Failed to fetch existencias');
+    }
+  }
+};
+
+// Bodegas API
+export const bodegasAPI = {
+  listar: async (token: string) => {
+    try {
+      const data = await apiRequest(`/api/Bodegas/listar`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Bodegas API Error:', error);
+      throw new Error('Failed to fetch bodegas');
+    }
+  }
+};
+
 // Productos API
 export const productosAPI = {
   sincronizar: async (productos: any[], token: string) => {

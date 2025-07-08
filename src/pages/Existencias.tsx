@@ -1,64 +1,134 @@
+
 import { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
-import { CubeIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { CubeIcon, MagnifyingGlassIcon, FunnelIcon, BuildingOfficeIcon } from '@heroicons/react/24/outline';
 import { getUser } from '@/utils/auth';
+import { existenciasAPI, bodegasAPI } from '@/api/api';
 import toast from 'react-hot-toast';
 
-interface Stock {
-  id: number;
+interface Existencia {
+  idExistencia: number;
   producto: string;
   cantidad: number;
   ubicacion: string;
   lote: string;
   fechaVencimiento: string;
+  bodega: string;
+}
+
+interface Bodega {
+  idBodega: number;
+  nombre: string;
+  codigo: string;
+}
+
+interface PaginacionInfo {
+  paginaActual: number;
+  totalPaginas: number;
+  totalRegistros: number;
+  tamanoPagina: number;
 }
 
 function Existencias() {
-  const [stocks, setStocks] = useState<Stock[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [existencias, setExistencias] = useState<Existencia[]>([]);
+  const [bodegas, setBodegas] = useState<Bodega[]>([]);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [bodegaSeleccionada, setBodegaSeleccionada] = useState<number>(0); // 0 = todas las bodegas
+  const [paginacion, setPaginacion] = useState<PaginacionInfo>({
+    paginaActual: 1,
+    totalPaginas: 1,
+    totalRegistros: 0,
+    tamanoPagina: 20
+  });
+  
   const user = getUser();
 
   useEffect(() => {
     document.title = 'TOMWMSUX - Existencias';
-    // Simular carga de datos
-    setTimeout(() => {
-      setStocks([
-        {
-          id: 1,
-          producto: 'Producto A',
-          cantidad: 150,
-          ubicacion: 'A-01-01',
-          lote: 'LOT001',
-          fechaVencimiento: '2024-12-31'
-        },
-        {
-          id: 2,
-          producto: 'Producto B',
-          cantidad: 75,
-          ubicacion: 'B-02-03',
-          lote: 'LOT002',
-          fechaVencimiento: '2024-11-15'
-        },
-        {
-          id: 3,
-          producto: 'Producto C',
-          cantidad: 200,
-          ubicacion: 'C-01-05',
-          lote: 'LOT003',
-          fechaVencimiento: '2025-03-20'
-        }
-      ]);
-      setLoading(false);
-      toast.success('Datos de existencias cargados correctamente');
-    }, 1000);
+    cargarBodegas();
   }, []);
 
-  const filteredStocks = stocks.filter(stock =>
-    stock.producto.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    stock.ubicacion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    stock.lote.toLowerCase().includes(searchTerm.toLowerCase())
+  useEffect(() => {
+    if (user.idPropietario) {
+      cargarExistencias();
+    }
+  }, [bodegaSeleccionada, paginacion.paginaActual]);
+
+  const cargarBodegas = async () => {
+    try {
+      const data = await bodegasAPI.listar(user.token);
+      console.log('Bodegas cargadas:', data);
+      setBodegas(data || []);
+    } catch (error) {
+      console.error('Error al cargar bodegas:', error);
+      toast.error('Error al cargar las bodegas');
+    }
+  };
+
+  const cargarExistencias = async (pagina: number = paginacion.paginaActual) => {
+    if (!user.idPropietario) {
+      toast.error('No se encontró el ID del propietario');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const filtro = {
+        idPropietario: user.idPropietario,
+        pagina,
+        tamanoPagina: paginacion.tamanoPagina,
+        ...(bodegaSeleccionada > 0 && { idBodega: bodegaSeleccionada })
+      };
+
+      const data = await existenciasAPI.listar(filtro, user.token);
+      console.log('Existencias cargadas:', data);
+      
+      if (data) {
+        setExistencias(data.datos || []);
+        setPaginacion({
+          paginaActual: data.paginaActual || 1,
+          totalPaginas: data.totalPaginas || 1,
+          totalRegistros: data.totalRegistros || 0,
+          tamanoPagina: data.tamanoPagina || 20
+        });
+
+        if (data.datos && data.datos.length > 0) {
+          toast.success(`Se cargaron ${data.datos.length} existencias`);
+        } else {
+          toast('No se encontraron existencias', {
+            icon: 'ℹ️',
+            style: {
+              background: '#3b82f6',
+              color: '#fff'
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error al cargar existencias:', error);
+      toast.error('Error al cargar las existencias');
+      setExistencias([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const cambiarPagina = (nuevaPagina: number) => {
+    if (nuevaPagina >= 1 && nuevaPagina <= paginacion.totalPaginas) {
+      setPaginacion(prev => ({ ...prev, paginaActual: nuevaPagina }));
+    }
+  };
+
+  const filteredExistencias = existencias.filter(existencia =>
+    existencia.producto?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    existencia.ubicacion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    existencia.lote?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    existencia.bodega?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const bodegaActual = bodegas.find(b => b.idBodega === bodegaSeleccionada);
 
   return (
     <Layout>
@@ -75,17 +145,59 @@ function Existencias() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Buscar por producto, ubicación o lote..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
+          {/* Filtros */}
+          <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <div className="flex items-center space-x-2 mb-4">
+              <FunnelIcon className="h-5 w-5 text-gray-500" />
+              <h3 className="text-sm font-medium text-gray-700">Filtros</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bodega
+                </label>
+                <div className="relative">
+                  <BuildingOfficeIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <select
+                    value={bodegaSeleccionada}
+                    onChange={(e) => setBodegaSeleccionada(parseInt(e.target.value))}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value={0}>Todas las bodegas</option>
+                    {bodegas.map((bodega) => (
+                      <option key={bodega.idBodega} value={bodega.idBodega}>
+                        {bodega.nombre} ({bodega.codigo})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Buscar
+                </label>
+                <div className="relative">
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Buscar por producto, ubicación o lote..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-end">
+                <button
+                  onClick={() => cargarExistencias(1)}
+                  disabled={loading}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Cargando...' : 'Actualizar'}
+                </button>
               </div>
             </div>
           </div>
@@ -94,11 +206,13 @@ function Existencias() {
         {/* Welcome message */}
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-lg shadow-sm p-6 text-white">
           <h2 className="text-xl font-semibold mb-2">¡Bienvenido, {user.username}!</h2>
-          <p className="opacity-90">Tienes acceso completo al sistema de gestión de inventarios</p>
+          <p className="opacity-90">
+            Consulta el inventario {bodegaActual ? `de la bodega ${bodegaActual.nombre}` : 'de todas las bodegas'}
+          </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="p-2 bg-green-100 rounded-lg">
@@ -106,7 +220,7 @@ function Existencias() {
               </div>
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Total Productos</p>
-                <p className="text-2xl font-bold text-gray-900">{stocks.length}</p>
+                <p className="text-2xl font-bold text-gray-900">{filteredExistencias.length}</p>
               </div>
             </div>
           </div>
@@ -119,7 +233,7 @@ function Existencias() {
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">Stock Total</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {stocks.reduce((sum, stock) => sum + stock.cantidad, 0)}
+                  {filteredExistencias.reduce((sum, stock) => sum + (stock.cantidad || 0), 0)}
                 </p>
               </div>
             </div>
@@ -128,13 +242,23 @@ function Existencias() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <div className="flex items-center">
               <div className="p-2 bg-yellow-100 rounded-lg">
-                <CubeIcon className="h-6 w-6 text-yellow-600" />
+                <BuildingOfficeIcon className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Ubicaciones</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {new Set(stocks.map(s => s.ubicacion)).size}
-                </p>
+                <p className="text-sm font-medium text-gray-600">Bodegas</p>
+                <p className="text-2xl font-bold text-gray-900">{bodegas.length}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <div className="flex items-center">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <CubeIcon className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Total Registros</p>
+                <p className="text-2xl font-bold text-gray-900">{paginacion.totalRegistros}</p>
               </div>
             </div>
           </div>
@@ -142,10 +266,13 @@ function Existencias() {
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
             <h3 className="text-lg font-medium text-gray-900">
-              Lista de Existencias ({filteredStocks.length})
+              Lista de Existencias ({filteredExistencias.length} de {paginacion.totalRegistros})
             </h3>
+            <div className="text-sm text-gray-500">
+              Página {paginacion.paginaActual} de {paginacion.totalPaginas}
+            </div>
           </div>
 
           {loading ? (
@@ -171,40 +298,92 @@ function Existencias() {
                       Lote
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Bodega
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Vencimiento
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredStocks.map((stock) => (
-                    <tr key={stock.id} className="hover:bg-gray-50">
+                  {filteredExistencias.map((existencia) => (
+                    <tr key={existencia.idExistencia} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {stock.producto}
+                        {existencia.producto}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          stock.cantidad > 100 
+                          existencia.cantidad > 100 
                             ? 'bg-green-100 text-green-800' 
-                            : stock.cantidad > 50 
+                            : existencia.cantidad > 50 
                             ? 'bg-yellow-100 text-yellow-800'
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {stock.cantidad}
+                          {existencia.cantidad || 0}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {stock.ubicacion}
+                        {existencia.ubicacion}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {stock.lote}
+                        {existencia.lote}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {stock.fechaVencimiento}
+                        {existencia.bodega}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {existencia.fechaVencimiento ? new Date(existencia.fechaVencimiento).toLocaleDateString() : 'N/A'}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+
+              {!loading && filteredExistencias.length === 0 && (
+                <div className="text-center py-12">
+                  <CubeIcon className="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">No hay existencias</h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    No se encontraron existencias para los filtros seleccionados.
+                  </p>
+                </div>
+              )}
+
+              {/* Paginación */}
+              {paginacion.totalPaginas > 1 && (
+                <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center text-sm text-gray-700">
+                      <span>
+                        Mostrando {((paginacion.paginaActual - 1) * paginacion.tamanoPagina) + 1} a{' '}
+                        {Math.min(paginacion.paginaActual * paginacion.tamanoPagina, paginacion.totalRegistros)} de{' '}
+                        {paginacion.totalRegistros} resultados
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => cambiarPagina(paginacion.paginaActual - 1)}
+                        disabled={paginacion.paginaActual <= 1}
+                        className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Anterior
+                      </button>
+                      
+                      <span className="text-sm text-gray-700">
+                        Página {paginacion.paginaActual} de {paginacion.totalPaginas}
+                      </span>
+                      
+                      <button
+                        onClick={() => cambiarPagina(paginacion.paginaActual + 1)}
+                        disabled={paginacion.paginaActual >= paginacion.totalPaginas}
+                        className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        Siguiente
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
