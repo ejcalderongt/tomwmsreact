@@ -7,21 +7,22 @@ import toast from 'react-hot-toast';
 import { salidasAPI } from '@/api/api';
 
 interface DocumentoSalida {
-  codigo: string;
+  correlativo: number;
   bodega: string;
   propietario: string;
   cliente: string;
-  tipoSalida: string;
+  tipoDocumento: string;
   estado: string;
-  noDocumento: string;
+  noDocumento: number;
   referencia: string;
   fecha: string;
-  noPoliza: string;
-  noOrden: string;
+  fechaPedido: string;
+  noDocumentoExterno: string;
   activo: boolean;
-  enviado_A_ERP: boolean;
-  idPedidoEnc?: number;
-  idOrdenSalidaEnc?: number;
+  enviadoAErp: boolean;
+  idDespachoEnc: number;
+  idPickingEnc: number;
+  anulado: boolean;
 }
 
 function Salidas() {
@@ -87,8 +88,8 @@ function Salidas() {
   };
 
   const handleRowClick = (documento: DocumentoSalida) => {
-    // Usar idOrdenSalidaEnc como identificador principal, o idPedidoEnc como fallback
-    const id = documento.idOrdenSalidaEnc || documento.idPedidoEnc;
+    // Usar idDespachoEnc como identificador principal
+    const id = documento.idDespachoEnc;
     if (id) {
       navigate(`/salidas/detalle/${id}`);
     } else {
@@ -189,14 +190,14 @@ function Salidas() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correlativo</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodega</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Salida</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Documento</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Documento</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Orden</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referencia</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enviado ERP</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activo</th>
                   </tr>
@@ -204,12 +205,12 @@ function Salidas() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {documentos.map((documento, index) => (
                     <tr 
-                      key={documento.codigo || index} 
+                      key={documento.correlativo || index} 
                       className="hover:bg-gray-50 cursor-pointer"
                       onClick={() => handleRowClick(documento)}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {documento.codigo}
+                        {documento.correlativo}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {documento.bodega}
@@ -218,11 +219,11 @@ function Salidas() {
                         {documento.cliente}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {documento.tipoSalida}
+                        {documento.tipoDocumento}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          documento.estado === 'Completado' 
+                          documento.estado === 'Despachado' 
                             ? 'bg-green-100 text-green-800' 
                             : documento.estado === 'Pendiente'
                             ? 'bg-yellow-100 text-yellow-800'
@@ -238,15 +239,15 @@ function Salidas() {
                         {formatDate(documento.fecha)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {documento.noOrden}
+                        {documento.referencia}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          documento.enviado_A_ERP 
+                          documento.enviadoAErp 
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-red-100 text-red-800'
                         }`}>
-                          {formatBoolean(documento.enviado_A_ERP)}
+                          {formatBoolean(documento.enviadoAErp)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
