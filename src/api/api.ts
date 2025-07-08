@@ -308,13 +308,23 @@ export const polizasAPI = {
 export const existenciasAPI = {
   listar: async (filtro: { idBodega?: number; idPropietario: number; pagina: number; tamanoPagina: number }, token: string) => {
     try {
+      // Ensure idBodega is always included, defaulting to 0 if undefined
+      const requestBody = {
+        idBodega: filtro.idBodega || 0,
+        idPropietario: filtro.idPropietario,
+        pagina: filtro.pagina,
+        tamanoPagina: filtro.tamanoPagina
+      };
+
+      console.log('Existencias API Request Body:', requestBody);
+
       const data = await apiRequest(`/Existencias/listar`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(filtro),
+        body: JSON.stringify(requestBody),
       });
 
       return data;

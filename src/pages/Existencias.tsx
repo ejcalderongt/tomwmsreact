@@ -122,7 +122,7 @@ function Existencias() {
       }
 
       const filtro = {
-        idBodega: bodegaSeleccionada === 0 ? undefined : bodegaSeleccionada,
+        idBodega: bodegaSeleccionada, // Always send idBodega, 0 means all warehouses
         idPropietario,
         pagina: paginaActual,
         tamanoPagina
