@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { authAPI } from "@/api/api";
 import { saveUser, isAuthenticated, getToken } from "@/utils/auth";
 import toast from "react-hot-toast";

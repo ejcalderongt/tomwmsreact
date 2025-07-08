@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Login from "@/pages/Login";
 import Ingresos from "@/pages/Ingresos";
 import DetalleDocumentoIngreso from "@/pages/DetalleDocumentoIngreso";
@@ -6,7 +6,6 @@ import DetalleDocumentoSalida from "@/pages/DetalleDocumentoSalida";
 import Existencias from "@/pages/Existencias";
 import Salidas from "@/pages/Salidas";
 import SessionExpired from "@/pages/SessionExpired";
-import Index from "@/index";
 import PrivateRoute from "@/routes/PrivateRoute";
 import ToastProvider from "@/components/ToastProvider";
 
@@ -23,16 +22,18 @@ function App() {
 
         {/* Rutas protegidas */}
         <Route element={<PrivateRoute />}>
-          <Route path="/" element={<Index />} />
           <Route path="/ingresos" element={<Ingresos />} />
-          <Route path="/ingresos/detalle/:IdOrdenCompraEnc" element={<PrivateRoute><DetalleDocumentoIngreso /></PrivateRoute>} />
-          <Route path="/salidas" element={<PrivateRoute><Salidas /></PrivateRoute>} />
-          <Route path="/salidas/detalle/:IdDocumento" element={<PrivateRoute><DetalleDocumentoSalida /></PrivateRoute>} />
-          <Route path="/existencias" element={<PrivateRoute><Existencias /></PrivateRoute>} />
+          <Route path="/ingresos/detalle/:IdOrdenCompraEnc" element={<DetalleDocumentoIngreso />} />
+          <Route path="/salidas" element={<Salidas />} />
+          <Route path="/salidas/detalle/:IdDocumento" element={<DetalleDocumentoSalida />} />
+          <Route path="/existencias" element={<Existencias />} />
         </Route>
 
+        {/* Default route - redirect to login */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        
         {/* Ruta fallback */}
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
   );
