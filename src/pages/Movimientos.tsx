@@ -163,7 +163,7 @@ function Movimientos() {
     }
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString: string, includeTime: boolean = false) => {
     if (!dateString) return '-';
     
     // Handle null or empty dates
@@ -174,13 +174,21 @@ function Movimientos() {
       return '-';
     }
     
-    return date.toLocaleDateString('es-ES', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    if (includeTime) {
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } else {
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
   };
 
   const formatNumber = (value: number | undefined | null, decimales: number = 2): string => {
@@ -427,7 +435,7 @@ function Movimientos() {
                           {movimiento.idMovimiento || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatDate(movimiento.fecha || '')}
+                          {formatDate(movimiento.fecha || '', true)}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
                           {movimiento.producto || '-'}
@@ -463,7 +471,7 @@ function Movimientos() {
                           {movimiento.licencia || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatDate(movimiento.fecha_vence || '')}
+                          {formatDate(movimiento.fecha_vence || '', false)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {getEstadoProducto(movimiento.estadoOrigen)}
