@@ -58,7 +58,7 @@ function Login() {
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center mb-4">
             <img 
-              src="/tom-wms-logo.png" 
+              src="/tom_wms.png" 
               alt="TOM WMS Logo" 
               className="w-32 h-32 object-contain"
             />
