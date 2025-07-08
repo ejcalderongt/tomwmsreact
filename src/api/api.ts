@@ -31,6 +31,7 @@ const clearAuthAndRedirect = () => {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('wms_token');
     localStorage.removeItem('wms_user');
+    localStorage.removeItem('token'); // Also remove any legacy token
   }
   
   // Clear request cache

@@ -47,7 +47,7 @@ export const getToken = (): string | null => {
 
 export const isAuthenticated = (): boolean => {
   try {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem(TOKEN_KEY);
     if (!token) {
       console.log('No token found in localStorage');
       return false;
@@ -59,7 +59,7 @@ export const isAuthenticated = (): boolean => {
     const parts = token.split('.');
     if (parts.length !== 3) {
       console.log('Invalid token format');
-      localStorage.removeItem('token');
+      localStorage.removeItem(TOKEN_KEY);
       return false;
     }
 
@@ -72,7 +72,7 @@ export const isAuthenticated = (): boolean => {
 
     if (payload.exp < currentTime) {
       console.log('Token expired, removing from localStorage');
-      localStorage.removeItem('token');
+      localStorage.removeItem(TOKEN_KEY);
       return false;
     }
 
@@ -80,7 +80,7 @@ export const isAuthenticated = (): boolean => {
     return true;
   } catch (error) {
     console.error('Error checking authentication:', error);
-    localStorage.removeItem('token');
+    localStorage.removeItem(TOKEN_KEY);
     return false;
   }
 };
