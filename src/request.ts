@@ -1,54 +1,45 @@
 
-// API Configuration - Use relative URLs to leverage Vite proxy
-const API_BASE_URL = '';
+import { getUser } from "@/utils/auth";
 
-export async function apiRequest(path: string, options: RequestInit = {}) {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...options.headers,
+export const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
+  const user = getUser();
+
+  const config: RequestInit = {
+    ...options,
+    credentials: 'omit', // Evita el popup de autenticación básica
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   };
 
-  // Build full URL - always use relative paths to hit the proxy
-  const fullUrl = path.startsWith('http') ? path : `${API_BASE_URL}${path}`;
-
-  try {
-    const response = await fetch(fullUrl, {
-      ...options,
-      headers,
-      // Prevent browser from showing basic auth dialog
-      credentials: 'omit'
-    });
-
-    if (!response.ok) {
-      // Clone response to read body for error details
-      const responseClone = response.clone();
-      let errorMessage = `API Error: ${response.status}`;
-      
-      try {
-        const errorData = await responseClone.json();
-        if (errorData.message) {
-          errorMessage = errorData.message;
-        }
-      } catch {
-        // If response is not JSON, use status text
-        errorMessage = response.statusText || errorMessage;
-      }
-
-      if (response.status === 401) {
-        console.warn("Token inválido o expirado.");
-        // Limpiar token inválido del localStorage
-        localStorage.removeItem('wms_token');
-        localStorage.removeItem('wms_user');
-        throw new Error('Unauthorized');
-      }
-      
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('API Request Error:', error);
-    throw error;
+  // Solo agregar token si existe
+  if (user.token) {
+    config.headers = {
+      ...config.headers,
+      'Authorization': `Bearer ${user.token}`,
+    };
   }
-}
+
+  const response = await fetch(`/api${endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint}`, config);
+
+  if (!response.ok) {
+    console.error(`API request failed for ${endpoint}:`, response.status, response.statusText);
+    try {
+        const errorBody = await response.json();
+        console.error("Error details:", errorBody);
+        throw new Error(errorBody.message || `Request failed with status ${response.status}`);
+    } catch (parseError) {
+        console.error("Failed to parse error body:", parseError);
+        throw new Error(`Request failed with status ${response.status}`);
+    }
+  }
+  
+  try {
+      const data = await response.json();
+      return data;
+  } catch (jsonError) {
+      console.error("Failed to parse JSON response:", jsonError);
+      throw new Error("Failed to parse JSON response");
+  }
+};
