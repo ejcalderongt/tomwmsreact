@@ -18,6 +18,15 @@ interface Movimiento {
   activo?: boolean;
   usuario?: string;
   fechaCreacion?: string;
+  fechaAgr?: string;
+  lic_plate?: string;
+  fecha_vence?: string;
+  idProductoEstado?: number;
+  peso?: number;
+  ticket?: string;
+  poliza?: string;
+  idUnidadMedida?: number;
+  cantidad?: number;
   // Add more properties as needed based on API response
 }
 
@@ -131,8 +140,17 @@ function Movimientos() {
   };
 
   const formatDate = (dateString: string) => {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('es-ES', {
+    if (!dateString) return '-';
+    
+    // Handle null or empty dates
+    const date = new Date(dateString);
+    
+    // Check if it's a valid date and not the default 1900-01-01
+    if (isNaN(date.getTime()) || date.getFullYear() <= 1900) {
+      return '-';
+    }
+    
+    return date.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -141,8 +159,50 @@ function Movimientos() {
     });
   };
 
-  const formatBoolean = (value: boolean) => {
+  const formatNumber = (value: number | undefined | null, decimales: number = 2): string => {
+    if (value === null || value === undefined || isNaN(Number(value))) {
+      return '-';
+    }
+    return Number(value).toLocaleString('es-ES', {
+      minimumFractionDigits: decimales,
+      maximumFractionDigits: decimales
+    });
+  };
+
+  const formatBoolean = (value: boolean | undefined) => {
+    if (value === undefined || value === null) return '-';
     return value ? 'Activo' : 'Inactivo';
+  };
+
+  const getBodegaNombre = (idBodega: number | undefined): string => {
+    if (!idBodega) return '-';
+    const bodega = bodegas.find(b => b.idBodega === idBodega);
+    return bodega ? bodega.nombre : `Bodega ${idBodega}`;
+  };
+
+  const getTipoMovimiento = (idTipo: number | undefined): string => {
+    if (!idTipo) return '-';
+    // You can expand this mapping based on your business logic
+    const tipos: { [key: number]: string } = {
+      1: 'Ingreso',
+      2: 'Salida',
+      3: 'Transferencia',
+      4: 'Ajuste',
+      5: 'Inventario'
+    };
+    return tipos[idTipo] || `Tipo ${idTipo}`;
+  };
+
+  const getEstadoProducto = (idEstado: number | undefined): string => {
+    if (!idEstado) return '-';
+    // You can expand this mapping based on your business logic
+    const estados: { [key: number]: string } = {
+      1: 'Buen Estado',
+      2: 'Dañado',
+      3: 'Vencido',
+      4: 'Cuarentena'
+    };
+    return estados[idEstado] || `Estado ${idEstado}`;
   };
 
   // Filter movements based on search term
@@ -153,8 +213,11 @@ function Movimientos() {
       movimiento.idMovimiento?.toString().includes(searchTerm) ||
       movimiento.observaciones?.toLowerCase().includes(searchTerm) ||
       movimiento.usuario?.toLowerCase().includes(searchTerm) ||
-      movimiento.idBodegaOrigen?.toString().includes(searchTerm) ||
-      movimiento.idBodegaDestino?.toString().includes(searchTerm)
+      movimiento.lic_plate?.toLowerCase().includes(searchTerm) ||
+      movimiento.ticket?.toLowerCase().includes(searchTerm) ||
+      movimiento.poliza?.toLowerCase().includes(searchTerm) ||
+      getBodegaNombre(movimiento.idBodegaOrigen).toLowerCase().includes(searchTerm) ||
+      getBodegaNombre(movimiento.idBodegaDestino).toLowerCase().includes(searchTerm)
     );
   });
 
@@ -298,6 +361,33 @@ function Movimientos() {
                       Usuario
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Cantidad
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      UM Bas
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Peso
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Lic Plate
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha Vence
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Estado Producto
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Ticket
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Fecha Agr
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Póliza
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Estado
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -308,7 +398,7 @@ function Movimientos() {
                 <tbody className="bg-white divide-y divide-gray-200">
                   {movimientosFiltrados.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan={17} className="px-6 py-12 text-center text-gray-500">
                         No se encontraron movimientos para los filtros seleccionados
                       </td>
                     </tr>
@@ -322,16 +412,43 @@ function Movimientos() {
                           {formatDate(movimiento.fecha || '')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.idBodegaOrigen || '-'}
+                          {getBodegaNombre(movimiento.idBodegaOrigen)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.idBodegaDestino || '-'}
+                          {getBodegaNombre(movimiento.idBodegaDestino)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.idTipoMovimiento || '-'}
+                          {getTipoMovimiento(movimiento.idTipoMovimiento)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {movimiento.usuario || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {formatNumber(movimiento.cantidad)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {movimiento.idUnidadMedida || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                          {formatNumber(movimiento.peso)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {movimiento.lic_plate || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formatDate(movimiento.fecha_vence || '')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {getEstadoProducto(movimiento.idProductoEstado)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {movimiento.ticket || '-'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formatDate(movimiento.fechaAgr || '')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {movimiento.poliza || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
@@ -358,7 +475,7 @@ function Movimientos() {
         {movimientosFiltrados.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-medium text-gray-900 mb-4">Resumen</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-blue-50 rounded-lg p-4">
                 <div className="text-2xl font-bold text-blue-600">
                   {movimientosFiltrados.length}
@@ -375,7 +492,13 @@ function Movimientos() {
                 <div className="text-2xl font-bold text-gray-600">
                   {new Set(movimientosFiltrados.map(m => m.idBodegaOrigen).filter(id => id != null)).size}
                 </div>
-                <div className="text-sm text-gray-600">Bodegas Involucradas</div>
+                <div className="text-sm text-gray-600">Bodegas Origen</div>
+              </div>
+              <div className="bg-purple-50 rounded-lg p-4">
+                <div className="text-2xl font-bold text-purple-600">
+                  {formatNumber(movimientosFiltrados.reduce((sum, m) => sum + (m.cantidad || 0), 0))}
+                </div>
+                <div className="text-sm text-purple-600">Total Cantidad</div>
               </div>
             </div>
           </div>
