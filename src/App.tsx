@@ -30,14 +30,7 @@ function App() {
           <Route path="/salidas/detalle/:IdDocumento" element={<DetalleDocumentoSalida />} />
           <Route path="/existencias" element={<Existencias />} />
           <Route path="/resumen-existencias" element={<ResumenExistencias />} />
-          <Route
-            path="/movimientos"
-            element={
-              <PrivateRoute>
-                <Movimientos />
-              </PrivateRoute>
-            }
-          />
+          <Route path="/movimientos" element={<Movimientos />} />
         </Route>
 
         {/* Default route - redirect to login */}

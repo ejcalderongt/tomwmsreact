@@ -448,6 +448,15 @@ export const movimientosAPI = {
       }
 
       const endpoint = `/Movimientos/listar?${params.toString()}`;
+      
+      // Create cache key for this request
+      const cacheKey = `movimientos_${endpoint}_${token.substring(0, 20)}`;
+      
+      // Check if request is already in progress
+      if (requestCache.has(cacheKey)) {
+        console.log('Movimientos request already in progress, waiting for result...');
+        return await requestCache.get(cacheKey);
+      }
 
       console.log('=== MOVIMIENTOS API REQUEST DEBUG ===');
       console.log('Endpoint:', endpoint);
@@ -461,12 +470,20 @@ export const movimientosAPI = {
       console.log('Query String:', params.toString());
       console.log('====================================');
 
-      const data = await apiRequest(endpoint, {
+      // Create the request promise and cache it
+      const requestPromise = apiRequest(endpoint, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
+
+      requestCache.set(cacheKey, requestPromise);
+
+      const data = await requestPromise;
+
+      // Clear from cache after completion
+      requestCache.delete(cacheKey);
 
       console.log('=== MOVIMIENTOS API RESPONSE DEBUG ===');
       console.log('Response received:', data);

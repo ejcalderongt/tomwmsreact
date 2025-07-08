@@ -49,8 +49,14 @@ function Movimientos() {
   useEffect(() => {
     document.title = 'TOMWMSUX - Movimientos';
     cargarBodegas();
-    cargarMovimientos();
   }, []);
+
+  useEffect(() => {
+    // Only load movements after bodegas are loaded
+    if (!loadingBodegas) {
+      cargarMovimientos();
+    }
+  }, [loadingBodegas, bodegaSeleccionada, fechaInicio, fechaFin]);
 
   const cargarBodegas = async () => {
     setLoadingBodegas(true);
@@ -75,6 +81,8 @@ function Movimientos() {
   };
 
   const cargarMovimientos = async () => {
+    if (loading) return; // Prevent duplicate requests
+    
     setLoading(true);
     try {
       const token = getToken();
@@ -113,7 +121,9 @@ function Movimientos() {
   };
 
   const handleBuscar = () => {
-    cargarMovimientos();
+    if (!loading) {
+      cargarMovimientos();
+    }
   };
 
   const formatDate = (dateString: string) => {
