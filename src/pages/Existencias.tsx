@@ -7,18 +7,27 @@ import { existenciasAPI, bodegasAPI } from '@/api/api';
 import { getToken, logout } from '@/utils/auth';
 
 interface Existencia {
-  idExistencia: number;
-  codigo_producto: string;
-  nombre_producto: string;
-  nombre_unidad_medida: string;
-  cantidad: number;
-  cantidad_disponible: number;
-  cantidad_reservada: number;
-  ubicacion: string;
+  idStock: number;
+  codigo: string;
+  nombre: string;
+  unidadMedida: string;
+  cantidad_UMBas: number;
+  disponible_UMBas: number;
+  cantidadReservadaUmBas: number;
+  nombre_Completo: string;
   lote: string;
-  fecha_vencimiento: string;
-  nombre_bodega: string;
+  fecha_vence: string;
+  bodega: string;
   idBodega: number;
+  presentacion: string;
+  cantidad_Presentacion: number;
+  disponible_Presentacion: number;
+  cantidad_Reservada_Pres: number;
+  costo: number;
+  valor_total: number;
+  nomEstado: string;
+  marca: string;
+  familia: string;
 }
 
 interface Bodega {
@@ -374,50 +383,72 @@ function Existencias() {
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodega</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UmBas</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disponible</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cant. UMBas</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disp. UMBas</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reservada</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Presentación</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cant. Pres.</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ubicación</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimiento</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {existencias.map((existencia, index) => (
-                      <tr key={existencia.idExistencia || index} className="hover:bg-gray-50">
+                      <tr key={existencia.idStock || index} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {existencia.codigo_producto}
+                          {existencia.codigo}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900">
-                          {existencia.nombre_producto}
+                          {existencia.nombre}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.nombre_bodega}
+                          {existencia.marca}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.nombre_unidad_medida}
+                          {existencia.bodega}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStockStatus(existencia.cantidad)}`}>
-                            {formatNumber(existencia.cantidad, 0)}
+                          {existencia.unidadMedida}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStockStatus(existencia.cantidad_UMBas)}`}>
+                            {formatNumber(existencia.cantidad_UMBas, 2)}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatNumber(existencia.cantidad_disponible, 0)}
+                          {formatNumber(existencia.disponible_UMBas, 2)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatNumber(existencia.cantidad_reservada, 0)}
+                          {formatNumber(existencia.cantidadReservadaUmBas, 2)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.ubicacion}
+                          {existencia.presentacion}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formatNumber(existencia.cantidad_Presentacion, 2)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {existencia.nombre_Completo}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {existencia.lote}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatDate(existencia.fecha_vencimiento)}
+                          {formatDate(existencia.fecha_vence)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${existencia.nomEstado === 'Buen Estado' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            {existencia.nomEstado}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {formatNumber(existencia.costo, 2)}
                         </td>
                       </tr>
                     ))}
