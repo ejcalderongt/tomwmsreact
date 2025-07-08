@@ -317,12 +317,12 @@ export const polizasAPI = {
 export const existenciasAPI = {
   listar: async (filtro: { idBodega?: number; idPropietario: number; pagina: number; tamanoPagina: number }, token: string) => {
     try {
-      // Build query parameters for GET request
+      // Build query parameters for GET request using the correct API parameter names
       const params = new URLSearchParams({
-        idBodega: (filtro.idBodega || 0).toString(),
-        idPropietario: filtro.idPropietario.toString(),
-        pagina: filtro.pagina.toString(),
-        tamanoPagina: filtro.tamanoPagina.toString()
+        IdBodega: (filtro.idBodega || 0).toString(),
+        IdPropietario: filtro.idPropietario.toString(),
+        page: filtro.pagina.toString(),
+        pageSize: filtro.tamanoPagina.toString()
       });
 
       const endpoint = `/Stock/listar?${params.toString()}`;
@@ -331,10 +331,10 @@ export const existenciasAPI = {
       console.log('Endpoint:', endpoint);
       console.log('Full URL will be:', `/api${endpoint}`);
       console.log('Request Parameters:');
-      console.log('  - idBodega:', filtro.idBodega || 0);
-      console.log('  - idPropietario:', filtro.idPropietario);
-      console.log('  - pagina:', filtro.pagina);
-      console.log('  - tamanoPagina:', filtro.tamanoPagina);
+      console.log('  - IdBodega:', filtro.idBodega || 0);
+      console.log('  - IdPropietario:', filtro.idPropietario);
+      console.log('  - page:', filtro.pagina);
+      console.log('  - pageSize:', filtro.tamanoPagina);
       console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
       console.log('Query String:', params.toString());
       console.log('=====================================');
@@ -352,11 +352,23 @@ export const existenciasAPI = {
       console.log('Is array:', Array.isArray(data));
       if (data) {
         console.log('Response keys:', Object.keys(data));
-        if (data.existencias) {
-          console.log('Existencias count:', data.existencias.length);
+        if (data.data) {
+          console.log('Data count:', data.data.length);
         }
       }
       console.log('======================================');
+
+      // Map the API response to expected format
+      if (data && data.data) {
+        const response = {
+          existencias: data.data,
+          totalRegistros: data.total || data.data.length,
+          totalPaginas: Math.ceil((data.total || data.data.length) / filtro.tamanoPagina),
+          paginaActual: filtro.pagina
+        };
+        console.log('Mapped response:', response);
+        return response;
+      }
 
       // Handle the response format - wrap in expected structure if needed
       if (Array.isArray(data)) {
@@ -370,7 +382,13 @@ export const existenciasAPI = {
         return response;
       }
 
-      return data;
+      // If no data found, return empty response
+      return {
+        existencias: [],
+        totalRegistros: 0,
+        totalPaginas: 1,
+        paginaActual: filtro.pagina
+      };
     } catch (error) {
       console.error('=== EXISTENCIAS API ERROR ===');
       console.error('Error details:', error);
