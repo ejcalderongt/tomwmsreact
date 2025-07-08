@@ -56,14 +56,13 @@ function Login() {
       <div className="w-full max-w-md">
         {/* Logo and Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4">
+          <div className="inline-flex items-center justify-center mb-2">
             <img 
               src="/tom_wms.png" 
               alt="TOM WMS Logo" 
               className="w-32 h-32 object-contain"
             />
           </div>
-          <h1 className="text-3xl font-semibold text-white mb-2">TOM WMS</h1>
           <p className="text-gray-400">Administración de Bodegas</p>
         </div>
 
