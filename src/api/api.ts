@@ -278,6 +278,52 @@ export const polizasAPI = {
 
 // Stock API (Existencias)
 export const existenciasAPI = {
+  resumen: async (filtro: { idBodega?: number; idPropietario: number }, token: string) => {
+    try {
+      // Build request body for POST request
+      const requestBody = {
+        idBodega: filtro.idBodega || 0,
+        idPropietario: filtro.idPropietario
+      };
+
+      console.log('=== RESUMEN EXISTENCIAS API REQUEST DEBUG ===');
+      console.log('Endpoint: /Stock/resumen');
+      console.log('Request Body:', requestBody);
+      console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+      console.log('===============================================');
+
+      const data = await apiRequest('/Stock/resumen', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log('=== RESUMEN EXISTENCIAS API RESPONSE DEBUG ===');
+      console.log('Response received:', data);
+      console.log('Response type:', typeof data);
+      console.log('Is array:', Array.isArray(data));
+      if (data) {
+        console.log('Response keys:', Object.keys(data));
+        if (Array.isArray(data)) {
+          console.log('Data count:', data.length);
+        }
+      }
+      console.log('===============================================');
+
+      // Return the data directly as it should be an array of summary objects
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('=== RESUMEN EXISTENCIAS API ERROR ===');
+      console.error('Error details:', error);
+      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('====================================');
+      throw new Error('Failed to fetch resumen data');
+    }
+  },
+
   listar: async (filtro: { idBodega?: number; idPropietario: number; pagina: number; tamanoPagina: number }, token: string) => {
     try {
       // Build query parameters for GET request using the correct API parameter names

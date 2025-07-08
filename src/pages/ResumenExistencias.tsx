@@ -132,50 +132,33 @@ function ResumenExistencias() {
         return;
       }
 
-      console.log('Cargando existencias con filtros:', { idBodega: bodegaSeleccionada, idPropietario });
+      console.log('Cargando resumen con filtros:', { idBodega: bodegaSeleccionada, idPropietario });
 
-      // Load all pages to get complete data for summary
-      let todasExistencias: Existencia[] = [];
-      let paginaActual = 1;
-      let totalPaginas = 1;
+      const filtro = {
+        idBodega: bodegaSeleccionada,
+        idPropietario
+      };
 
-      do {
-        const filtro = {
-          idBodega: bodegaSeleccionada,
-          idPropietario,
-          pagina: paginaActual,
-          tamanoPagina: 100 // Use larger page size for efficiency
-        };
+      // Use the dedicated resumen endpoint for a single request
+      const resumenData: ResumenProducto[] = await existenciasAPI.resumen(filtro, token);
+      console.log('Datos de resumen recibidos:', resumenData);
 
-        console.log(`Cargando página ${paginaActual} con filtro:`, filtro);
-        const data: ExistenciasResponse = await existenciasAPI.listar(filtro, token);
-        console.log(`Datos recibidos página ${paginaActual}:`, data);
-
-        if (data && data.existencias && Array.isArray(data.existencias)) {
-          todasExistencias = [...todasExistencias, ...data.existencias];
-          totalPaginas = data.totalPaginas || 1;
-        } else {
-          console.warn('No se recibieron existencias válidas:', data);
-          break;
-        }
-
-        paginaActual++;
-
-      } while (paginaActual <= totalPaginas);
-
-      console.log('Total existencias cargadas:', todasExistencias.length);
-      setExistenciasDetalle(todasExistencias);
-
-      if (todasExistencias.length > 0) {
-        generarResumen(todasExistencias);
-        toast.success(`Se procesaron ${todasExistencias.length} existencias para el resumen`);
+      if (Array.isArray(resumenData) && resumenData.length > 0) {
+        setResumenProductos(resumenData);
+        setFilteredResumen(resumenData);
+        
+        // Clear existencias detalle since we're using resumen data directly
+        setExistenciasDetalle([]);
+        
+        toast.success(`Se cargaron ${resumenData.length} productos en el resumen`);
       } else {
         setResumenProductos([]);
         setFilteredResumen([]);
-        toast.info('No se encontraron existencias con los filtros seleccionados');
+        setExistenciasDetalle([]);
+        toast.info('No se encontraron productos con los filtros seleccionados');
       }
     } catch (error: any) {
-      console.error('Error al cargar existencias:', error);
+      console.error('Error al cargar resumen:', error);
 
       if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
         logout();
@@ -183,7 +166,7 @@ function ResumenExistencias() {
         return;
       }
 
-      const errorMessage = error instanceof Error ? error.message : 'Error al cargar las existencias';
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar el resumen';
       toast.error(`Error: ${errorMessage}`);
       setExistenciasDetalle([]);
       setResumenProductos([]);
@@ -194,73 +177,7 @@ function ResumenExistencias() {
     }
   };
 
-  const generarResumen = (existencias: Existencia[]) => {
-    const productosMap = new Map<string, ResumenProducto>();
-
-    existencias.forEach(existencia => {
-      const key = `${existencia.codigo}-${existencia.nombre}`;
-
-      if (productosMap.has(key)) {
-        const producto = productosMap.get(key)!;
-
-        // Sum quantities
-        producto.cantidad_UMBas_Total += existencia.cantidad_UMBas || 0;
-        producto.disponible_UMBas_Total += existencia.disponible_UMBas || 0;
-        producto.cantidadReservadaUmBas_Total += existencia.cantidadReservadaUmBas || 0;
-        producto.cantidad_Presentacion_Total += existencia.cantidad_Presentacion || 0;
-        producto.disponible_Presentacion_Total += existencia.disponible_Presentacion || 0;
-        producto.cantidad_Reservada_Pres_Total += existencia.cantidad_Reservada_Pres || 0;
-        producto.valor_total_Total += existencia.valor_total || 0;
-
-        // Collect unique values
-        if (existencia.bodega && !producto.bodegas.includes(existencia.bodega)) {
-          producto.bodegas.push(existencia.bodega);
-        }
-
-        // Count unique locations and lots (simplified approach)
-        producto.ubicaciones += 1;
-        producto.lotes += 1;
-
-      } else {
-        // Create new product summary
-        const nuevoProducto: ResumenProducto = {
-          codigo: existencia.codigo || '',
-          nombre: existencia.nombre || '',
-          marca: existencia.marca || '',
-          familia: existencia.familia || '',
-          unidadMedida: existencia.unidadMedida || '',
-          presentacion: existencia.presentacion || '',
-          cantidad_UMBas_Total: existencia.cantidad_UMBas || 0,
-          disponible_UMBas_Total: existencia.disponible_UMBas || 0,
-          cantidadReservadaUmBas_Total: existencia.cantidadReservadaUmBas || 0,
-          cantidad_Presentacion_Total: existencia.cantidad_Presentacion || 0,
-          disponible_Presentacion_Total: existencia.disponible_Presentacion || 0,
-          cantidad_Reservada_Pres_Total: existencia.cantidad_Reservada_Pres || 0,
-          costo_Promedio: existencia.costo || 0,
-          valor_total_Total: existencia.valor_total || 0,
-          bodegas: existencia.bodega ? [existencia.bodega] : [],
-          ubicaciones: 1,
-          lotes: 1,
-        };
-
-        productosMap.set(key, nuevoProducto);
-      }
-    });
-
-    // Calculate average cost
-    productosMap.forEach(producto => {
-      const existenciasProducto = existencias.filter(e => 
-        e.codigo === producto.codigo && e.nombre === producto.nombre
-      );
-
-      const totalCosto = existenciasProducto.reduce((sum, e) => sum + (e.costo || 0), 0);
-      producto.costo_Promedio = existenciasProducto.length > 0 ? totalCosto / existenciasProducto.length : 0;
-    });
-
-    const resumen = Array.from(productosMap.values());
-    setResumenProductos(resumen);
-    setFilteredResumen(resumen);
-  };
+  
 
   // Search filter function
   const filterResumen = (resumen: ResumenProducto[], term: string) => {
@@ -402,7 +319,7 @@ function ResumenExistencias() {
                   <> (filtrados por: "{searchTerm}")</>
                 )}
               </span>
-              <span>Total registros detalle: {existenciasDetalle.length}</span>
+              <span>Resumen de productos consolidado</span>
             </div>
           </div>
         )}
