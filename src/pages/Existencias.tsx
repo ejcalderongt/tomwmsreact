@@ -47,6 +47,7 @@ interface ExistenciasResponse {
 function Existencias() {
   const navigate = useNavigate();
   const [existencias, setExistencias] = useState<Existencia[]>([]);
+  const [allExistencias, setAllExistencias] = useState<Existencia[]>([]); // Store all loaded data
   const [bodegas, setBodegas] = useState<Bodega[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingBodegas, setLoadingBodegas] = useState(true);
@@ -58,6 +59,12 @@ function Existencias() {
     // Try to restore from localStorage first, fallback to 0 (all warehouses)
     const saved = localStorage.getItem('existencias_bodegaSeleccionada');
     return saved ? parseInt(saved, 10) : 0;
+  });
+  
+  const [searchTerm, setSearchTerm] = useState<string>(() => {
+    // Try to restore from localStorage first, fallback to empty string
+    const saved = localStorage.getItem('existencias_searchTerm');
+    return saved || '';
   });
 
   // Paginación
@@ -85,6 +92,7 @@ function Existencias() {
       if (savedExistencias && savedTotalRegistros && savedTotalPaginas) {
         try {
           const parsedExistencias = JSON.parse(savedExistencias);
+          setAllExistencias(parsedExistencias);
           setExistencias(parsedExistencias);
           setTotalRegistros(parseInt(savedTotalRegistros, 10));
           setTotalPaginas(parseInt(savedTotalPaginas, 10));
@@ -184,7 +192,9 @@ function Existencias() {
       console.log('=== EXISTENCIAS API COMPLETED ===');
       console.log('Response data:', data);
 
-      setExistencias(data.existencias || []);
+      const existenciasData = data.existencias || [];
+      setAllExistencias(existenciasData);
+      setExistencias(existenciasData);
       setTotalRegistros(data.totalRegistros || 0);
       setTotalPaginas(data.totalPaginas || 1);
       setPaginaActual(data.paginaActual || 1);
@@ -195,6 +205,7 @@ function Existencias() {
       localStorage.setItem('existencias_data', JSON.stringify(data.existencias || []));
       localStorage.setItem('existencias_totalRegistros', (data.totalRegistros || 0).toString());
       localStorage.setItem('existencias_totalPaginas', (data.totalPaginas || 1).toString());
+      localStorage.setItem('existencias_searchTerm', searchTerm);
 
       if (!data.existencias || data.existencias.length === 0) {
         toast('No se encontraron existencias con los filtros seleccionados', {
@@ -221,6 +232,7 @@ function Existencias() {
       // Show more specific error message
       const errorMessage = error instanceof Error ? error.message : 'Error al cargar las existencias';
       toast.error(`Error: ${errorMessage}`);
+      setAllExistencias([]);
       setExistencias([]);
       setTotalRegistros(0);
       setTotalPaginas(1);
@@ -230,11 +242,42 @@ function Existencias() {
     }
   };
 
+  // Search filter function
+  const filterExistencias = (existenciasToFilter: Existencia[], term: string) => {
+    if (!term.trim()) {
+      return existenciasToFilter;
+    }
+    
+    const searchLower = term.toLowerCase().trim();
+    return existenciasToFilter.filter(existencia => 
+      existencia.codigo?.toLowerCase().includes(searchLower) ||
+      existencia.nombre?.toLowerCase().includes(searchLower) ||
+      existencia.lote?.toLowerCase().includes(searchLower) ||
+      existencia.nombre_Completo?.toLowerCase().includes(searchLower)
+    );
+  };
+
+  // Apply search filter whenever searchTerm or allExistencias changes
+  useEffect(() => {
+    const filtered = filterExistencias(allExistencias, searchTerm);
+    setExistencias(filtered);
+  }, [searchTerm, allExistencias]);
+
   const handleBodegaChange = (idBodega: number) => {
     setBodegaSeleccionada(idBodega);
     setPaginaActual(1); // Resetear a la primera página
     // Trigger fresh data load when filter changes
     setTimeout(() => cargarExistencias(), 0);
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    localStorage.setItem('existencias_searchTerm', value);
+  };
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    localStorage.removeItem('existencias_searchTerm');
   };
 
   const handlePageChange = (nuevaPagina: number) => {
@@ -359,6 +402,34 @@ function Existencias() {
               </select>
             </div>
 
+            <div className="flex-1 min-w-64">
+              <label htmlFor="search" className="block text-sm font-medium text-gray-700 mb-2">
+                <MagnifyingGlassIcon className="h-4 w-4 inline mr-1" />
+                Buscar Producto
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  id="search"
+                  value={searchTerm}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  placeholder="Código, nombre, lote o ubicación..."
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                />
+                {searchTerm && (
+                  <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+            </div>
+
             <button
               onClick={() => {
                 setPaginaActual(1);
@@ -381,6 +452,9 @@ function Existencias() {
                 Mostrando {existencias.length} de {totalRegistros} existencias
                 {bodegaSeleccionada > 0 && (
                   <> en {bodegas.find(b => b.idBodega === bodegaSeleccionada)?.nombre}</>
+                )}
+                {searchTerm && (
+                  <> (filtradas por: "{searchTerm}")</>
                 )}
               </span>
               <span>Página {paginaActual} de {totalPaginas}</span>
@@ -407,8 +481,19 @@ function Existencias() {
                 <CubeIcon className="mx-auto h-12 w-12 text-gray-400" />
                 <h3 className="mt-2 text-sm font-medium text-gray-900">No se encontraron existencias</h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  No hay existencias con los filtros seleccionados.
+                  {searchTerm ? 
+                    `No hay existencias que coincidan con "${searchTerm}".` :
+                    "No hay existencias con los filtros seleccionados."
+                  }
                 </p>
+                {searchTerm && (
+                  <button
+                    onClick={clearSearch}
+                    className="mt-2 text-sm text-purple-600 hover:text-purple-700"
+                  >
+                    Limpiar búsqueda
+                  </button>
+                )}
               </div>
             </div>
           ) : (
