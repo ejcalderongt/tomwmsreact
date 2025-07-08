@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
@@ -47,6 +46,36 @@ function Layout({ children }: LayoutProps) {
             </button>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
+            {/* Reportes de Existencias */}
+            <div className="space-y-1">
+              <div className="px-4 py-2">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Reportes de Existencias
+                </p>
+              </div>
+              <a
+                href="/existencias"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/existencias'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <CubeIcon className="mr-3 h-6 w-6" />
+                Detalle
+              </a>
+              <a
+                href="/resumen-existencias"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/resumen-existencias'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <CubeIcon className="mr-3 h-6 w-6" />
+                Resumen
+              </a>
+            </div>
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
               return (
@@ -84,6 +113,36 @@ function Layout({ children }: LayoutProps) {
             <h1 className="text-xl font-bold text-white">TOMWMSUX</h1>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
+            {/* Reportes de Existencias */}
+            <div className="space-y-1">
+              <div className="px-4 py-2">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Reportes de Existencias
+                </p>
+              </div>
+              <a
+                href="/existencias"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/existencias'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <CubeIcon className="mr-3 h-6 w-6" />
+                Detalle
+              </a>
+              <a
+                href="/resumen-existencias"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/resumen-existencias'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <CubeIcon className="mr-3 h-6 w-6" />
+                Resumen
+              </a>
+            </div>
             {navigation.map((item) => {
               const isActive = location.pathname === item.href;
               return (
