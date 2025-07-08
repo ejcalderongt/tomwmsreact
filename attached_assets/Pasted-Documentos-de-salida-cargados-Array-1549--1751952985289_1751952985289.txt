@@ -1,0 +1,297 @@
+Documentos de salida cargados: 
+Array(1549) [ {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, … ]
+​
+[0…99]
+​
+[100…199]
+​​
+100: Object { correlativo: 205, idBodega: 1, noDocumento: 205, … }
+​​​
+activo: true
+​​​
+anulado: false
+​​​
+bodega: "Bodega Principal"
+​​​
+bodegaDestino: ""
+​​​
+bodegaOrigen: "BOD1"
+​​​
+cliente: "C000590 - OPERADORA DE TIENDAS, S.A"
+​​​
+correlativo: 205
+​​​
+enviadoAErp: true
+​​​
+estado: "Despachado"
+​​​
+fecAgr: "2025-06-04T12:16:17.833"
+​​​
+fecha: "2025-06-04T12:16:17.833"
+​​​
+fechaPedido: "2025-06-05T00:32:34.097"
+​​​
+idBodega: 1
+​​​
+idDespachoEnc: 146
+​​​
+idPickingEnc: 51
+​​​
+idPrioridadPicking: 0
+​​​
+muelle: "Muelle1"
+​​​
+noDocumento: 205
+​​​
+noDocumentoExterno: "0"
+​​​
+noPickingErp: ""
+​​​
+observacion: ""
+​​​
+propietario: "KILIO-GARESA"
+​​​
+referencia: "16670"
+​​​
+referencia2: "10663"
+​​​
+roadRuta: ""
+​​​
+roadVendedor: ""
+​​​
+rutaDespacho: ""
+​​​
+tipoDocumento: "Pedido de Venta SAP"
+​​​
+<prototype>: Object { … }
+​​
+101: Object { correlativo: 206, idBodega: 1, noDocumento: 206, … }
+​​
+102: Object { correlativo: 207, idBodega: 1, noDocumento: 207, … }
+​​
+103: Object { correlativo: 208, idBodega: 1, noDocumento: 208, … }
+​​
+104: Object { correlativo: 209, idBodega: 1, noDocumento: 209, … }
+​​
+105: Object { correlativo: 210, idBodega: 1, noDocumento: 210, … }
+​​
+106: Object { correlativo: 211, idBodega: 1, noDocumento: 211, … }
+​​
+107: Object { correlativo: 212, idBodega: 1, noDocumento: 212, … }
+​​
+108: Object { correlativo: 1024, idBodega: 1, noDocumento: 1024, … }
+​​
+109: Object { correlativo: 1025, idBodega: 1, noDocumento: 1025, … }
+​​
+110: Object { correlativo: 1026, idBodega: 1, noDocumento: 1026, … }
+​​
+111: Object { correlativo: 1027, idBodega: 1, noDocumento: 1027, … }
+​​
+112: Object { correlativo: 1028, idBodega: 1, noDocumento: 1028, … }
+​​
+113: Object { correlativo: 1029, idBodega: 1, noDocumento: 1029, … }
+​​
+114: Object { correlativo: 1030, idBodega: 1, noDocumento: 1030, … }
+​​
+115: Object { correlativo: 1043, idBodega: 1, noDocumento: 1043, … }
+​​
+116: Object { correlativo: 1044, idBodega: 1, noDocumento: 1044, … }
+​​
+117: Object { correlativo: 1045, idBodega: 1, noDocumento: 1045, … }
+​​
+118: Object { correlativo: 1046, idBodega: 1, noDocumento: 1046, … }
+​​
+119: Object { correlativo: 1047, idBodega: 1, noDocumento: 1047, … }
+​​
+120: Object { correlativo: 1048, idBodega: 1, noDocumento: 1048, … }
+​​
+121: Object { correlativo: 1049, idBodega: 1, noDocumento: 1049, … }
+​​
+122: Object { correlativo: 1050, idBodega: 1, noDocumento: 1050, … }
+​​
+123: Object { correlativo: 1051, idBodega: 1, noDocumento: 1051, … }
+​​
+124: Object { correlativo: 1052, idBodega: 1, noDocumento: 1052, … }
+​​
+125: Object { correlativo: 1054, idBodega: 4, noDocumento: 1054, … }
+​​
+126: Object { correlativo: 1055, idBodega: 1, noDocumento: 1055, … }
+​​
+127: Object { correlativo: 1056, idBodega: 1, noDocumento: 1056, … }
+​​
+128: Object { correlativo: 1057, idBodega: 1, noDocumento: 1057, … }
+​​
+129: Object { correlativo: 1059, idBodega: 1, noDocumento: 1059, … }
+​​
+130: Object { correlativo: 1060, idBodega: 1, noDocumento: 1060, … }
+​​
+131: Object { correlativo: 1061, idBodega: 1, noDocumento: 1061, … }
+​​
+132: Object { correlativo: 1062, idBodega: 1, noDocumento: 1062, … }
+​​
+133: Object { correlativo: 1063, idBodega: 1, noDocumento: 1063, … }
+​​
+134: Object { correlativo: 1064, idBodega: 1, noDocumento: 1064, … }
+​​
+135: Object { correlativo: 1065, idBodega: 1, noDocumento: 1065, … }
+​​
+136: Object { correlativo: 1066, idBodega: 1, noDocumento: 1066, … }
+​​
+137: Object { correlativo: 1067, idBodega: 1, noDocumento: 1067, … }
+​​
+138: Object { correlativo: 1068, idBodega: 1, noDocumento: 1068, … }
+​​
+139: Object { correlativo: 1069, idBodega: 1, noDocumento: 1069, … }
+​​
+140: Object { correlativo: 1070, idBodega: 1, noDocumento: 1070, … }
+​​
+141: Object { correlativo: 1071, idBodega: 1, noDocumento: 1071, … }
+​​
+142: Object { correlativo: 941, idBodega: 1, noDocumento: 941, … }
+​​
+143: Object { correlativo: 942, idBodega: 1, noDocumento: 942, … }
+​​
+144: Object { correlativo: 943, idBodega: 1, noDocumento: 943, … }
+​​
+145: Object { correlativo: 944, idBodega: 1, noDocumento: 944, … }
+​​
+146: Object { correlativo: 945, idBodega: 1, noDocumento: 945, … }
+​​
+147: Object { correlativo: 946, idBodega: 1, noDocumento: 946, … }
+​​
+148: Object { correlativo: 1072, idBodega: 1, noDocumento: 1072, … }
+​​
+149: Object { correlativo: 1073, idBodega: 1, noDocumento: 1073, … }
+​​
+150: Object { correlativo: 1074, idBodega: 1, noDocumento: 1074, … }
+​​
+151: Object { correlativo: 1075, idBodega: 1, noDocumento: 1075, … }
+​​
+152: Object { correlativo: 1076, idBodega: 1, noDocumento: 1076, … }
+​​
+153: Object { correlativo: 1077, idBodega: 1, noDocumento: 1077, … }
+​​
+154: Object { correlativo: 1085, idBodega: 1, noDocumento: 1085, … }
+​​
+155: Object { correlativo: 1086, idBodega: 1, noDocumento: 1086, … }
+​​
+156: Object { correlativo: 1087, idBodega: 1, noDocumento: 1087, … }
+​​
+157: Object { correlativo: 1088, idBodega: 1, noDocumento: 1088, … }
+​​
+158: Object { correlativo: 1089, idBodega: 1, noDocumento: 1089, … }
+​​
+159: Object { correlativo: 1090, idBodega: 1, noDocumento: 1090, … }
+​​
+160: Object { correlativo: 1091, idBodega: 1, noDocumento: 1091, … }
+​​
+161: Object { correlativo: 1092, idBodega: 1, noDocumento: 1092, … }
+​​
+162: Object { correlativo: 1093, idBodega: 1, noDocumento: 1093, … }
+​​
+163: Object { correlativo: 1094, idBodega: 1, noDocumento: 1094, … }
+​​
+164: Object { correlativo: 1095, idBodega: 1, noDocumento: 1095, … }
+​​
+165: Object { correlativo: 1096, idBodega: 1, noDocumento: 1096, … }
+​​
+166: Object { correlativo: 1097, idBodega: 1, noDocumento: 1097, … }
+​​
+167: Object { correlativo: 1098, idBodega: 1, noDocumento: 1098, … }
+​​
+168: Object { correlativo: 1099, idBodega: 1, noDocumento: 1099, … }
+​​
+169: Object { correlativo: 1100, idBodega: 1, noDocumento: 1100, … }
+​​
+170: Object { correlativo: 1101, idBodega: 1, noDocumento: 1101, … }
+​​
+171: Object { correlativo: 1102, idBodega: 1, noDocumento: 1102, … }
+​​
+172: Object { correlativo: 1103, idBodega: 1, noDocumento: 1103, … }
+​​
+173: Object { correlativo: 1104, idBodega: 1, noDocumento: 1104, … }
+​​
+174: Object { correlativo: 1105, idBodega: 1, noDocumento: 1105, … }
+​​
+175: Object { correlativo: 1106, idBodega: 1, noDocumento: 1106, … }
+​​
+176: Object { correlativo: 1107, idBodega: 1, noDocumento: 1107, … }
+​​
+177: Object { correlativo: 170, idBodega: 1, noDocumento: 170, … }
+​​
+178: Object { correlativo: 171, idBodega: 1, noDocumento: 171, … }
+​​
+179: Object { correlativo: 172, idBodega: 1, noDocumento: 172, … }
+​​
+180: Object { correlativo: 173, idBodega: 1, noDocumento: 173, … }
+​​
+181: Object { correlativo: 174, idBodega: 1, noDocumento: 174, … }
+​​
+182: Object { correlativo: 175, idBodega: 1, noDocumento: 175, … }
+​​
+183: Object { correlativo: 176, idBodega: 1, noDocumento: 176, … }
+​​
+184: Object { correlativo: 177, idBodega: 1, noDocumento: 177, … }
+​​
+185: Object { correlativo: 178, idBodega: 1, noDocumento: 178, … }
+​​
+186: Object { correlativo: 179, idBodega: 1, noDocumento: 179, … }
+​​
+187: Object { correlativo: 180, idBodega: 1, noDocumento: 180, … }
+​​
+188: Object { correlativo: 226, idBodega: 1, noDocumento: 226, … }
+​​
+189: Object { correlativo: 227, idBodega: 1, noDocumento: 227, … }
+​​
+190: Object { correlativo: 228, idBodega: 1, noDocumento: 228, … }
+​​
+191: Object { correlativo: 229, idBodega: 1, noDocumento: 229, … }
+​​
+192: Object { correlativo: 230, idBodega: 1, noDocumento: 230, … }
+​​
+193: Object { correlativo: 231, idBodega: 1, noDocumento: 231, … }
+​​
+194: Object { correlativo: 232, idBodega: 1, noDocumento: 232, … }
+​​
+195: Object { correlativo: 233, idBodega: 1, noDocumento: 233, … }
+​​
+196: Object { correlativo: 236, idBodega: 1, noDocumento: 236, … }
+​​
+197: Object { correlativo: 237, idBodega: 1, noDocumento: 237, … }
+​​
+198: Object { correlativo: 238, idBodega: 1, noDocumento: 238, … }
+​​
+199: Object { correlativo: 239, idBodega: 1, noDocumento: 239, … }
+​
+[200…299]
+​
+[300…399]
+​
+[400…499]
+​
+[500…599]
+​
+[600…699]
+​
+[700…799]
+​
+[800…899]
+​
+[900…999]
+​
+[1000…1099]
+​
+[1100…1199]
+​
+[1200…1299]
+​
+[1300…1399]
+​
+[1400…1499]
+​
+[1500…1548]
+​
+length: 1549
+​
+<prototype>: Array []
+Salidas.tsx:66:15
