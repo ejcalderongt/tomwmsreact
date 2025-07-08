@@ -47,7 +47,15 @@ export const isAuthenticated = (): boolean => {
     return false;
   }
   const token = getToken();
-  return !!token && token.trim() !== '';
+  const isValid = !!token && token.trim() !== '';
+  
+  // If token is invalid, clear session
+  if (!isValid && (localStorage.getItem(TOKEN_KEY) || localStorage.getItem(USER_ID_KEY))) {
+    console.log('Invalid token detected, clearing session');
+    logout();
+  }
+  
+  return isValid;
 };
 
 export const logout = (): void => {

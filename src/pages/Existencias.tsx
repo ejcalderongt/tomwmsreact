@@ -4,7 +4,7 @@ import Layout from '@/components/Layout';
 import { CubeIcon, BuildingStorefrontIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { existenciasAPI, bodegasAPI } from '@/api/api';
-import { getToken } from '@/utils/auth';
+import { getToken, logout } from '@/utils/auth';
 
 interface Existencia {
   idExistencia: number;
@@ -63,12 +63,16 @@ function Existencias() {
   }, [bodegas, bodegaSeleccionada, paginaActual]);
 
   const cargarBodegas = async () => {
+    // Prevent multiple simultaneous requests
+    if (loadingBodegas) return;
+    
     setLoadingBodegas(true);
     try {
       const token = getToken();
 
       if (!token) {
         console.log('No token found, redirecting to login');
+        logout(); // Clear session
         navigate('/login', { replace: true });
         return;
       }
@@ -82,8 +86,9 @@ function Existencias() {
       console.error('Error al cargar bodegas:', error);
       
       // Check if it's an authentication error
-      if (error instanceof Error && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
-        console.log('Authentication error, redirecting to login');
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
+        console.log('Authentication error, clearing session and redirecting to login');
+        logout(); // Clear session
         navigate('/login', { replace: true });
         return;
       }
@@ -96,6 +101,9 @@ function Existencias() {
   };
 
   const cargarExistencias = async () => {
+    // Prevent multiple simultaneous requests
+    if (loading) return;
+    
     setLoading(true);
     try {
       const token = getToken();
@@ -103,6 +111,7 @@ function Existencias() {
 
       if (!token || !idPropietario) {
         console.log('Missing authentication data, redirecting to login');
+        logout(); // Clear session
         navigate('/login', { replace: true });
         return;
       }
@@ -138,8 +147,9 @@ function Existencias() {
       console.error('Error al cargar existencias:', error);
       
       // Check if it's an authentication error
-      if (error instanceof Error && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
-        console.log('Authentication error, redirecting to login');
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
+        console.log('Authentication error, clearing session and redirecting to login');
+        logout(); // Clear session
         navigate('/login', { replace: true });
         return;
       }
