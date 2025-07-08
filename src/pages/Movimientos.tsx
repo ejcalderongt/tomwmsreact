@@ -8,16 +8,16 @@ import toast from 'react-hot-toast';
 import { ArrowsRightLeftIcon, MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 interface Movimiento {
-  idMovimiento: number;
-  idEmpresa: number;
-  idBodegaOrigen: number;
-  idBodegaDestino: number;
-  idTipoMovimiento: number;
-  fecha: string;
-  observaciones: string;
-  activo: boolean;
-  usuario: string;
-  fechaCreacion: string;
+  idMovimiento?: number;
+  idEmpresa?: number;
+  idBodegaOrigen?: number;
+  idBodegaDestino?: number;
+  idTipoMovimiento?: number;
+  fecha?: string;
+  observaciones?: string;
+  activo?: boolean;
+  usuario?: string;
+  fechaCreacion?: string;
   // Add more properties as needed based on API response
 }
 
@@ -150,11 +150,11 @@ function Movimientos() {
     if (!busqueda) return true;
     const searchTerm = busqueda.toLowerCase();
     return (
-      movimiento.idMovimiento.toString().includes(searchTerm) ||
+      movimiento.idMovimiento?.toString().includes(searchTerm) ||
       movimiento.observaciones?.toLowerCase().includes(searchTerm) ||
       movimiento.usuario?.toLowerCase().includes(searchTerm) ||
-      movimiento.idBodegaOrigen.toString().includes(searchTerm) ||
-      movimiento.idBodegaDestino.toString().includes(searchTerm)
+      movimiento.idBodegaOrigen?.toString().includes(searchTerm) ||
+      movimiento.idBodegaDestino?.toString().includes(searchTerm)
     );
   });
 
@@ -314,21 +314,21 @@ function Movimientos() {
                     </tr>
                   ) : (
                     movimientosFiltrados.map((movimiento) => (
-                      <tr key={movimiento.idMovimiento} className="hover:bg-gray-50">
+                      <tr key={movimiento.idMovimiento || Math.random()} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {movimiento.idMovimiento}
+                          {movimiento.idMovimiento || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatDate(movimiento.fecha)}
+                          {formatDate(movimiento.fecha || '')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.idBodegaOrigen}
+                          {movimiento.idBodegaOrigen || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.idBodegaDestino}
+                          {movimiento.idBodegaDestino || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.idTipoMovimiento}
+                          {movimiento.idTipoMovimiento || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {movimiento.usuario || '-'}
@@ -373,7 +373,7 @@ function Movimientos() {
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="text-2xl font-bold text-gray-600">
-                  {new Set(movimientosFiltrados.map(m => m.idBodegaOrigen)).size}
+                  {new Set(movimientosFiltrados.map(m => m.idBodegaOrigen).filter(id => id != null)).size}
                 </div>
                 <div className="text-sm text-gray-600">Bodegas Involucradas</div>
               </div>
