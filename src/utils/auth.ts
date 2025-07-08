@@ -48,32 +48,49 @@ export const getToken = (): string | null => {
 export const isAuthenticated = (): boolean => {
   try {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) {
-      console.log('No token found in localStorage');
+    if (!token || token === 'undefined' || token === 'null') {
+      console.log('No valid token found in localStorage');
       return false;
     }
 
     console.log('Token found, validating...');
 
-    // Check if token has correct format
+    // Check if token has correct format (JWT should have 3 parts)
     const parts = token.split('.');
     if (parts.length !== 3) {
       console.log('Invalid token format');
       localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(USER_KEY);
       return false;
     }
 
-    // Check if token is expired
-    const payload = JSON.parse(atob(parts[1]));
-    const currentTime = Date.now() / 1000;
+    // Try to decode the payload to check expiration
+    try {
+      // Add padding if needed for base64 decoding
+      let payload = parts[1];
+      while (payload.length % 4) {
+        payload += '=';
+      }
+      
+      const decodedPayload = JSON.parse(atob(payload));
+      
+      // Check if token has expiration and if it's expired
+      if (decodedPayload.exp) {
+        const currentTime = Date.now() / 1000;
+        console.log('Token expiry:', new Date(decodedPayload.exp * 1000));
+        console.log('Current time:', new Date(currentTime * 1000));
 
-    console.log('Token expiry:', new Date(payload.exp * 1000));
-    console.log('Current time:', new Date(currentTime * 1000));
-
-    if (payload.exp < currentTime) {
-      console.log('Token expired, removing from localStorage');
-      localStorage.removeItem(TOKEN_KEY);
-      return false;
+        if (decodedPayload.exp < currentTime) {
+          console.log('Token expired, removing from localStorage');
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(USER_KEY);
+          return false;
+        }
+      }
+    } catch (parseError) {
+      console.log('Could not parse token payload, but token exists');
+      // If we can't parse the payload, we'll assume token is valid
+      // and let the server validate it
     }
 
     console.log('Token is valid');
@@ -81,6 +98,7 @@ export const isAuthenticated = (): boolean => {
   } catch (error) {
     console.error('Error checking authentication:', error);
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     return false;
   }
 };
