@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from "@/api/api";
-import { saveUser, isAuthenticated, getToken } from "@/utils/auth";
+import { saveUser, isAuthenticated, getToken, logout } from "@/utils/auth";
 import toast from "react-hot-toast";
 
 function Login() {
@@ -15,26 +15,26 @@ function Login() {
 
     // Solo verificar si hay un token válido al cargar la página
     const checkToken = async () => {
-      if (isAuthenticated()) {
-        try {
+      try {
+        if (isAuthenticated()) {
           const token = getToken();
-          if (token) {
-            // Verificar que el token sea válido antes de redirigir
+          if (token && token !== 'undefined') {
+            console.log('Checking existing token...');
             await authAPI.testAuth(token);
+            console.log('Token valid, redirecting to existencias');
             navigate("/existencias", { replace: true });
           }
-        } catch (error) {
-          console.log('Token inválido, permaneciendo en login');
-          // Token inválido, limpiar y permanecer en login
-          localStorage.removeItem('wms_token');
-          localStorage.removeItem('wms_user');
         }
+      } catch (error) {
+        console.log('Token validation failed, staying on login');
+        // Token inválido, limpiar y permanecer en login
+        logout();
       }
     };
 
     // Solo ejecutar la verificación una vez al montar el componente
     checkToken();
-  }, []); // Remover navigate de las dependencias para evitar bucles
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

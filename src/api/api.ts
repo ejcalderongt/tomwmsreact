@@ -1,10 +1,5 @@
 import { getUser } from "@/utils/auth";
 
-export interface LoginCredentials {
-  username: string;
-  password: string;
-}
-
 export interface DocumentoIngresoFiltro {
   fechaInicio: string;
   fechaFin: string;
@@ -15,6 +10,11 @@ export interface DocumentoIngresoFiltro {
 export interface User {
   username: string;
   token: string;
+}
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
 }
 
 // Request deduplication cache
@@ -129,6 +129,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
+      console.log('Attempting login with credentials:', { username: credentials.username });
       const data = await apiRequest(`/Auth/login-propietario`, {
         method: 'POST',
         headers: {
@@ -137,11 +138,16 @@ export const authAPI = {
         body: JSON.stringify(credentials),
       });
 
-      console.log('API Response:', data);
-      return data;
+      console.log('Login API Response:', data);
+      
+      // Ensure we return the expected format
+      return {
+        username: credentials.username,
+        token: data.token || data.accessToken || data
+      };
     } catch (error) {
       console.error('Login API Error:', error);
-      throw new Error('Login failed');
+      throw new Error('Usuario o contraseña incorrectos');
     }
   },
 
