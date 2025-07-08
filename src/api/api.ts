@@ -455,7 +455,12 @@ export const movimientosAPI = {
       // Check if request is already in progress
       if (requestCache.has(cacheKey)) {
         console.log('Movimientos request already in progress, waiting for result...');
-        return await requestCache.get(cacheKey);
+        try {
+          return await requestCache.get(cacheKey);
+        } catch (cacheError) {
+          console.log('Cache request failed, removing from cache and retrying:', cacheError);
+          requestCache.delete(cacheKey);
+        }
       }
 
       console.log('=== MOVIMIENTOS API REQUEST DEBUG ===');

@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { movimientosAPI, bodegasAPI } from '@/api/api';
@@ -32,6 +32,7 @@ function Movimientos() {
   const [loading, setLoading] = useState(false);
   const [loadingBodegas, setLoadingBodegas] = useState(true);
   const [bodegaSeleccionada, setBodegaSeleccionada] = useState<number>(0);
+  const loadingRef = useRef(false);
   const [fechaInicio, setFechaInicio] = useState(() => {
     // Default to first day of current month
     const today = new Date();
@@ -81,9 +82,11 @@ function Movimientos() {
   };
 
   const cargarMovimientos = async () => {
-    if (loading) return; // Prevent duplicate requests
+    if (loading || loadingRef.current) return; // Prevent duplicate requests
     
     setLoading(true);
+    loadingRef.current = true;
+    
     try {
       const token = getToken();
       const userData = getUser();
@@ -117,6 +120,7 @@ function Movimientos() {
       setMovimientos([]);
     } finally {
       setLoading(false);
+      loadingRef.current = false;
     }
   };
 
