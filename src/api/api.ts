@@ -76,7 +76,9 @@ export const ingresosAPI = {
   
   obtenerDetalle: async (idOrdenCompraEnc: number, token: string) => {
     try {
-      const data = await apiRequest(`/api/sync/ingresos/${idOrdenCompraEnc}/detalle-oc`, {
+      const url = `/api/sync/ingresos/${idOrdenCompraEnc}/detalle-oc`;
+      console.log('URL detalle OC:', url);
+      const data = await apiRequest(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -91,7 +93,9 @@ export const ingresosAPI = {
   
   obtenerRecepciones: async (idOrdenCompraEnc: number, token: string) => {
     try {
-      const data = await apiRequest(`/api/sync/ingresos/${idOrdenCompraEnc}/recepciones`, {
+      const url = `/api/sync/ingresos/${idOrdenCompraEnc}/recepciones`;
+      console.log('URL recepciones:', url);
+      const data = await apiRequest(url, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

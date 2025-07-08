@@ -58,7 +58,7 @@ function DetalleDocumentoIngreso() {
     try {
       // Usar las claves correctas del localStorage
       const token = localStorage.getItem('wms_token') || localStorage.getItem('token') || '';
-      
+
       const id = parseInt(IdOrdenCompraEnc || '0');
       if (!id) {
         toast.error('ID de documento inválido');
@@ -91,9 +91,17 @@ function DetalleDocumentoIngreso() {
       const data = await ingresosAPI.obtenerDetalle(id, token);
       console.log("Respuesta detalle OC:", data);
       setDetalleOC(data || []);
-      
+
       if (!data || data.length === 0) {
-        toast.info('No se encontró detalle para esta orden de compra');
+        toast('No se encontró detalle para esta orden de compra', {
+          icon: 'ℹ️',
+          style: {
+            background: '#3b82f6',
+            color: '#fff'
+          }
+        });
+      } else {
+        toast.success(`Se cargaron ${data.length} elementos del detalle`);
       }
     } catch (error) {
         console.error('Error al cargar detalle:', error);
@@ -107,9 +115,17 @@ function DetalleDocumentoIngreso() {
       const data = await ingresosAPI.obtenerRecepciones(id, token);
       console.log("Respuesta directa de la API (recepciones):", data);
       setRecepciones(data || []);
-      
+
       if (!data || data.length === 0) {
-        toast.info('No se encontraron recepciones para esta orden de compra');
+        toast('No se encontraron recepciones para esta orden de compra', {
+          icon: 'ℹ️',
+          style: {
+            background: '#3b82f6',
+            color: '#fff'
+          }
+        });
+      } else {
+        toast.success(`Se cargaron ${data.length} recepciones`);
       }
     } catch (error) {
           console.error('Error al cargar recepciones:', error);
