@@ -18,7 +18,7 @@ export default defineConfig({
     allowedHosts: true, // Permite todos los hosts externos
     proxy: {
       "/api": {
-        target: "http://52.41.114.122:8091",
+        target: "http://52.41.114.122:8097",
         changeOrigin: true,
         secure: false,
         ws: false, // No se requiere WebSocket

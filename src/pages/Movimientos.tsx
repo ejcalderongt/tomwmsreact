@@ -8,26 +8,50 @@ import toast from 'react-hot-toast';
 import { ArrowsRightLeftIcon, MagnifyingGlassIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 interface Movimiento {
-  idMovimiento?: number;
-  idEmpresa?: number;
+  propietario?: string;
+  producto?: string;
+  poliza?: string;
+  presentacion?: string;
+  estadoOrigen?: string;
+  estadoDestino?: string;
+  umBas?: string;
+  cantidad?: number;
+  peso?: number;
+  lote?: string;
+  ubicOrigen?: string;
+  ubicDestino?: string;
+  tipoTarea?: string;
+  fecha?: string;
+  idProducto?: number;
+  codigo?: string;
+  codigoBarra?: string;
+  idTipoTarea?: number;
+  contabilizar?: boolean;
+  fecha_vence?: string;
+  idTipoActualizacionCosto?: number;
+  idPresentacion?: number;
+  idUnidadMedida?: number;
+  idEstadoOrigen?: number;
+  idProductoBodega?: number;
+  idPropietarioBodega?: number;
+  idBodega?: number;
+  licencia?: string;
+  clasificacion?: string;
+  familia?: string;
   idBodegaOrigen?: number;
   idBodegaDestino?: number;
-  idTipoMovimiento?: number;
-  fecha?: string;
-  observaciones?: string;
-  activo?: boolean;
-  usuario?: string;
-  fechaCreacion?: string;
-  fechaAgr?: string;
-  lic_plate?: string;
-  fecha_vence?: string;
-  idProductoEstado?: number;
-  peso?: number;
-  ticket?: string;
-  poliza?: string;
-  idUnidadMedida?: number;
-  cantidad?: number;
-  // Add more properties as needed based on API response
+  codigo_Bodega_Destino?: string;
+  nombre_Bodega_Destino?: string;
+  idMovimiento?: number;
+  codigo_Bodega_Origen?: string;
+  nombre_Bodega_Origen?: string;
+  nombreArea?: string;
+  factor?: number;
+  idTicketTMS?: string;
+  operador?: string;
+  idUbicacionDestino?: number;
+  idUbicacionOrigen?: number;
+  idPropietario?: number;
 }
 
 interface Bodega {
@@ -174,35 +198,18 @@ function Movimientos() {
     return value ? 'Activo' : 'Inactivo';
   };
 
-  const getBodegaNombre = (idBodega: number | undefined): string => {
-    if (!idBodega) return '-';
-    const bodega = bodegas.find(b => b.idBodega === idBodega);
-    return bodega ? bodega.nombre : `Bodega ${idBodega}`;
+  const getBodegaNombre = (nombre: string | undefined, codigo: string | undefined): string => {
+    if (!nombre && !codigo) return '-';
+    if (codigo && nombre) return `${codigo} - ${nombre}`;
+    return nombre || codigo || '-';
   };
 
-  const getTipoMovimiento = (idTipo: number | undefined): string => {
-    if (!idTipo) return '-';
-    // You can expand this mapping based on your business logic
-    const tipos: { [key: number]: string } = {
-      1: 'Ingreso',
-      2: 'Salida',
-      3: 'Transferencia',
-      4: 'Ajuste',
-      5: 'Inventario'
-    };
-    return tipos[idTipo] || `Tipo ${idTipo}`;
+  const getTipoTarea = (tipoTarea: string | undefined): string => {
+    return tipoTarea || '-';
   };
 
-  const getEstadoProducto = (idEstado: number | undefined): string => {
-    if (!idEstado) return '-';
-    // You can expand this mapping based on your business logic
-    const estados: { [key: number]: string } = {
-      1: 'Buen Estado',
-      2: 'Dañado',
-      3: 'Vencido',
-      4: 'Cuarentena'
-    };
-    return estados[idEstado] || `Estado ${idEstado}`;
+  const getEstadoProducto = (estado: string | undefined): string => {
+    return estado || '-';
   };
 
   // Filter movements based on search term
@@ -211,13 +218,15 @@ function Movimientos() {
     const searchTerm = busqueda.toLowerCase();
     return (
       movimiento.idMovimiento?.toString().includes(searchTerm) ||
-      movimiento.observaciones?.toLowerCase().includes(searchTerm) ||
-      movimiento.usuario?.toLowerCase().includes(searchTerm) ||
-      movimiento.lic_plate?.toLowerCase().includes(searchTerm) ||
-      movimiento.ticket?.toLowerCase().includes(searchTerm) ||
+      movimiento.producto?.toLowerCase().includes(searchTerm) ||
+      movimiento.operador?.toLowerCase().includes(searchTerm) ||
+      movimiento.licencia?.toLowerCase().includes(searchTerm) ||
+      movimiento.idTicketTMS?.toLowerCase().includes(searchTerm) ||
       movimiento.poliza?.toLowerCase().includes(searchTerm) ||
-      getBodegaNombre(movimiento.idBodegaOrigen).toLowerCase().includes(searchTerm) ||
-      getBodegaNombre(movimiento.idBodegaDestino).toLowerCase().includes(searchTerm)
+      movimiento.codigo?.toLowerCase().includes(searchTerm) ||
+      movimiento.lote?.toLowerCase().includes(searchTerm) ||
+      movimiento.nombre_Bodega_Origen?.toLowerCase().includes(searchTerm) ||
+      movimiento.nombre_Bodega_Destino?.toLowerCase().includes(searchTerm)
     );
   });
 
@@ -349,16 +358,25 @@ function Movimientos() {
                       Fecha
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Producto
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Código
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Lote
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Bodega Origen
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Bodega Destino
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Tipo Movimiento
+                      Tipo Tarea
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Usuario
+                      Operador
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Cantidad
@@ -370,35 +388,35 @@ function Movimientos() {
                       Peso
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Lic Plate
+                      Licencia
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Fecha Vence
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado Producto
+                      Estado Origen
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Ticket
+                      Estado Destino
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Fecha Agr
+                      Ticket TMS
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Póliza
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado
+                      Ubicación Origen
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Observaciones
+                      Ubicación Destino
                     </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {movimientosFiltrados.length === 0 ? (
                     <tr>
-                      <td colSpan={17} className="px-6 py-12 text-center text-gray-500">
+                      <td colSpan={20} className="px-6 py-12 text-center text-gray-500">
                         No se encontraron movimientos para los filtros seleccionados
                       </td>
                     </tr>
@@ -411,56 +429,59 @@ function Movimientos() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {formatDate(movimiento.fecha || '')}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {getBodegaNombre(movimiento.idBodegaOrigen)}
+                        <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                          {movimiento.producto || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {getBodegaNombre(movimiento.idBodegaDestino)}
+                          {movimiento.codigo || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {getTipoMovimiento(movimiento.idTipoMovimiento)}
+                          {movimiento.lote || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.usuario || '-'}
+                          {getBodegaNombre(movimiento.nombre_Bodega_Origen, movimiento.codigo_Bodega_Origen)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {getBodegaNombre(movimiento.nombre_Bodega_Destino, movimiento.codigo_Bodega_Destino)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {getTipoTarea(movimiento.tipoTarea)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {movimiento.operador || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                           {formatNumber(movimiento.cantidad)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.idUnidadMedida || '-'}
+                          {movimiento.umBas || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
                           {formatNumber(movimiento.peso)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.lic_plate || '-'}
+                          {movimiento.licencia || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {formatDate(movimiento.fecha_vence || '')}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {getEstadoProducto(movimiento.idProductoEstado)}
+                          {getEstadoProducto(movimiento.estadoOrigen)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {movimiento.ticket || '-'}
+                          {getEstadoProducto(movimiento.estadoDestino)}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatDate(movimiento.fechaAgr || '')}
+                          {movimiento.idTicketTMS || '-'}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                           {movimiento.poliza || '-'}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            movimiento.activo 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-red-100 text-red-800'
-                          }`}>
-                            {formatBoolean(movimiento.activo)}
-                          </span>
+                        <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
+                          {movimiento.ubicOrigen || '-'}
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
-                          {movimiento.observaciones || '-'}
+                          {movimiento.ubicDestino || '-'}
                         </td>
                       </tr>
                     ))
@@ -484,9 +505,9 @@ function Movimientos() {
               </div>
               <div className="bg-green-50 rounded-lg p-4">
                 <div className="text-2xl font-bold text-green-600">
-                  {movimientosFiltrados.filter(m => m.activo).length}
+                  {new Set(movimientosFiltrados.map(m => m.producto).filter(p => p != null)).size}
                 </div>
-                <div className="text-sm text-green-600">Movimientos Activos</div>
+                <div className="text-sm text-green-600">Productos Únicos</div>
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="text-2xl font-bold text-gray-600">
