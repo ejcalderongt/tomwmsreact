@@ -41,6 +41,8 @@ function Existencias() {
   const [bodegas, setBodegas] = useState<Bodega[]>([]);
   const [loading, setLoading] = useState(false);
   const [loadingBodegas, setLoadingBodegas] = useState(true);
+  const [isLoadingBodegas, setIsLoadingBodegas] = useState(false);
+  const [isLoadingExistencias, setIsLoadingExistencias] = useState(false);
 
   // Filtros
   const [bodegaSeleccionada, setBodegaSeleccionada] = useState<number>(0); // 0 = Todas las bodegas
@@ -64,8 +66,9 @@ function Existencias() {
 
   const cargarBodegas = async () => {
     // Prevent multiple simultaneous requests
-    if (loadingBodegas) return;
+    if (isLoadingBodegas) return;
     
+    setIsLoadingBodegas(true);
     setLoadingBodegas(true);
     try {
       const token = getToken();
@@ -97,13 +100,15 @@ function Existencias() {
       setBodegas([]);
     } finally {
       setLoadingBodegas(false);
+      setIsLoadingBodegas(false);
     }
   };
 
   const cargarExistencias = async () => {
     // Prevent multiple simultaneous requests
-    if (loading) return;
+    if (isLoadingExistencias) return;
     
+    setIsLoadingExistencias(true);
     setLoading(true);
     try {
       const token = getToken();
@@ -158,6 +163,7 @@ function Existencias() {
       setExistencias([]);
     } finally {
       setLoading(false);
+      setIsLoadingExistencias(false);
     }
   };
 

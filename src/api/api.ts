@@ -17,7 +17,43 @@ export interface User {
   token: string;
 }
 
+// Request deduplication cache
+const requestCache = new Map<string, Promise<any>>();
+let isRedirecting = false;
+
+const clearAuthAndRedirect = () => {
+  if (isRedirecting) return;
+  isRedirecting = true;
+  
+  console.log('Authentication failed, clearing session and redirecting to login');
+  
+  // Clear localStorage
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('wms_token');
+    localStorage.removeItem('wms_idPropietario');
+    localStorage.removeItem('wms_username');
+  }
+  
+  // Clear request cache
+  requestCache.clear();
+  
+  // Redirect to login
+  setTimeout(() => {
+    window.location.href = '/login';
+  }, 100);
+};
+
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
+  // Create cache key for deduplication (exclude login requests)
+  const isLoginRequest = endpoint.includes('/Auth/login-propietario');
+  const cacheKey = !isLoginRequest ? `${endpoint}:${JSON.stringify(options)}` : null;
+  
+  // Return existing promise if same request is already in progress
+  if (cacheKey && requestCache.has(cacheKey)) {
+    console.log('Returning cached request for:', endpoint);
+    return requestCache.get(cacheKey);
+  }
+
   const config: RequestInit = {
     ...options,
     credentials: 'omit', // Evita el popup de autenticación básica
@@ -28,7 +64,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
   };
 
   // Para login, no agregar token
-  if (!endpoint.includes('/Auth/login-propietario')) {
+  if (!isLoginRequest) {
     const user = getUser();
     if (user.token) {
       config.headers = {
@@ -38,43 +74,47 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     }
   }
 
-  const response = await fetch(`/api${endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint}`, config);
-
-  // Handle authentication errors
-  if (response.status === 401 || response.status === 403) {
-    console.log('Authentication failed, clearing session and redirecting to login');
-
-    // Clear localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('wms_token');
-      localStorage.removeItem('wms_idPropietario');
-      localStorage.removeItem('wms_username');
-    }
-
-    // Redirect to login
-    window.location.href = '/login';
-    throw new Error(`Authentication failed: ${response.status}`);
-  }
+  const requestPromise = fetch(`/api${endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint}`, config)
+    .then(async (response) => {
+      // Handle authentication errors
+      if (response.status === 401 || response.status === 403) {
+        clearAuthAndRedirect();
+        throw new Error(`Authentication failed: ${response.status}`);
+      }
 
   if (!response.ok) {
-    console.error(`API request failed for ${endpoint}:`, response.status, response.statusText);
-    try {
-        const errorBody = await response.json();
-        console.error("Error details:", errorBody);
-        throw new Error(errorBody.message || `Request failed with status ${response.status}`);
-    } catch (parseError) {
-        console.error("Failed to parse error body:", parseError);
-        throw new Error(`Request failed with status ${response.status}`);
-    }
+        console.error(`API request failed for ${endpoint}:`, response.status, response.statusText);
+        try {
+            const errorBody = await response.json();
+            console.error("Error details:", errorBody);
+            throw new Error(errorBody.message || `Request failed with status ${response.status}`);
+        } catch (parseError) {
+            console.error("Failed to parse error body:", parseError);
+            throw new Error(`Request failed with status ${response.status}`);
+        }
+      }
+
+      try {
+          const data = await response.json();
+          return data;
+      } catch (jsonError) {
+          console.error("Failed to parse JSON response:", jsonError);
+          throw new Error("Failed to parse JSON response");
+      }
+    })
+    .finally(() => {
+      // Remove from cache when request completes
+      if (cacheKey) {
+        requestCache.delete(cacheKey);
+      }
+    });
+
+  // Cache the request promise (except for login)
+  if (cacheKey) {
+    requestCache.set(cacheKey, requestPromise);
   }
 
-  try {
-      const data = await response.json();
-      return data;
-  } catch (jsonError) {
-      console.error("Failed to parse JSON response:", jsonError);
-      throw new Error("Failed to parse JSON response");
-  }
+  return requestPromise;
 };
 
 // Auth API
