@@ -1,77 +1,74 @@
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { ArrowLeftOnRectangleIcon, CalendarIcon, FunnelIcon } from '@heroicons/react/24/outline';
-import { getUser } from '@/utils/auth';
-import { salidasAPI } from '@/api/api';
+import { ArrowLeftOnRectangleIcon, CalendarDaysIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import { salidasAPI } from '@/api/api';
 
 interface DocumentoSalida {
-  idOrdenCompraEnc: number;
-  numeroOC: string;
-  fechaOC: string;
-  proveedor: string;
+  codigo: string;
+  bodega: string;
+  propietario: string;
+  cliente: string;
+  tipoSalida: string;
   estado: string;
-  total: number;
+  noDocumento: string;
+  referencia: string;
+  fecha: string;
+  noPoliza: string;
+  noOrden: string;
+  activo: boolean;
+  enviado_A_ERP: boolean;
+  idPedidoEnc?: number;
+  idOrdenSalidaEnc?: number;
 }
 
 function Salidas() {
-  const [salidas, setSalidas] = useState<DocumentoSalida[]>([]);
+  const navigate = useNavigate();
+  const [documentos, setDocumentos] = useState<DocumentoSalida[]>([]);
   const [loading, setLoading] = useState(false);
-  const [fechaInicio, setFechaInicio] = useState('');
-  const [fechaFin, setFechaFin] = useState('');
-  const [aplicandoFiltros, setAplicandoFiltros] = useState(false);
-  
-  const user = getUser();
+  const [fechaInicio, setFechaInicio] = useState(() => {
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    return firstDay.toISOString().split('T')[0];
+  });
+  const [fechaFin, setFechaFin] = useState(() => {
+    return new Date().toISOString().split('T')[0];
+  });
 
   useEffect(() => {
     document.title = 'TOMWMSUX - Salidas';
-    
-    // Establecer fechas por defecto (último mes)
-    const hoy = new Date();
-    const hace30Dias = new Date();
-    hace30Dias.setDate(hoy.getDate() - 30);
-    
-    setFechaInicio(hace30Dias.toISOString().split('T')[0]);
-    setFechaFin(hoy.toISOString().split('T')[0]);
+    cargarDocumentos();
   }, []);
 
-  // Cargar documentos automáticamente cuando se establecen las fechas
-  useEffect(() => {
-    if (fechaInicio && fechaFin && user.idPropietario) {
-      cargarDocumentos();
-    }
-  }, [fechaInicio, fechaFin]);
-
   const cargarDocumentos = async () => {
-    if (!fechaInicio || !fechaFin) {
-      toast.error('Por favor selecciona ambas fechas');
-      return;
-    }
-
-    if (!user.idPropietario) {
-      toast.error('No se encontró el ID del propietario');
-      return;
-    }
-
     setLoading(true);
-    setAplicandoFiltros(true);
-
     try {
+      const token = localStorage.getItem('wms_token') || localStorage.getItem('token') || '';
+      const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
+      
+      if (!token || !idPropietario) {
+        toast.error('No se encontró información de autenticación');
+        navigate('/login');
+        return;
+      }
+
       const filtro = {
         fechaInicio,
         fechaFin,
         idBodega: 0, // 0 para todas las bodegas
-        idPropietario: user.idPropietario
+        idPropietario
       };
 
-      const data = await salidasAPI.listarDocumentos(filtro, user.token);
-      console.log('Respuesta salidas:', data);
+      console.log('Cargando documentos de salida con filtro:', filtro);
+      const data = await salidasAPI.listarDocumentos(filtro, token);
+      console.log('Documentos de salida cargados:', data);
       
-      setSalidas(data || []);
+      setDocumentos(data || []);
       
       if (!data || data.length === 0) {
-        toast('No se encontraron documentos de salida en el rango de fechas seleccionado', {
+        toast('No se encontraron documentos en el rango de fechas seleccionado', {
           icon: 'ℹ️',
           style: {
             background: '#3b82f6',
@@ -84,21 +81,28 @@ function Salidas() {
     } catch (error) {
       console.error('Error al cargar documentos:', error);
       toast.error('Error al cargar los documentos de salida');
-      setSalidas([]);
     } finally {
       setLoading(false);
-      setAplicandoFiltros(false);
     }
   };
 
-  const limpiarFiltros = () => {
-    const hoy = new Date();
-    const hace30Dias = new Date();
-    hace30Dias.setDate(hoy.getDate() - 30);
-    
-    setFechaInicio(hace30Dias.toISOString().split('T')[0]);
-    setFechaFin(hoy.toISOString().split('T')[0]);
-    setSalidas([]);
+  const handleRowClick = (documento: DocumentoSalida) => {
+    // Usar idOrdenSalidaEnc como identificador principal, o idPedidoEnc como fallback
+    const id = documento.idOrdenSalidaEnc || documento.idPedidoEnc;
+    if (id) {
+      navigate(`/salidas/detalle/${id}`);
+    } else {
+      toast.error('No se pudo obtener el ID del documento');
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return '';
+    return new Date(dateString).toLocaleDateString('es-ES');
+  };
+
+  const formatBoolean = (value: boolean) => {
+    return value ? 'Sí' : 'No';
   };
 
   return (
@@ -106,156 +110,158 @@ function Salidas() {
       <div className="space-y-6">
         {/* Header */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center space-x-3 mb-4">
+          <div className="flex items-center space-x-3">
             <div className="p-2 bg-red-100 rounded-lg">
               <ArrowLeftOnRectangleIcon className="h-6 w-6 text-red-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Salidas</h1>
-              <p className="text-gray-600">Gestión de documentos de salida</p>
-            </div>
-          </div>
-
-          {/* Filtros */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <div className="flex items-center space-x-2 mb-4">
-              <FunnelIcon className="h-5 w-5 text-gray-500" />
-              <h3 className="text-sm font-medium text-gray-700">Filtros de búsqueda</h3>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha Inicio
-                </label>
-                <div className="relative">
-                  <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="date"
-                    value={fechaInicio}
-                    onChange={(e) => setFechaInicio(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Fecha Fin
-                </label>
-                <div className="relative">
-                  <CalendarIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="date"
-                    value={fechaFin}
-                    onChange={(e) => setFechaFin(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-end space-x-2">
-                <button
-                  onClick={cargarDocumentos}
-                  disabled={aplicandoFiltros || !fechaInicio || !fechaFin}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {aplicandoFiltros ? 'Cargando...' : 'Buscar'}
-                </button>
-                
-                <button
-                  onClick={limpiarFiltros}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                >
-                  Limpiar
-                </button>
-              </div>
+              <h1 className="text-2xl font-bold text-gray-900">Documentos de Salida</h1>
+              <p className="text-gray-600">Gestión de documentos de salida y despachos</p>
             </div>
           </div>
         </div>
 
-        {/* Welcome message */}
-        <div className="bg-gradient-to-r from-red-500 to-pink-600 rounded-lg shadow-sm p-6 text-white">
-          <h2 className="text-xl font-semibold mb-2">¡Bienvenido, {user.username}!</h2>
-          <p className="opacity-90">Consulta tus documentos de salida y gestiona las entregas</p>
+        {/* Filtros */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex flex-wrap items-end gap-4">
+            <div className="flex-1 min-w-48">
+              <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-2">
+                Fecha Inicio
+              </label>
+              <input
+                type="date"
+                id="fechaInicio"
+                value={fechaInicio}
+                onChange={(e) => setFechaInicio(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              />
+            </div>
+            
+            <div className="flex-1 min-w-48">
+              <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-2">
+                Fecha Fin
+              </label>
+              <input
+                type="date"
+                id="fechaFin"
+                value={fechaFin}
+                onChange={(e) => setFechaFin(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+              />
+            </div>
+            
+            <button
+              onClick={cargarDocumentos}
+              disabled={loading}
+              className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <CalendarDaysIcon className="h-4 w-4 mr-2" />
+              {loading ? 'Cargando...' : 'Consultar'}
+            </button>
+          </div>
         </div>
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-medium text-gray-900">
-              Documentos de Salida ({salidas.length})
+              Documentos de Salida ({documentos.length})
             </h3>
           </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-600"></div>
-              <span className="ml-2 text-gray-600">Cargando salidas...</span>
+              <span className="ml-2 text-gray-600">Cargando documentos...</span>
+            </div>
+          ) : documentos.length === 0 ? (
+            <div className="flex items-center justify-center py-12">
+              <div className="text-center">
+                <DocumentArrowDownIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No se encontraron documentos</h3>
+                <p className="mt-1 text-sm text-gray-500">
+                  No hay documentos de salida en el rango de fechas seleccionado.
+                </p>
+              </div>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Documento
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Fecha
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Proveedor
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Total
-                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodega</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cliente</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo Salida</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Documento</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Orden</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Enviado ERP</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activo</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {salidas.map((salida) => (
-                    <tr key={salida.idOrdenCompraEnc} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-blue-600 hover:text-blue-800 cursor-pointer">
-                        {salida.numeroOC}
+                  {documentos.map((documento, index) => (
+                    <tr 
+                      key={documento.codigo || index} 
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => handleRowClick(documento)}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {documento.codigo}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(salida.fechaOC).toLocaleDateString()}
+                        {documento.bodega}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {salida.proveedor}
+                        {documento.cliente}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {documento.tipoSalida}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          salida.estado === 'Despachado' 
+                          documento.estado === 'Completado' 
                             ? 'bg-green-100 text-green-800' 
-                            : 'bg-yellow-100 text-yellow-800'
+                            : documento.estado === 'Pendiente'
+                            ? 'bg-yellow-100 text-yellow-800'
+                            : 'bg-gray-100 text-gray-800'
                         }`}>
-                          {salida.estado}
+                          {documento.estado}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        ${salida.total?.toLocaleString() || '0'}
+                        {documento.noDocumento}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatDate(documento.fecha)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {documento.noOrden}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          documento.enviado_A_ERP 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {formatBoolean(documento.enviado_A_ERP)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          documento.activo 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'bg-red-100 text-red-800'
+                        }`}>
+                          {formatBoolean(documento.activo)}
+                        </span>
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-
-              {!loading && salidas.length === 0 && (
-                <div className="text-center py-12">
-                  <ArrowLeftOnRectangleIcon className="mx-auto h-12 w-12 text-gray-400" />
-                  <h3 className="mt-2 text-sm font-medium text-gray-900">No hay documentos</h3>
-                  <p className="mt-1 text-sm text-gray-500">
-                    {fechaInicio && fechaFin 
-                      ? 'No se encontraron documentos de salida en el rango de fechas seleccionado.'
-                      : 'Selecciona un rango de fechas para buscar documentos.'
-                    }
-                  </p>
-                </div>
-              )}
             </div>
           )}
         </div>

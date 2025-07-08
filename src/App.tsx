@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "@/pages/Login";
 import Ingresos from "@/pages/Ingresos";
 import DetalleDocumentoIngreso from "@/pages/DetalleDocumentoIngreso";
+import DetalleDocumentoSalida from "@/pages/DetalleDocumentoSalida";
 import Existencias from "@/pages/Existencias";
 import Salidas from "@/pages/Salidas";
 import SessionExpired from "@/pages/SessionExpired";
@@ -24,9 +25,10 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<Index />} />
           <Route path="/ingresos" element={<Ingresos />} />
-          <Route path="/documentos-ingreso/detalle/:IdOrdenCompraEnc" element={<DetalleDocumentoIngreso />} />
-          <Route path="/salidas" element={<Salidas />} />
-          <Route path="/existencias" element={<Existencias />} />
+          <Route path="/ingresos/detalle/:IdOrdenCompraEnc" element={<PrivateRoute><DetalleDocumentoIngreso /></PrivateRoute>} />
+          <Route path="/salidas" element={<PrivateRoute><Salidas /></PrivateRoute>} />
+          <Route path="/salidas/detalle/:IdDocumento" element={<PrivateRoute><DetalleDocumentoSalida /></PrivateRoute>} />
+          <Route path="/existencias" element={<PrivateRoute><Existencias /></PrivateRoute>} />
         </Route>
 
         {/* Ruta fallback */}

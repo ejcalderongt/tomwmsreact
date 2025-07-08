@@ -127,6 +127,60 @@ export const salidasAPI = {
       console.error('Salidas API Error:', error);
       throw new Error('Failed to fetch salidas documents');
     }
+  },
+  
+  obtenerDetallePE: async (idPedidoEnc: number, token: string) => {
+    try {
+      const url = `/api/sync/salidas/${idPedidoEnc}/detalle-pe`;
+      console.log('URL detalle PE:', url);
+      const data = await apiRequest(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Detalle PE API Error:', error);
+      throw new Error('Failed to fetch detalle PE');
+    }
+  },
+  
+  obtenerDespachos: async (idOrdenSalidaEnc: number, token: string) => {
+    try {
+      const url = `/api/sync/salidas/${idOrdenSalidaEnc}/despachos`;
+      console.log('URL despachos:', url);
+      const data = await apiRequest(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Despachos API Error:', error);
+      throw new Error('Failed to fetch despachos');
+    }
+  }
+};
+
+// Pólizas API
+export const polizasAPI = {
+  obtenerPoliza: async (idOrdenCompraEnc: number, token: string) => {
+    try {
+      const url = `/api/sync/ingresos/${idOrdenCompraEnc}/poliza`;
+      console.log('URL póliza:', url);
+      const data = await apiRequest(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      return data;
+    } catch (error) {
+      console.error('Póliza API Error:', error);
+      throw new Error('Failed to fetch poliza');
+    }
   }
 };
 
