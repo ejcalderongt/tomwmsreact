@@ -7,13 +7,24 @@ import toast from 'react-hot-toast';
 import { salidasAPI } from '@/api/api';
 
 interface DetallePE {
-  no_Linea: number;
+  no_linea: number;
   codigo_producto: string;
   nombre_producto: string;
-  nombre_unidad_medida_basica: string;
+  nom_presentacion: string;
+  nom_unid_med: string;
+  nom_estado: string;
   cantidad: number;
-  precio_unitario?: number;
-  total?: number;
+  cant_despachada: number;
+  peso_Bruto: number;
+  peso_Neto: number;
+  costo: number;
+  valor_aduana: number;
+  valor_fob: number;
+  valor_iva: number;
+  valor_dai: number;
+  valor_seguro: number;
+  valor_flete: number;
+  total_linea: number;
 }
 
 interface DespachoDetalle {
@@ -239,25 +250,47 @@ function DetalleDocumentoSalida() {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No Línea</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Línea</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UmBas</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Presentación</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UM</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unit.</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Despachado</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peso Bruto</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Peso Neto</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Aduana</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor FOB</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor IVA</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor DAI</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Seguro</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Flete</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Línea</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {detallePE.map((item, index) => (
                         <tr key={index} className="hover:bg-gray-50">
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.no_Linea}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.no_linea}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.codigo_producto}</td>
                           <td className="px-6 py-4 text-sm text-gray-900">{item.nombre_producto}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.nombre_unidad_medida_basica}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.nom_presentacion}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.nom_unid_med}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.nom_estado}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.cantidad)}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.precio_unitario ? formatNumber(item.precio_unitario) : ''}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{item.total ? formatNumber(item.total) : ''}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.cant_despachada)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.peso_Bruto)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.peso_Neto)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.costo)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.valor_aduana)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.valor_fob)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.valor_iva)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.valor_dai)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.valor_seguro)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.valor_flete)}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatNumber(item.total_linea)}</td>
                         </tr>
                       ))}
                     </tbody>
