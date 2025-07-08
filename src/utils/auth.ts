@@ -55,17 +55,11 @@ export const isAuthenticated = (): boolean => {
     // Basic token format check (JWT should have 3 parts)
     const parts = token.split('.');
     if (parts.length !== 3) {
-      localStorage.removeItem(TOKEN_KEY);
-      localStorage.removeItem(USER_KEY);
       return false;
     }
 
-    // Let the server validate the token - don't try to decode it client-side
     return true;
   } catch (error) {
-    console.error('Error checking authentication:', error);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
     return false;
   }
 };

@@ -28,7 +28,7 @@ function App() {
           <Route path="/salidas" element={<Salidas />} />
           <Route path="/salidas/detalle/:IdDocumento" element={<DetalleDocumentoSalida />} />
           <Route path="/existencias" element={<Existencias />} />
-          <Route path="/resumen-existencias" element={<PrivateRoute><ResumenExistencias /></PrivateRoute>} />
+          <Route path="/resumen-existencias" element={<ResumenExistencias />} />
         </Route>
 
         {/* Default route - redirect to login */}

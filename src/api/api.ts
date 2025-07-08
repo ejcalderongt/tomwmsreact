@@ -25,8 +25,6 @@ const clearAuthAndRedirect = () => {
   if (isRedirecting) return;
   isRedirecting = true;
   
-  console.log('Authentication failed, clearing session and redirecting to login');
-  
   // Clear localStorage
   if (typeof window !== 'undefined') {
     localStorage.removeItem('wms_token');
@@ -39,15 +37,13 @@ const clearAuthAndRedirect = () => {
   
   // Only redirect if not already on login page
   if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
-    setTimeout(() => {
-      window.location.href = '/login';
-    }, 100);
+    window.location.href = '/login';
   }
   
   // Reset redirecting flag after timeout
   setTimeout(() => {
     isRedirecting = false;
-  }, 1000);
+  }, 2000);
 };
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {

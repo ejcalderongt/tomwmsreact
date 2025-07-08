@@ -34,7 +34,7 @@ const AuthWatcher = () => {
       }
     };
 
-    const interval = setInterval(checkToken, 60000); // Check every 60 seconds
+    const interval = setInterval(checkToken, 300000); // Check every 5 minutes
     return () => clearInterval(interval);
   }, [navigate, location.pathname]);
 

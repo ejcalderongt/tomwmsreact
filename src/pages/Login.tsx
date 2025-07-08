@@ -13,25 +13,12 @@ function Login() {
   useEffect(() => {
     document.title = "TOMWMSUX - Iniciar Sesión";
 
-    // Solo verificar si hay un token válido al cargar la página
-    const checkToken = () => {
-      try {
-        if (isAuthenticated()) {
-          const token = getToken();
-          if (token && token !== 'undefined') {
-            console.log('Token found, redirecting to existencias');
-            navigate("/existencias", { replace: true });
-          }
-        }
-      } catch (error) {
-        console.log('Authentication check failed, staying on login');
-        logout();
-      }
-    };
-
-    // Solo ejecutar la verificación una vez al montar el componente
-    checkToken();
-  }, []);
+    // Solo verificar una vez al montar si ya está autenticado
+    if (isAuthenticated()) {
+      console.log('User already authenticated, redirecting to existencias');
+      navigate("/existencias", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
