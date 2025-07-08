@@ -30,17 +30,35 @@ function Salidas() {
   const [documentos, setDocumentos] = useState<DocumentoSalida[]>([]);
   const [loading, setLoading] = useState(false);
   const [fechaInicio, setFechaInicio] = useState(() => {
+    // Try to restore from localStorage first
+    const saved = localStorage.getItem('salidas_fechaInicio');
+    if (saved) return saved;
     const today = new Date();
     const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
     return firstDay.toISOString().split('T')[0];
   });
   const [fechaFin, setFechaFin] = useState(() => {
+    // Try to restore from localStorage first
+    const saved = localStorage.getItem('salidas_fechaFin');
+    if (saved) return saved;
     return new Date().toISOString().split('T')[0];
   });
 
   useEffect(() => {
     document.title = 'TOMWMSUX - Salidas';
-    cargarDocumentos();
+    // Try to restore previous results from localStorage
+    const savedDocumentos = localStorage.getItem('salidas_documentos');
+    if (savedDocumentos) {
+      try {
+        const parsedDocumentos = JSON.parse(savedDocumentos);
+        setDocumentos(parsedDocumentos);
+      } catch (error) {
+        console.error('Error parsing saved documentos:', error);
+        cargarDocumentos();
+      }
+    } else {
+      cargarDocumentos();
+    }
   }, []);
 
   const cargarDocumentos = async () => {
@@ -67,6 +85,11 @@ function Salidas() {
       console.log('Documentos de salida cargados:', data);
       
       setDocumentos(data || []);
+      
+      // Save filter state and results to localStorage
+      localStorage.setItem('salidas_fechaInicio', fechaInicio);
+      localStorage.setItem('salidas_fechaFin', fechaFin);
+      localStorage.setItem('salidas_documentos', JSON.stringify(data || []));
       
       if (!data || data.length === 0) {
         toast('No se encontraron documentos en el rango de fechas seleccionado', {

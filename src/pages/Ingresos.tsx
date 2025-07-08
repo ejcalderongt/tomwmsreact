@@ -33,10 +33,16 @@ function Ingresos() {
   const [documentos, setDocumentos] = useState<DocumentoIngreso[]>([]);
   const [loading, setLoading] = useState(false);
   const [fechaInicio, setFechaInicio] = useState(() => {
+    // Try to restore from localStorage first, fallback to today
+    const saved = localStorage.getItem('ingresos_fechaInicio');
+    if (saved) return saved;
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
   const [fechaFin, setFechaFin] = useState(() => {
+    // Try to restore from localStorage first, fallback to today
+    const saved = localStorage.getItem('ingresos_fechaFin');
+    if (saved) return saved;
     const today = new Date();
     return today.toISOString().split('T')[0];
   });
@@ -45,8 +51,21 @@ function Ingresos() {
 
   useEffect(() => {
     document.title = 'TOMWMSUX - Ingresos';
-    // Cargar datos iniciales
-    cargarDocumentosIngreso();
+    // Try to restore previous results from localStorage
+    const savedDocumentos = localStorage.getItem('ingresos_documentos');
+    if (savedDocumentos) {
+      try {
+        const parsedDocumentos = JSON.parse(savedDocumentos);
+        setDocumentos(parsedDocumentos);
+      } catch (error) {
+        console.error('Error parsing saved documentos:', error);
+        // If there's an error, load fresh data
+        cargarDocumentosIngreso();
+      }
+    } else {
+      // No saved data, load fresh
+      cargarDocumentosIngreso();
+    }
   }, []);
 
   const cargarDocumentosIngreso = async () => {
@@ -54,6 +73,10 @@ function Ingresos() {
     try {
       const token = getToken();
       const userData = getUser();
+
+      // Save current filter state to localStorage
+      localStorage.setItem('ingresos_fechaInicio', fechaInicio);
+      localStorage.setItem('ingresos_fechaFin', fechaFin);
 
       // Validación temporalmente deshabilitada
       // if (!token || !userData.username) {
@@ -74,6 +97,10 @@ function Ingresos() {
 
       const data = await ingresosAPI.listarDocumentos(filtro, token);
       setDocumentos(data || []);
+      
+      // Save results to localStorage
+      localStorage.setItem('ingresos_documentos', JSON.stringify(data || []));
+      
       toast.success(`${data?.length || 0} documentos cargados correctamente`);
     } catch (error) {
       console.error('Error al cargar documentos:', error);

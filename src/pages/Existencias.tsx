@@ -54,10 +54,18 @@ function Existencias() {
   const [isLoadingExistencias, setIsLoadingExistencias] = useState(false);
 
   // Filtros
-  const [bodegaSeleccionada, setBodegaSeleccionada] = useState<number>(0); // 0 = Todas las bodegas
+  const [bodegaSeleccionada, setBodegaSeleccionada] = useState<number>(() => {
+    // Try to restore from localStorage first, fallback to 0 (all warehouses)
+    const saved = localStorage.getItem('existencias_bodegaSeleccionada');
+    return saved ? parseInt(saved, 10) : 0;
+  });
 
   // Paginación
-  const [paginaActual, setPaginaActual] = useState(1);
+  const [paginaActual, setPaginaActual] = useState(() => {
+    // Try to restore from localStorage first, fallback to 1
+    const saved = localStorage.getItem('existencias_paginaActual');
+    return saved ? parseInt(saved, 10) : 1;
+  });
   const [totalPaginas, setTotalPaginas] = useState(1);
   const [totalRegistros, setTotalRegistros] = useState(0);
   const tamanoPagina = 50;
@@ -69,9 +77,26 @@ function Existencias() {
 
   useEffect(() => {
     if (bodegas.length > 0) {
-      cargarExistencias();
+      // Try to restore previous results from localStorage first
+      const savedExistencias = localStorage.getItem('existencias_data');
+      const savedTotalRegistros = localStorage.getItem('existencias_totalRegistros');
+      const savedTotalPaginas = localStorage.getItem('existencias_totalPaginas');
+      
+      if (savedExistencias && savedTotalRegistros && savedTotalPaginas) {
+        try {
+          const parsedExistencias = JSON.parse(savedExistencias);
+          setExistencias(parsedExistencias);
+          setTotalRegistros(parseInt(savedTotalRegistros, 10));
+          setTotalPaginas(parseInt(savedTotalPaginas, 10));
+        } catch (error) {
+          console.error('Error parsing saved existencias:', error);
+          cargarExistencias();
+        }
+      } else {
+        cargarExistencias();
+      }
     }
-  }, [bodegas, bodegaSeleccionada, paginaActual]);
+  }, [bodegas]);
 
   const cargarBodegas = async () => {
     // Prevent multiple simultaneous requests
@@ -164,6 +189,13 @@ function Existencias() {
       setTotalPaginas(data.totalPaginas || 1);
       setPaginaActual(data.paginaActual || 1);
 
+      // Save filter state and results to localStorage
+      localStorage.setItem('existencias_bodegaSeleccionada', bodegaSeleccionada.toString());
+      localStorage.setItem('existencias_paginaActual', (data.paginaActual || 1).toString());
+      localStorage.setItem('existencias_data', JSON.stringify(data.existencias || []));
+      localStorage.setItem('existencias_totalRegistros', (data.totalRegistros || 0).toString());
+      localStorage.setItem('existencias_totalPaginas', (data.totalPaginas || 1).toString());
+
       if (!data.existencias || data.existencias.length === 0) {
         toast('No se encontraron existencias con los filtros seleccionados', {
           icon: 'ℹ️',
@@ -201,11 +233,15 @@ function Existencias() {
   const handleBodegaChange = (idBodega: number) => {
     setBodegaSeleccionada(idBodega);
     setPaginaActual(1); // Resetear a la primera página
+    // Trigger fresh data load when filter changes
+    setTimeout(() => cargarExistencias(), 0);
   };
 
   const handlePageChange = (nuevaPagina: number) => {
     if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
       setPaginaActual(nuevaPagina);
+      // Trigger fresh data load when page changes
+      setTimeout(() => cargarExistencias(), 0);
     }
   };
 
