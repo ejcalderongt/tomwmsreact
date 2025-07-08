@@ -426,6 +426,71 @@ export const bodegasAPI = {
   }
 };
 
+// Movimientos API
+export const movimientosAPI = {
+  listar: async (filtro: { idBodega?: number; idPropietario: number; fechaInicio?: string; fechaFin?: string }, token: string) => {
+    try {
+      // Build query parameters for GET request
+      const params = new URLSearchParams({
+        IdPropietario: filtro.idPropietario.toString()
+      });
+
+      if (filtro.idBodega && filtro.idBodega > 0) {
+        params.append('IdBodega', filtro.idBodega.toString());
+      }
+
+      if (filtro.fechaInicio) {
+        params.append('FechaInicio', filtro.fechaInicio);
+      }
+
+      if (filtro.fechaFin) {
+        params.append('FechaFin', filtro.fechaFin);
+      }
+
+      const endpoint = `/Movimientos/listar?${params.toString()}`;
+
+      console.log('=== MOVIMIENTOS API REQUEST DEBUG ===');
+      console.log('Endpoint:', endpoint);
+      console.log('Full URL will be:', `/api${endpoint}`);
+      console.log('Query Parameters:');
+      console.log('  - IdPropietario:', filtro.idPropietario);
+      console.log('  - IdBodega:', filtro.idBodega || 'All');
+      console.log('  - FechaInicio:', filtro.fechaInicio || 'No filter');
+      console.log('  - FechaFin:', filtro.fechaFin || 'No filter');
+      console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+      console.log('Query String:', params.toString());
+      console.log('====================================');
+
+      const data = await apiRequest(endpoint, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      console.log('=== MOVIMIENTOS API RESPONSE DEBUG ===');
+      console.log('Response received:', data);
+      console.log('Response type:', typeof data);
+      console.log('Is array:', Array.isArray(data));
+      if (data) {
+        console.log('Response keys:', Object.keys(data));
+        if (Array.isArray(data)) {
+          console.log('Movimientos count:', data.length);
+        }
+      }
+      console.log('=====================================');
+
+      return Array.isArray(data) ? data : [];
+    } catch (error) {
+      console.error('=== MOVIMIENTOS API ERROR ===');
+      console.error('Error details:', error);
+      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('============================');
+      throw new Error('Failed to fetch movimientos data');
+    }
+  }
+};
+
 // Productos API
 export const productosAPI = {
   sincronizar: async (productos: any[], token: string) => {

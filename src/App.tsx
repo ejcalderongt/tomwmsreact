@@ -5,6 +5,7 @@ import DetalleDocumentoIngreso from "@/pages/DetalleDocumentoIngreso";
 import DetalleDocumentoSalida from "@/pages/DetalleDocumentoSalida";
 import Existencias from "@/pages/Existencias";
 import ResumenExistencias from "@/pages/ResumenExistencias";
+import Movimientos from '@/pages/Movimientos';
 import Salidas from "@/pages/Salidas";
 import SessionExpired from "@/pages/SessionExpired";
 import PrivateRoute from "@/routes/PrivateRoute";
@@ -29,6 +30,14 @@ function App() {
           <Route path="/salidas/detalle/:IdDocumento" element={<DetalleDocumentoSalida />} />
           <Route path="/existencias" element={<Existencias />} />
           <Route path="/resumen-existencias" element={<ResumenExistencias />} />
+          <Route
+            path="/movimientos"
+            element={
+              <PrivateRoute>
+                <Movimientos />
+              </PrivateRoute>
+            }
+          />
         </Route>
 
         {/* Default route - redirect to login */}

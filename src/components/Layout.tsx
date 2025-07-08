@@ -7,7 +7,9 @@ import {
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
-  ArrowLeftOnRectangleIcon
+  ArrowLeftOnRectangleIcon,
+  ChartBarIcon,
+  ArrowsRightLeftIcon
 } from '@heroicons/react/24/outline';
 import { logout } from '@/utils/auth';
 import toast from 'react-hot-toast';
@@ -144,6 +146,17 @@ function Layout({ children }: LayoutProps) {
                 <CubeIcon className="mr-3 h-6 w-6" />
                 Resumen
               </a>
+              <a
+                href="/movimientos"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/movimientos'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <CubeIcon className="mr-3 h-6 w-6" />
+                Movimientos
+              </a>
             </div>
 
             {/* Other Navigation Items - excluding Existencias since it's already in the reports section */}
@@ -157,7 +170,7 @@ function Layout({ children }: LayoutProps) {
                     isActive
                       ? 'bg-blue-100 text-blue-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   <item.icon className="mr-3 h-6 w-6" />
                   {item.name}
