@@ -280,25 +280,29 @@ export const polizasAPI = {
 export const existenciasAPI = {
   resumen: async (filtro: { idBodega?: number; idPropietario: number }, token: string) => {
     try {
-      // Build request body for POST request
-      const requestBody = {
-        idBodega: filtro.idBodega || 0,
-        idPropietario: filtro.idPropietario
-      };
+      // Build query parameters for GET request
+      const params = new URLSearchParams({
+        IdBodega: (filtro.idBodega || 0).toString(),
+        IdPropietario: filtro.idPropietario.toString()
+      });
+
+      const endpoint = `/Stock/resumen?${params.toString()}`;
 
       console.log('=== RESUMEN EXISTENCIAS API REQUEST DEBUG ===');
-      console.log('Endpoint: /Stock/resumen');
-      console.log('Request Body:', requestBody);
+      console.log('Endpoint:', endpoint);
+      console.log('Full URL will be:', `/api${endpoint}`);
+      console.log('Query Parameters:');
+      console.log('  - IdBodega:', filtro.idBodega || 0);
+      console.log('  - IdPropietario:', filtro.idPropietario);
       console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
+      console.log('Query String:', params.toString());
       console.log('===============================================');
 
-      const data = await apiRequest('/Stock/resumen', {
-        method: 'POST',
+      const data = await apiRequest(endpoint, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify(requestBody),
       });
 
       console.log('=== RESUMEN EXISTENCIAS API RESPONSE DEBUG ===');
