@@ -1,42 +1,41 @@
-export interface User {
-  username: string;
-  token: string;
-  idPropietario?: number;
-}
+
+// src/utils/auth.ts
 
 const TOKEN_KEY = 'wms_token';
-const USER_KEY = 'wms_user';
+const USER_ID_KEY = 'wms_idPropietario';
+const USERNAME_KEY = 'wms_username';
+
+export interface User {
+  token: string;
+  idPropietario: number;
+  username: string;
+}
 
 export const saveUser = (user: User): void => {
   localStorage.setItem(TOKEN_KEY, user.token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  localStorage.setItem(USER_ID_KEY, user.idPropietario.toString());
+  localStorage.setItem(USERNAME_KEY, user.username);
 };
 
 export const getUser = (): User => {
-  const username = localStorage.getItem('wms_username') || '';
-  const token = localStorage.getItem('wms_token') || '';
-  const idPropietario = localStorage.getItem('wms_idPropietario') ? 
-    parseInt(localStorage.getItem('wms_idPropietario') || '0') : undefined;
-
-  return { username, token, idPropietario };
+  return {
+    token: localStorage.getItem(TOKEN_KEY) || '',
+    idPropietario: parseInt(localStorage.getItem(USER_ID_KEY) || '0'),
+    username: localStorage.getItem(USERNAME_KEY) || ''
+  };
 };
 
-export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
+export const getToken = (): string => {
+  return localStorage.getItem(TOKEN_KEY) || '';
 };
 
 export const isAuthenticated = (): boolean => {
-  const token = localStorage.getItem('wms_token');
-  return !!token;
-};
-
-export const clearInvalidToken = (): void => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
+  const token = getToken();
+  return !!token && token.trim() !== '';
 };
 
 export const logout = (): void => {
-  localStorage.removeItem('wms_username');
-  localStorage.removeItem('wms_token');
-  localStorage.removeItem('wms_idPropietario');
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_ID_KEY);
+  localStorage.removeItem(USERNAME_KEY);
 };

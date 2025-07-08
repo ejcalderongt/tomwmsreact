@@ -4,6 +4,7 @@ import Layout from '@/components/Layout';
 import { CubeIcon, BuildingStorefrontIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { existenciasAPI, bodegasAPI } from '@/api/api';
+import { getToken } from '@/utils/auth';
 
 interface Existencia {
   idExistencia: number;
@@ -64,11 +65,11 @@ function Existencias() {
   const cargarBodegas = async () => {
     setLoadingBodegas(true);
     try {
-      const token = localStorage.getItem('wms_token') || localStorage.getItem('token') || '';
+      const token = getToken();
 
       if (!token) {
-        toast.error('No se encontró información de autenticación');
-        navigate('/login');
+        console.log('No token found, redirecting to login');
+        navigate('/login', { replace: true });
         return;
       }
 
@@ -88,12 +89,12 @@ function Existencias() {
   const cargarExistencias = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('wms_token') || localStorage.getItem('token') || '';
+      const token = getToken();
       const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
 
       if (!token || !idPropietario) {
-        toast.error('No se encontró información de autenticación');
-        navigate('/login');
+        console.log('Missing authentication data, redirecting to login');
+        navigate('/login', { replace: true });
         return;
       }
 
