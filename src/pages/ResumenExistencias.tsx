@@ -131,6 +131,8 @@ function ResumenExistencias() {
         return;
       }
 
+      console.log('Cargando existencias con filtros:', { idBodega: bodegaSeleccionada, idPropietario });
+
       // Load all pages to get complete data for summary
       let todasExistencias: Existencia[] = [];
       let paginaActual = 1;
@@ -144,21 +146,33 @@ function ResumenExistencias() {
           tamanoPagina: 100 // Use larger page size for efficiency
         };
 
+        console.log(`Cargando página ${paginaActual} con filtro:`, filtro);
         const data: ExistenciasResponse = await existenciasAPI.listar(filtro, token);
+        console.log(`Datos recibidos página ${paginaActual}:`, data);
         
-        if (data.existencias) {
+        if (data && data.existencias && Array.isArray(data.existencias)) {
           todasExistencias = [...todasExistencias, ...data.existencias];
+          totalPaginas = data.totalPaginas || 1;
+        } else {
+          console.warn('No se recibieron existencias válidas:', data);
+          break;
         }
         
-        totalPaginas = data.totalPaginas || 1;
         paginaActual++;
         
       } while (paginaActual <= totalPaginas);
 
+      console.log('Total existencias cargadas:', todasExistencias.length);
       setExistenciasDetalle(todasExistencias);
-      generarResumen(todasExistencias);
-
-      toast.success(`Se procesaron ${todasExistencias.length} existencias para el resumen`);
+      
+      if (todasExistencias.length > 0) {
+        generarResumen(todasExistencias);
+        toast.success(`Se procesaron ${todasExistencias.length} existencias para el resumen`);
+      } else {
+        setResumenProductos([]);
+        setFilteredResumen([]);
+        toast.info('No se encontraron existencias con los filtros seleccionados');
+      }
     } catch (error) {
       console.error('Error al cargar existencias:', error);
       
@@ -172,6 +186,7 @@ function ResumenExistencias() {
       toast.error(`Error: ${errorMessage}`);
       setExistenciasDetalle([]);
       setResumenProductos([]);
+      setFilteredResumen([]);
     } finally {
       setLoading(false);
     }

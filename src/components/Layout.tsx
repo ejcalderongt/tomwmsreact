@@ -76,7 +76,9 @@ function Layout({ children }: LayoutProps) {
                 Resumen
               </a>
             </div>
-            {navigation.map((item) => {
+
+            {/* Other Navigation Items - excluding Existencias since it's already in the reports section */}
+            {navigation.filter(item => item.name !== 'Existencias').map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link
@@ -86,7 +88,7 @@ function Layout({ children }: LayoutProps) {
                     isActive
                       ? 'bg-blue-100 text-blue-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  }`}
+                    }`}
                 >
                   <item.icon className="mr-3 h-6 w-6" />
                   {item.name}
@@ -143,7 +145,9 @@ function Layout({ children }: LayoutProps) {
                 Resumen
               </a>
             </div>
-            {navigation.map((item) => {
+
+            {/* Other Navigation Items - excluding Existencias since it's already in the reports section */}
+            {navigation.filter(item => item.name !== 'Existencias').map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link
