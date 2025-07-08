@@ -80,7 +80,16 @@ function Existencias() {
       setBodegas(data || []);
     } catch (error) {
       console.error('Error al cargar bodegas:', error);
+      
+      // Check if it's an authentication error
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
+        console.log('Authentication error, redirecting to login');
+        navigate('/login', { replace: true });
+        return;
+      }
+      
       toast.error('Error al cargar las bodegas');
+      setBodegas([]);
     } finally {
       setLoadingBodegas(false);
     }
@@ -127,7 +136,16 @@ function Existencias() {
       }
     } catch (error) {
       console.error('Error al cargar existencias:', error);
+      
+      // Check if it's an authentication error
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('Unauthorized'))) {
+        console.log('Authentication error, redirecting to login');
+        navigate('/login', { replace: true });
+        return;
+      }
+      
       toast.error('Error al cargar las existencias');
+      setExistencias([]);
     } finally {
       setLoading(false);
     }
