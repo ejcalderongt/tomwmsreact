@@ -31,23 +31,16 @@ interface Existencia {
 }
 
 interface ResumenProducto {
-  codigo: string;
-  nombre: string;
-  marca: string;
-  familia: string;
-  unidadMedida: string;
-  presentacion: string;
-  cantidad_UMBas_Total: number;
-  disponible_UMBas_Total: number;
-  cantidadReservadaUmBas_Total: number;
-  cantidad_Presentacion_Total: number;
-  disponible_Presentacion_Total: number;
-  cantidad_Reservada_Pres_Total: number;
-  costo_Promedio: number;
-  valor_total_Total: number;
-  bodegas: string[];
-  ubicaciones: number;
-  lotes: number;
+  id: number;
+  cod: string;
+  prop: string;
+  nom: string;
+  pres: string;
+  barra: string;
+  um: string;
+  bodega: string;
+  cantidadUMBas: number;
+  cantidadPresentacion: number;
 }
 
 interface Bodega {
@@ -187,10 +180,10 @@ function ResumenExistencias() {
 
     const searchLower = term.toLowerCase().trim();
     return resumen.filter(producto => 
-      producto.codigo?.toLowerCase().includes(searchLower) ||
-      producto.nombre?.toLowerCase().includes(searchLower) ||
-      producto.marca?.toLowerCase().includes(searchLower) ||
-      producto.familia?.toLowerCase().includes(searchLower)
+      producto.cod?.toLowerCase().includes(searchLower) ||
+      producto.nom?.toLowerCase().includes(searchLower) ||
+      producto.bodega?.toLowerCase().includes(searchLower) ||
+      producto.barra?.toLowerCase().includes(searchLower)
     );
   };
 
@@ -278,7 +271,7 @@ function ResumenExistencias() {
                   id="search"
                   value={searchTerm}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  placeholder="Código, nombre, marca o familia..."
+                  placeholder="Código, nombre, bodega o código de barra..."
                   className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
                 {searchTerm && (
@@ -377,74 +370,52 @@ function ResumenExistencias() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Propietario</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Familia</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UM</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total UMBas</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disp. UMBas</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reservada</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Presentación</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Pres.</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodegas</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ubicaciones</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lotes</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo Prom.</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor Total</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código Barra</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UM</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodega</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cant. UMBas</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cant. Presentación</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {filteredResumen.map((producto, index) => (
-                    <tr key={`${producto.codigo}-${index}`} className="hover:bg-gray-50">
+                    <tr key={`${producto.id}-${index}`} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {producto.codigo}
+                        {producto.id}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {producto.cod}
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
-                        {producto.nombre}
+                        {producto.prop}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-900">
+                        {producto.nom}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {producto.marca}
+                        {producto.pres || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {producto.familia}
+                        {producto.barra}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {producto.unidadMedida}
+                        {producto.um}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStockStatus(producto.cantidad_UMBas_Total)}`}>
-                          {formatNumber(producto.cantidad_UMBas_Total, 2)}
+                        {producto.bodega}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStockStatus(producto.cantidadUMBas)}`}>
+                          {formatNumber(producto.cantidadUMBas, 2)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatNumber(producto.disponible_UMBas_Total, 2)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatNumber(producto.cantidadReservadaUmBas_Total, 2)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {producto.presentacion}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatNumber(producto.cantidad_Presentacion_Total, 2)}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-900">
-                        <div className="max-w-32 truncate" title={producto.bodegas.join(', ')}>
-                          {producto.bodegas.join(', ')}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {producto.ubicaciones}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {producto.lotes}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatNumber(producto.costo_Promedio, 2)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {formatNumber(producto.valor_total_Total, 2)}
+                        {formatNumber(producto.cantidadPresentacion, 2)}
                       </td>
                     </tr>
                   ))}

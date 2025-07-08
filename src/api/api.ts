@@ -307,14 +307,14 @@ export const existenciasAPI = {
       console.log('Is array:', Array.isArray(data));
       if (data) {
         console.log('Response keys:', Object.keys(data));
-        if (Array.isArray(data)) {
-          console.log('Data count:', data.length);
+        if (data.resumenProducto && Array.isArray(data.resumenProducto)) {
+          console.log('ResumenProducto count:', data.resumenProducto.length);
         }
       }
       console.log('===============================================');
 
-      // Return the data directly as it should be an array of summary objects
-      return Array.isArray(data) ? data : [];
+      // Return the resumenProducto array from the response
+      return data?.resumenProducto || [];
     } catch (error) {
       console.error('=== RESUMEN EXISTENCIAS API ERROR ===');
       console.error('Error details:', error);
