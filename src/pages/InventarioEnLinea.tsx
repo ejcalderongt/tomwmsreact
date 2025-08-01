@@ -542,12 +542,11 @@ function InventarioEnLinea() {
             </div>
           ) : (
             <>
-              <div className="flex-1 overflow-auto">
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
+              <div className="flex-1 overflow-y-auto overflow-x-auto" style={{ overflowX: 'auto', overflowY: 'auto' }}>
+                <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: '1200px' }}>
                     <thead className="bg-gray-50 sticky top-0 z-10">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodega</th>
@@ -562,9 +561,9 @@ function InventarioEnLinea() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimiento</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
                       {inventario.map((item, index) => (
                         <tr key={item.idStock || index} className="hover:bg-gray-50">
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -618,9 +617,8 @@ function InventarioEnLinea() {
                           </td>
                         </tr>
                       ))}
-                    </tbody>
-                  </table>
-                </div>
+                  </tbody>
+                </table>
               </div>
 
               {/* Paginación */}
