@@ -310,9 +310,10 @@ function Existencias() {
   const renderPaginacion = () => {
     const botones = [];
     const maxBotones = 5;
+    const maxPaginas = Math.max(totalPaginas, paginaActual);
 
     let inicio = Math.max(1, paginaActual - Math.floor(maxBotones / 2));
-    let fin = Math.min(totalPaginas, inicio + maxBotones - 1);
+    let fin = Math.min(maxPaginas, inicio + maxBotones - 1);
 
     if (fin - inicio < maxBotones - 1) {
       inicio = Math.max(1, fin - maxBotones + 1);
@@ -330,6 +331,26 @@ function Existencias() {
       </button>
     );
 
+    // Siempre mostrar botón página 1 si no está en el rango visible
+    if (inicio > 1) {
+      botones.push(
+        <button
+          key={1}
+          onClick={() => handlePageChange(1)}
+          className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700"
+        >
+          1
+        </button>
+      );
+      if (inicio > 2) {
+        botones.push(
+          <span key="ellipsis-start" className="px-3 py-2 text-sm text-gray-400">
+            ...
+          </span>
+        );
+      }
+    }
+
     // Botones de páginas
     for (let i = inicio; i <= fin; i++) {
       botones.push(
@@ -338,7 +359,7 @@ function Existencias() {
           onClick={() => handlePageChange(i)}
           className={`px-3 py-2 text-sm ${
             i === paginaActual
-              ? 'bg-blue-600 text-white'
+              ? 'bg-purple-600 text-white'
               : 'text-gray-500 hover:text-gray-700'
           }`}
         >
@@ -347,12 +368,13 @@ function Existencias() {
       );
     }
 
-    // Botón siguiente
+    // Botón siguiente - siempre habilitado si no estamos en página 1 o si hay más páginas disponibles
+    const puedeAvanzar = totalPaginas === 0 || paginaActual < maxPaginas;
     botones.push(
       <button
         key="next"
         onClick={() => handlePageChange(paginaActual + 1)}
-        disabled={paginaActual === totalPaginas}
+        disabled={!puedeAvanzar}
         className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
       >
         Siguiente
@@ -463,8 +485,8 @@ function Existencias() {
         )}
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 420px)' }}>
+          <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
             <h3 className="text-lg font-medium text-gray-900">
               Existencias ({totalRegistros})
             </h3>
@@ -498,9 +520,9 @@ function Existencias() {
             </div>
           ) : (
             <>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+              <div className="flex-1 overflow-y-auto overflow-x-auto" style={{ overflowX: 'auto', overflowY: 'auto' }}>
+                <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: '1200px' }}>
+                  <thead className="bg-gray-50 sticky top-0 z-10">
                     <tr>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                       <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
@@ -579,7 +601,7 @@ function Existencias() {
 
               {/* Paginación */}
               {totalPaginas > 1 && (
-                <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+                <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex-shrink-0">
                   <div className="flex justify-center">
                     <div className="flex space-x-1">
                       {renderPaginacion()}
