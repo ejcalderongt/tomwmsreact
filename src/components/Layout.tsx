@@ -57,6 +57,17 @@ function Layout({ children }: LayoutProps) {
                 </p>
               </div>
               <a
+                href="/inventario-en-linea"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/inventario-en-linea'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <WifiIcon className="mr-3 h-6 w-6" />
+                Inventario en Línea
+              </a>
+              <a
                 href="/existencias"
                 className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
                   location.pathname === '/existencias'
@@ -88,17 +99,6 @@ function Layout({ children }: LayoutProps) {
               >
                 <CubeIcon className="mr-3 h-6 w-6" />
                 Movimientos
-              </a>
-              <a
-                href="/inventario-en-linea"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/inventario-en-linea'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <WifiIcon className="mr-3 h-6 w-6" />
-                Inventario en Línea
               </a>
             </div>
 
@@ -148,6 +148,17 @@ function Layout({ children }: LayoutProps) {
                 </p>
               </div>
               <a
+                href="/inventario-en-linea"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/inventario-en-linea'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <WifiIcon className="mr-3 h-6 w-6" />
+                Inventario en Línea
+              </a>
+              <a
                 href="/existencias"
                 className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
                   location.pathname === '/existencias'
@@ -179,17 +190,6 @@ function Layout({ children }: LayoutProps) {
               >
                 <CubeIcon className="mr-3 h-6 w-6" />
                 Movimientos
-              </a>
-              <a
-                href="/inventario-en-linea"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/inventario-en-linea'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <WifiIcon className="mr-3 h-6 w-6" />
-                Inventario en Línea
               </a>
             </div>
 
