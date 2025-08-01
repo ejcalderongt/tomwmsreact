@@ -35,8 +35,8 @@ function App() {
           <Route path="/movimientos" element={<Movimientos />} />
         </Route>
 
-        {/* Default route - redirect to login */}
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        {/* Default route - redirect to inventario-en-linea if authenticated, otherwise login */}
+        <Route path="/" element={<Navigate to="/inventario-en-linea" replace />} />
 
         {/* Ruta fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />
