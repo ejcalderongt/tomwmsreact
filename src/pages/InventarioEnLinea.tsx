@@ -277,7 +277,7 @@ function InventarioEnLinea() {
   };
 
   const handlePageChange = (nuevaPagina: number) => {
-    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+    if (nuevaPagina >= 1 && nuevaPagina <= Math.max(totalPaginas, paginaActual)) {
       setPaginaActual(nuevaPagina);
       setTimeout(() => cargarInventario(), 0);
     }
@@ -305,9 +305,10 @@ function InventarioEnLinea() {
   const renderPaginacion = () => {
     const botones = [];
     const maxBotones = 5;
+    const maxPaginas = Math.max(totalPaginas, paginaActual);
 
     let inicio = Math.max(1, paginaActual - Math.floor(maxBotones / 2));
-    let fin = Math.min(totalPaginas, inicio + maxBotones - 1);
+    let fin = Math.min(maxPaginas, inicio + maxBotones - 1);
 
     if (fin - inicio < maxBotones - 1) {
       inicio = Math.max(1, fin - maxBotones + 1);
@@ -324,6 +325,26 @@ function InventarioEnLinea() {
         Anterior
       </button>
     );
+
+    // Siempre mostrar botón página 1 si no está en el rango visible
+    if (inicio > 1) {
+      botones.push(
+        <button
+          key={1}
+          onClick={() => handlePageChange(1)}
+          className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700"
+        >
+          1
+        </button>
+      );
+      if (inicio > 2) {
+        botones.push(
+          <span key="ellipsis-start" className="px-3 py-2 text-sm text-gray-400">
+            ...
+          </span>
+        );
+      }
+    }
 
     // Botones de páginas
     for (let i = inicio; i <= fin; i++) {
@@ -342,12 +363,13 @@ function InventarioEnLinea() {
       );
     }
 
-    // Botón siguiente
+    // Botón siguiente - siempre habilitado si no estamos en página 1 o si hay más páginas disponibles
+    const puedeAvanzar = totalPaginas === 0 || paginaActual < maxPaginas;
     botones.push(
       <button
         key="next"
         onClick={() => handlePageChange(paginaActual + 1)}
-        disabled={paginaActual === totalPaginas}
+        disabled={!puedeAvanzar}
         className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
       >
         Siguiente
@@ -602,7 +624,7 @@ function InventarioEnLinea() {
               </div>
 
               {/* Paginación */}
-              {totalPaginas > 1 && (
+              {(totalPaginas > 1 || paginaActual > 1) && (
                 <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex-shrink-0">
                   <div className="flex justify-center">
                     <div className="flex space-x-1">
