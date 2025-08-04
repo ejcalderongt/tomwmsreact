@@ -9,7 +9,7 @@ function Index() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (isAuthenticated()) {
-        navigate("/inventario-en-linea");
+        navigate("/existencias");
       } else {
         navigate("/login");
       }

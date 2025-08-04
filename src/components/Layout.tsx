@@ -67,13 +67,17 @@ function Layout({ children }: LayoutProps) {
                 <WifiIcon className="mr-3 h-6 w-6" />
                 Inventario en Línea
               </a>
-              <div
-                className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-400 cursor-not-allowed opacity-50"
-                title="Función deshabilitada - Usar Inventario en Línea"
+              <a
+                href="/existencias"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/existencias'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
               >
                 <CubeIcon className="mr-3 h-6 w-6" />
-                Existencias (Deshabilitado)
-              </div>
+                Detalle
+              </a>
               <a
                 href="/resumen-existencias"
                 className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
@@ -154,13 +158,17 @@ function Layout({ children }: LayoutProps) {
                 <WifiIcon className="mr-3 h-6 w-6" />
                 Inventario en Línea
               </a>
-              <div
-                className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-400 cursor-not-allowed opacity-50"
-                title="Función deshabilitada - Usar Inventario en Línea"
+              <a
+                href="/existencias"
+                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                  location.pathname === '/existencias'
+                    ? 'bg-blue-100 text-blue-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
               >
                 <CubeIcon className="mr-3 h-6 w-6" />
-                Existencias (Deshabilitado)
-              </div>
+                Detalle
+              </a>
               <a
                 href="/resumen-existencias"
                 className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
