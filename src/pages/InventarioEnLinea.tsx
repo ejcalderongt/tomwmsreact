@@ -280,7 +280,81 @@ function InventarioEnLinea() {
   const handlePageChange = (nuevaPagina: number) => {
     if (nuevaPagina >= 1 && nuevaPagina <= Math.max(totalPaginas, paginaActual)) {
       setPaginaActual(nuevaPagina);
-      setTimeout(() => cargarInventario(), 0);
+      // Llamar cargarInventario con la nueva página específicamente
+      cargarInventarioConPagina(nuevaPagina);
+    }
+  };
+
+  const cargarInventarioConPagina = async (pagina: number) => {
+    if (!isOnline) {
+      toast.error('Sin conexión a internet. Mostrando datos en caché.');
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const token = getToken();
+      const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
+
+      if (!token || !idPropietario) {
+        logout();
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      const filtro = {
+        idBodega: bodegaSeleccionada,
+        idPropietario,
+        pagina: pagina, // Usar la página específica pasada como parámetro
+        tamanoPagina
+      };
+
+      const data: InventarioResponse = await existenciasAPI.listar(filtro, token);
+
+      const inventarioData = data.existencias || [];
+      setAllInventario(inventarioData);
+      setInventario(inventarioData);
+      setTotalRegistros(data.totalRegistros || 0);
+      setTotalPaginas(data.totalPaginas || 1);
+      setPaginaActual(data.paginaActual || pagina);
+
+      // Save data and filter state to localStorage
+      localStorage.setItem('inventario_online_bodegaSeleccionada', bodegaSeleccionada.toString());
+      localStorage.setItem('inventario_online_paginaActual', (data.paginaActual || pagina).toString());
+      localStorage.setItem('inventario_online_data', JSON.stringify(data.existencias || []));
+      localStorage.setItem('inventario_online_totalRegistros', (data.totalRegistros || 0).toString());
+      localStorage.setItem('inventario_online_totalPaginas', (data.totalPaginas || 1).toString());
+      localStorage.setItem('inventario_online_searchTerm', searchTerm);
+
+      if (!data.existencias || data.existencias.length === 0) {
+        toast('No se encontraron items de inventario con los filtros seleccionados', {
+          icon: 'ℹ️',
+          style: {
+            background: '#3b82f6',
+            color: '#fff'
+          }
+        });
+      } else {
+        toast.success(`Se cargaron ${data.existencias.length} items de inventario (Página ${pagina})`);
+      }
+    } catch (error) {
+      console.error('Error al cargar inventario:', error);
+      
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
+        logout();
+        navigate('/login', { replace: true });
+        return;
+      }
+      
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar el inventario';
+      toast.error(`Error: ${errorMessage}`);
+      setAllInventario([]);
+      setInventario([]);
+      setTotalRegistros(0);
+      setTotalPaginas(1);
+    } finally {
+      setLoading(false);
     }
   };
 
