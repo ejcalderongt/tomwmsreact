@@ -310,7 +310,7 @@ function InventarioEnLinea() {
     }
 
     try {
-      // Preparar los datos para el Excel
+      // Preparar los datos para el Excel (solo los mostrados en la tabla actual)
       const datosExcel = inventario.map(item => ({
         'Código': item.codigo,
         'Producto': item.nombre,
@@ -330,50 +330,51 @@ function InventarioEnLinea() {
         'Familia': item.familia
       }));
 
+      // Calcular totales de la lista actual
+      const totalCantidadUMBase = inventario.reduce((sum, item) => sum + (item.cantidad_UMBas || 0), 0);
+      const totalDisponibleUMBase = inventario.reduce((sum, item) => sum + (item.disponible_UMBas || 0), 0);
+      const totalReservada = inventario.reduce((sum, item) => sum + (item.cantidadReservadaUmBas || 0), 0);
+      const totalCantidadPresentacion = inventario.reduce((sum, item) => sum + (item.cantidad_Presentacion || 0), 0);
+      const totalCosto = inventario.reduce((sum, item) => sum + (item.costo || 0), 0);
+
       // Crear el libro de trabajo
       const wb = XLSX.utils.book_new();
       
       // Crear la hoja con los datos
       const ws = XLSX.utils.json_to_sheet(datosExcel);
 
-      // Agregar información del encabezado
-      const fechaDescarga = new Date().toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      // Calcular la fila donde agregar los totales (después de los datos)
+      const filaInicial = datosExcel.length + 2; // +2 para dejar una fila vacía
 
-      const bodegaTexto = bodegaSeleccionada === 0 
-        ? 'Todas las bodegas' 
-        : bodegas.find(b => b.idBodega === bodegaSeleccionada)?.nombre || 'Bodega seleccionada';
-
-      const filtroTexto = searchTerm ? ` - Filtrado por: "${searchTerm}"` : '';
-
-      // Insertar filas de encabezado al inicio
+      // Agregar fila de totales
       XLSX.utils.sheet_add_aoa(ws, [
-        ['INVENTARIO EN LÍNEA'],
-        [`Fecha de descarga: ${fechaDescarga}`],
-        [`Bodega: ${bodegaTexto}${filtroTexto}`],
-        [`Total de registros: ${totalRegistros} (Mostrando ${inventario.length})`],
         [''], // Fila vacía
-      ], { origin: 'A1' });
-
-      // Ajustar el rango de la hoja
-      const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
-      range.e.r += 5; // Añadir las 5 filas del encabezado
-      ws['!ref'] = XLSX.utils.encode_range(range);
-
-      // Mover los datos 5 filas hacia abajo
-      const shiftedData = XLSX.utils.json_to_sheet(datosExcel);
-      XLSX.utils.sheet_add_json(ws, datosExcel, { origin: 'A6', skipHeader: false });
+        ['TOTALES:', '', '', '', '', 
+         formatNumber(totalCantidadUMBase, 2), 
+         formatNumber(totalDisponibleUMBase, 2), 
+         formatNumber(totalReservada, 2), 
+         '', 
+         formatNumber(totalCantidadPresentacion, 2), 
+         '', '', '', '', 
+         formatNumber(totalCosto, 2), 
+         '']
+      ], { origin: `A${filaInicial}` });
 
       // Agregar la hoja al libro
       XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
 
-      // Generar el archivo y descargarlo
-      const nombreArchivo = `Inventario_EnLinea_${new Date().toISOString().split('T')[0]}.xlsx`;
+      // Generar nombre del archivo con formato mejorado
+      const fechaHoy = new Date();
+      const dia = fechaHoy.getDate().toString().padStart(2, '0');
+      const mes = (fechaHoy.getMonth() + 1).toString().padStart(2, '0');
+      const año = fechaHoy.getFullYear().toString();
+      const fechaFormateada = `${dia}${mes}${año}`;
+
+      const bodegaCodigo = bodegaSeleccionada === 0 
+        ? 'TodasBodegas' 
+        : bodegas.find(b => b.idBodega === bodegaSeleccionada)?.codigo?.replace(/\s+/g, '') || 'Bodega';
+
+      const nombreArchivo = `InventarioEnLinea_${bodegaCodigo}_${fechaFormateada}.xlsx`;
       XLSX.writeFile(wb, nombreArchivo);
 
       toast.success(`Archivo descargado: ${nombreArchivo}`);
