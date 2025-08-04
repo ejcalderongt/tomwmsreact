@@ -29,7 +29,7 @@ function App() {
           <Route path="/ingresos/detalle/:IdOrdenCompraEnc" element={<DetalleDocumentoIngreso />} />
           <Route path="/salidas" element={<Salidas />} />
           <Route path="/salidas/detalle/:IdDocumento" element={<DetalleDocumentoSalida />} />
-          <Route path="/existencias" element={<Existencias />} />
+          <Route path="/existencias" element={<Navigate to="/inventario-en-linea" replace />} />
           <Route path="/resumen-existencias" element={<ResumenExistencias />} />
           <Route path="/inventario-en-linea" element={<InventarioEnLinea />} />
           <Route path="/movimientos" element={<Movimientos />} />
