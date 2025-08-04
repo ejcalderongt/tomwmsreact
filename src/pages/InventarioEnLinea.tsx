@@ -2,10 +2,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { CubeIcon, BuildingStorefrontIcon, MagnifyingGlassIcon, WifiIcon } from '@heroicons/react/24/outline';
+import { CubeIcon, BuildingStorefrontIcon, MagnifyingGlassIcon, WifiIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { existenciasAPI, bodegasAPI } from '@/api/api';
 import { getToken, logout } from '@/utils/auth';
+import * as XLSX from 'xlsx';
 
 interface InventarioItem {
   idStock: number;
@@ -302,6 +303,86 @@ function InventarioEnLinea() {
     return 'bg-red-100 text-red-800';
   };
 
+  const descargarExcel = () => {
+    if (inventario.length === 0) {
+      toast.error('No hay datos para descargar');
+      return;
+    }
+
+    try {
+      // Preparar los datos para el Excel
+      const datosExcel = inventario.map(item => ({
+        'Código': item.codigo,
+        'Producto': item.nombre,
+        'Marca': item.marca,
+        'Bodega': item.bodega,
+        'Unidad Medida': item.unidadMedida,
+        'Cantidad UM Base': item.cantidad_UMBas,
+        'Disponible UM Base': item.disponible_UMBas,
+        'Cantidad Reservada': item.cantidadReservadaUmBas,
+        'Presentación': item.presentacion,
+        'Cantidad Presentación': item.cantidad_Presentacion,
+        'Ubicación': item.nombre_Completo,
+        'Lote': item.lote,
+        'Fecha Vencimiento': item.fecha_vence ? formatDate(item.fecha_vence) : '',
+        'Estado': item.nomEstado,
+        'Costo': item.costo,
+        'Familia': item.familia
+      }));
+
+      // Crear el libro de trabajo
+      const wb = XLSX.utils.book_new();
+      
+      // Crear la hoja con los datos
+      const ws = XLSX.utils.json_to_sheet(datosExcel);
+
+      // Agregar información del encabezado
+      const fechaDescarga = new Date().toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+
+      const bodegaTexto = bodegaSeleccionada === 0 
+        ? 'Todas las bodegas' 
+        : bodegas.find(b => b.idBodega === bodegaSeleccionada)?.nombre || 'Bodega seleccionada';
+
+      const filtroTexto = searchTerm ? ` - Filtrado por: "${searchTerm}"` : '';
+
+      // Insertar filas de encabezado al inicio
+      XLSX.utils.sheet_add_aoa(ws, [
+        ['INVENTARIO EN LÍNEA'],
+        [`Fecha de descarga: ${fechaDescarga}`],
+        [`Bodega: ${bodegaTexto}${filtroTexto}`],
+        [`Total de registros: ${totalRegistros} (Mostrando ${inventario.length})`],
+        [''], // Fila vacía
+      ], { origin: 'A1' });
+
+      // Ajustar el rango de la hoja
+      const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+      range.e.r += 5; // Añadir las 5 filas del encabezado
+      ws['!ref'] = XLSX.utils.encode_range(range);
+
+      // Mover los datos 5 filas hacia abajo
+      const shiftedData = XLSX.utils.json_to_sheet(datosExcel);
+      XLSX.utils.sheet_add_json(ws, datosExcel, { origin: 'A6', skipHeader: false });
+
+      // Agregar la hoja al libro
+      XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+
+      // Generar el archivo y descargarlo
+      const nombreArchivo = `Inventario_EnLinea_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(wb, nombreArchivo);
+
+      toast.success(`Archivo descargado: ${nombreArchivo}`);
+    } catch (error) {
+      console.error('Error al generar el archivo Excel:', error);
+      toast.error('Error al generar el archivo Excel');
+    }
+  };
+
   const renderPaginacion = () => {
     const botones = [];
     const maxBotones = 5;
@@ -469,6 +550,16 @@ function InventarioEnLinea() {
             >
               <MagnifyingGlassIcon className="h-4 w-4 mr-2" />
               {loading ? 'Consultando...' : 'Consultar'}
+            </button>
+
+            <button
+              onClick={descargarExcel}
+              disabled={inventario.length === 0}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Descargar Excel"
+            >
+              <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
+              Descargar Excel
             </button>
           </div>
         </div>
