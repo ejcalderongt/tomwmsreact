@@ -65,11 +65,35 @@ export const isAuthenticated = (): boolean => {
 };
 
 export const logout = () => {
-  try {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
-    console.log('User logged out successfully');
-  } catch (error) {
-    console.error('Error during logout:', error);
-  }
+  localStorage.removeItem('wms_token');
+  localStorage.removeItem('wms_user');
+  localStorage.removeItem('wms_idPropietario');
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+};
+
+// Funciones utilitarias para formato de fecha
+export const formatDateToDisplay = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+export const formatDateToInput = (dateString: string): string => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
+
+export const formatDateFromInput = (inputDate: string): string => {
+  // Convierte de YYYY-MM-DD a DD/MM/YYYY para mostrar
+  if (!inputDate) return '';
+  const [year, month, day] = inputDate.split('-');
+  return `${day}/${month}/${year}`;
 };

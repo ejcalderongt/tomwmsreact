@@ -5,6 +5,7 @@ import Layout from '@/components/Layout';
 import { ArrowLeftOnRectangleIcon, CalendarDaysIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { salidasAPI } from '@/api/api';
+import { formatDateToDisplay, formatDateFromInput } from '@/utils/auth';
 
 interface DocumentoSalida {
   correlativo: number;
@@ -42,6 +43,20 @@ function Salidas() {
     const saved = localStorage.getItem('salidas_fechaFin');
     if (saved) return saved;
     return new Date().toISOString().split('T')[0];
+  });
+  
+  // Estados para mostrar las fechas en formato dd/MM/YYYY
+  const [fechaInicioDisplay, setFechaInicioDisplay] = useState(() => {
+    const saved = localStorage.getItem('salidas_fechaInicio');
+    if (saved) return formatDateFromInput(saved);
+    const today = new Date();
+    const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+    return formatDateToDisplay(firstDay.toISOString().split('T')[0]);
+  });
+  const [fechaFinDisplay, setFechaFinDisplay] = useState(() => {
+    const saved = localStorage.getItem('salidas_fechaFin');
+    if (saved) return formatDateFromInput(saved);
+    return formatDateToDisplay(new Date().toISOString().split('T')[0]);
   });
 
   // Paginación básica
@@ -133,7 +148,11 @@ function Salidas() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('es-ES');
+    const date = new Date(dateString);
+    const day = date.getDate().toString().padStart(2, '0');
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   const formatBoolean = (value: boolean) => {
@@ -163,26 +182,42 @@ function Salidas() {
               <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-2">
                 Fecha Inicio
               </label>
-              <input
-                type="date"
-                id="fechaInicio"
-                value={fechaInicio}
-                onChange={(e) => setFechaInicio(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              />
+              <div className="relative">
+                <input
+                  type="date"
+                  id="fechaInicio"
+                  value={fechaInicio}
+                  onChange={(e) => {
+                    setFechaInicio(e.target.value);
+                    setFechaInicioDisplay(formatDateFromInput(e.target.value));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 pointer-events-none">
+                  {fechaInicioDisplay}
+                </div>
+              </div>
             </div>
             
             <div className="flex-1 min-w-48">
               <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-2">
                 Fecha Fin
               </label>
-              <input
-                type="date"
-                id="fechaFin"
-                value={fechaFin}
-                onChange={(e) => setFechaFin(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              />
+              <div className="relative">
+                <input
+                  type="date"
+                  id="fechaFin"
+                  value={fechaFin}
+                  onChange={(e) => {
+                    setFechaFin(e.target.value);
+                    setFechaFinDisplay(formatDateFromInput(e.target.value));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 pointer-events-none">
+                  {fechaFinDisplay}
+                </div>
+              </div>
             </div>
             
             <button
