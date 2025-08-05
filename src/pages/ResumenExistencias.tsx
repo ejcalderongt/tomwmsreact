@@ -434,9 +434,10 @@ function ResumenExistencias() {
                 </tbody>
               </table>
             </div>
+          )}
 
-            {/* Paginación */}
-            {totalPaginasLocal > 1 && (
+          {/* Paginación */}
+          {totalPaginasLocal > 1 && (
               <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex-shrink-0">
                 <div className="flex items-center justify-between">
                   <div className="text-sm text-gray-700">
