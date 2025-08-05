@@ -357,33 +357,32 @@ function Ingresos() {
 
           {/* Paginación */}
           {totalPaginas > 1 && (
-              <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex-shrink-0">
-                <div className="flex items-center justify-between">
-                  <div className="text-sm text-gray-700">
-                    Mostrando {indexInicio + 1} a {Math.min(indexFin, documentos.length)} de {documentos.length} documentos
-                  </div>
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() => setPaginaActual(Math.max(1, paginaActual - 1))}
-                      disabled={paginaActual === 1}
-                      className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
-                    >
-                      Anterior
-                    </button>
-                    <span className="px-3 py-2 text-sm text-gray-700">
-                      Página {paginaActual} de {totalPaginas}
-                    </span>
-                    <button
-                      onClick={() => setPaginaActual(Math.min(totalPaginas, paginaActual + 1))}
-                      disabled={paginaActual === totalPaginas}
-                      className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
-                    >
-                      Siguiente
-                    </button>
-                  </div>
+            <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-700">
+                  Mostrando {indexInicio + 1} a {Math.min(indexFin, documentos.length)} de {documentos.length} documentos
+                </div>
+                <div className="flex space-x-1">
+                  <button
+                    onClick={() => setPaginaActual(Math.max(1, paginaActual - 1))}
+                    disabled={paginaActual === 1}
+                    className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Anterior
+                  </button>
+                  <span className="px-3 py-2 text-sm text-gray-700">
+                    Página {paginaActual} de {totalPaginas}
+                  </span>
+                  <button
+                    onClick={() => setPaginaActual(Math.min(totalPaginas, paginaActual + 1))}
+                    disabled={paginaActual === totalPaginas}
+                    className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Siguiente
+                  </button>
                 </div>
               </div>
-            )}
+            </div>
           )}
         </div>
       </div>
