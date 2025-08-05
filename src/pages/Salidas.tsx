@@ -44,6 +44,16 @@ function Salidas() {
     return new Date().toISOString().split('T')[0];
   });
 
+  // Paginación básica
+  const [paginaActual, setPaginaActual] = useState(1);
+  const itemsPorPagina = 50;
+  
+  // Calcular índices para paginación
+  const indexInicio = (paginaActual - 1) * itemsPorPagina;
+  const indexFin = indexInicio + itemsPorPagina;
+  const totalPaginas = Math.ceil(documentos.length / itemsPorPagina);
+  const documentosPaginados = documentos.slice(indexInicio, indexFin);
+
   useEffect(() => {
     document.title = 'TOMWMSUX - Salidas';
     // Try to restore previous results from localStorage
@@ -62,6 +72,7 @@ function Salidas() {
   }, []);
 
   const cargarDocumentos = async () => {
+    setPaginaActual(1); // Resetear a la primera página
     setLoading(true);
     try {
       const token = localStorage.getItem('wms_token') || localStorage.getItem('token') || '';
@@ -226,7 +237,7 @@ function Salidas() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {documentos.map((documento, index) => (
+                  {documentosPaginados.map((documento, index) => (
                     <tr 
                       key={documento.correlativo || index} 
                       className="hover:bg-gray-50 cursor-pointer"
@@ -287,6 +298,36 @@ function Salidas() {
                 </tbody>
               </table>
             </div>
+
+            {/* Paginación */}
+            {totalPaginas > 1 && (
+              <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex-shrink-0">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-700">
+                    Mostrando {indexInicio + 1} a {Math.min(indexFin, documentos.length)} de {documentos.length} documentos
+                  </div>
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => setPaginaActual(Math.max(1, paginaActual - 1))}
+                      disabled={paginaActual === 1}
+                      className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    >
+                      Anterior
+                    </button>
+                    <span className="px-3 py-2 text-sm text-gray-700">
+                      Página {paginaActual} de {totalPaginas}
+                    </span>
+                    <button
+                      onClick={() => setPaginaActual(Math.min(totalPaginas, paginaActual + 1))}
+                      disabled={paginaActual === totalPaginas}
+                      className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    >
+                      Siguiente
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           )}
         </div>
       </div>

@@ -71,6 +71,16 @@ function ResumenExistencias() {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
+  // Paginación básica
+  const [paginaActual, setPaginaActual] = useState(1);
+  const itemsPorPagina = 100;
+  
+  // Calcular índices para paginación
+  const indexInicio = (paginaActual - 1) * itemsPorPagina;
+  const indexFin = indexInicio + itemsPorPagina;
+  const totalPaginasLocal = Math.ceil(filteredResumen.length / itemsPorPagina);
+  const resumenPaginado = filteredResumen.slice(indexInicio, indexFin);
+
   useEffect(() => {
     document.title = 'TOMWMSUX - Resumen de Existencias';
     cargarBodegas();
@@ -195,11 +205,13 @@ function ResumenExistencias() {
 
   const handleBodegaChange = (idBodega: number) => {
     setBodegaSeleccionada(idBodega);
+    setPaginaActual(1); // Resetear a la primera página
     setTimeout(() => cargarExistencias(), 0);
   };
 
   const handleSearchChange = (value: string) => {
     setSearchTerm(value);
+    setPaginaActual(1); // Resetear a la primera página al buscar
   };
 
   const clearSearch = () => {
@@ -383,7 +395,7 @@ function ResumenExistencias() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredResumen.map((producto, index) => (
+                  {resumenPaginado.map((producto, index) => (
                     <tr key={`${producto.id}-${index}`} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         {producto.id}
@@ -422,6 +434,36 @@ function ResumenExistencias() {
                 </tbody>
               </table>
             </div>
+
+            {/* Paginación */}
+            {totalPaginasLocal > 1 && (
+              <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex-shrink-0">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm text-gray-700">
+                    Mostrando {indexInicio + 1} a {Math.min(indexFin, filteredResumen.length)} de {filteredResumen.length} productos
+                  </div>
+                  <div className="flex space-x-1">
+                    <button
+                      onClick={() => setPaginaActual(Math.max(1, paginaActual - 1))}
+                      disabled={paginaActual === 1}
+                      className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    >
+                      Anterior
+                    </button>
+                    <span className="px-3 py-2 text-sm text-gray-700">
+                      Página {paginaActual} de {totalPaginasLocal}
+                    </span>
+                    <button
+                      onClick={() => setPaginaActual(Math.min(totalPaginasLocal, paginaActual + 1))}
+                      disabled={paginaActual === totalPaginasLocal}
+                      className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                    >
+                      Siguiente
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
           )}
         </div>
       </div>

@@ -281,10 +281,106 @@ function Existencias() {
   };
 
   const handlePageChange = (nuevaPagina: number) => {
-    if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas) {
+    if (nuevaPagina >= 1 && nuevaPagina <= Math.max(totalPaginas, paginaActual)) {
       setPaginaActual(nuevaPagina);
-      // Trigger fresh data load when page changes
-      setTimeout(() => cargarExistencias(), 0);
+      // Llamar cargarExistencias con la nueva página específicamente
+      cargarExistenciasConPagina(nuevaPagina);
+    }
+  };
+
+  const cargarExistenciasConPagina = async (pagina: number) => {
+    // Prevent multiple simultaneous requests
+    if (isLoadingExistencias) {
+      console.log('Request already in progress, skipping...');
+      return;
+    }
+    
+    setIsLoadingExistencias(true);
+    setLoading(true);
+    
+    console.log('=== STARTING EXISTENCIAS LOAD ===');
+    console.log('Current state:');
+    console.log('  - bodegaSeleccionada:', bodegaSeleccionada);
+    console.log('  - pagina:', pagina);
+    console.log('  - tamanoPagina:', tamanoPagina);
+    
+    try {
+      const token = getToken();
+      const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
+
+      console.log('Authentication check:');
+      console.log('  - token exists:', !!token);
+      console.log('  - idPropietario:', idPropietario);
+
+      if (!token || !idPropietario) {
+        console.log('Missing authentication data, redirecting to login');
+        logout(); // Clear session
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      const filtro = {
+        idBodega: bodegaSeleccionada, // Always send idBodega, 0 means all warehouses
+        idPropietario,
+        pagina: pagina, // Usar la página específica pasada como parámetro
+        tamanoPagina
+      };
+
+      console.log('=== CALLING EXISTENCIAS API ===');
+      console.log('Filter object:', filtro);
+      
+      const data: ExistenciasResponse = await existenciasAPI.listar(filtro, token);
+      
+      console.log('=== EXISTENCIAS API COMPLETED ===');
+      console.log('Response data:', data);
+
+      const existenciasData = data.existencias || [];
+      setAllExistencias(existenciasData);
+      setExistencias(existenciasData);
+      setTotalRegistros(data.totalRegistros || 0);
+      setTotalPaginas(data.totalPaginas || 1);
+      setPaginaActual(data.paginaActual || pagina);
+
+      // Save filter state and results to localStorage
+      localStorage.setItem('existencias_bodegaSeleccionada', bodegaSeleccionada.toString());
+      localStorage.setItem('existencias_paginaActual', (data.paginaActual || pagina).toString());
+      localStorage.setItem('existencias_data', JSON.stringify(data.existencias || []));
+      localStorage.setItem('existencias_totalRegistros', (data.totalRegistros || 0).toString());
+      localStorage.setItem('existencias_totalPaginas', (data.totalPaginas || 1).toString());
+      localStorage.setItem('existencias_searchTerm', searchTerm);
+
+      if (!data.existencias || data.existencias.length === 0) {
+        toast('No se encontraron existencias con los filtros seleccionados', {
+          icon: 'ℹ️',
+          style: {
+            background: '#3b82f6',
+            color: '#fff'
+          }
+        });
+      } else {
+        toast.success(`Se cargaron ${data.existencias.length} existencias (Página ${pagina})`);
+      }
+    } catch (error) {
+      console.error('Error al cargar existencias:', error);
+      
+      // Check if it's an authentication error
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
+        console.log('Authentication error, clearing session and redirecting to login');
+        logout(); // Clear session
+        navigate('/login', { replace: true });
+        return;
+      }
+      
+      // Show more specific error message
+      const errorMessage = error instanceof Error ? error.message : 'Error al cargar las existencias';
+      toast.error(`Error: ${errorMessage}`);
+      setAllExistencias([]);
+      setExistencias([]);
+      setTotalRegistros(0);
+      setTotalPaginas(1);
+    } finally {
+      setLoading(false);
+      setIsLoadingExistencias(false);
     }
   };
 

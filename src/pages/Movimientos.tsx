@@ -77,6 +77,16 @@ function Movimientos() {
     return new Date().toISOString().split('T')[0];
   });
   const [busqueda, setBusqueda] = useState('');
+  
+  // Paginación básica
+  const [paginaActual, setPaginaActual] = useState(1);
+  const itemsPorPagina = 100;
+  
+  // Calcular índices para paginación
+  const indexInicio = (paginaActual - 1) * itemsPorPagina;
+  const indexFin = indexInicio + itemsPorPagina;
+  const totalPaginas = Math.ceil(movimientosFiltrados.length / itemsPorPagina);
+  const movimientosPaginados = movimientosFiltrados.slice(indexInicio, indexFin);
 
   const navigate = useNavigate();
 
@@ -192,6 +202,7 @@ function Movimientos() {
   const handleBuscar = () => {
     if (!loading && !loadingRef.current) {
       console.log('Manual search triggered');
+      setPaginaActual(1); // Resetear a la primera página
       cargarMovimientos();
     } else {
       console.log('Search blocked: already loading');
@@ -467,14 +478,14 @@ function Movimientos() {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {movimientosFiltrados.length === 0 ? (
+                  {movimientosPaginados.length === 0 ? (
                     <tr>
                       <td colSpan={20} className="px-6 py-12 text-center text-gray-500">
                         No se encontraron movimientos que coincidan con la búsqueda
                       </td>
                     </tr>
                   ) : (
-                    movimientosFiltrados.map((movimiento) => (
+                    movimientosPaginados.map((movimiento) => (
                       <tr key={movimiento.idMovimiento || Math.random()} className="hover:bg-gray-50">
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                           {movimiento.idMovimiento || '-'}
@@ -541,6 +552,36 @@ function Movimientos() {
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* Paginación */}
+          {totalPaginas > 1 && (
+            <div className="bg-white px-4 py-3 border-t border-gray-200 sm:px-6 flex-shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-700">
+                  Mostrando {indexInicio + 1} a {Math.min(indexFin, movimientosFiltrados.length)} de {movimientosFiltrados.length} movimientos
+                </div>
+                <div className="flex space-x-1">
+                  <button
+                    onClick={() => setPaginaActual(Math.max(1, paginaActual - 1))}
+                    disabled={paginaActual === 1}
+                    className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Anterior
+                  </button>
+                  <span className="px-3 py-2 text-sm text-gray-700">
+                    Página {paginaActual} de {totalPaginas}
+                  </span>
+                  <button
+                    onClick={() => setPaginaActual(Math.min(totalPaginas, paginaActual + 1))}
+                    disabled={paginaActual === totalPaginas}
+                    className="px-3 py-2 text-sm text-gray-500 hover:text-gray-700 disabled:text-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>
