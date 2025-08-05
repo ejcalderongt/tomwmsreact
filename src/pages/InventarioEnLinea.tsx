@@ -377,15 +377,57 @@ function InventarioEnLinea() {
     return 'bg-red-100 text-red-800';
   };
 
-  const descargarExcel = () => {
-    if (inventario.length === 0) {
-      toast.error('No hay datos para descargar');
+  const descargarExcel = async () => {
+    if (!isOnline) {
+      toast.error('Sin conexión a internet');
       return;
     }
 
+    setLoading(true);
+    
     try {
-      // Preparar los datos para el Excel (solo los mostrados en la tabla actual)
-      const datosExcel = inventario.map(item => ({
+      const token = getToken();
+      const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
+
+      if (!token || !idPropietario) {
+        logout();
+        navigate('/login', { replace: true });
+        return;
+      }
+
+      // Mostrar toast de carga con cronómetro
+      const startTime = Date.now();
+      const loadingToast = toast.loading('🔄 Obteniendo todos los datos de inventario...', {
+        duration: Infinity
+      });
+
+      // Llamada para obtener TODOS los datos sin paginación
+      const filtro = {
+        idBodega: bodegaSeleccionada,
+        idPropietario,
+        pagina: 1,
+        tamanoPagina: 999999 // Número muy grande para obtener todos los registros
+      };
+
+      const data = await existenciasAPI.listar(filtro, token);
+      const todosLosDatos = data.existencias || [];
+
+      // Actualizar el toast con el tiempo transcurrido
+      const elapsedTime = ((Date.now() - startTime) / 1000).toFixed(1);
+      toast.dismiss(loadingToast);
+      
+      if (todosLosDatos.length === 0) {
+        toast.error('No hay datos para descargar');
+        return;
+      }
+
+      // Mostrar toast de procesamiento
+      const processToast = toast.loading('📊 Generando archivo Excel...', {
+        duration: Infinity
+      });
+
+      // Preparar los datos para el Excel
+      const datosExcel = todosLosDatos.map(item => ({
         'Código': item.codigo,
         'Producto': item.nombre,
         'Marca': item.marca,
@@ -404,25 +446,21 @@ function InventarioEnLinea() {
         'Familia': item.familia
       }));
 
-      // Calcular totales de la lista actual
-      const totalCantidadUMBase = inventario.reduce((sum, item) => sum + (item.cantidad_UMBas || 0), 0);
-      const totalDisponibleUMBase = inventario.reduce((sum, item) => sum + (item.disponible_UMBas || 0), 0);
-      const totalReservada = inventario.reduce((sum, item) => sum + (item.cantidadReservadaUmBas || 0), 0);
-      const totalCantidadPresentacion = inventario.reduce((sum, item) => sum + (item.cantidad_Presentacion || 0), 0);
-      const totalCosto = inventario.reduce((sum, item) => sum + (item.costo || 0), 0);
+      // Calcular totales
+      const totalCantidadUMBase = todosLosDatos.reduce((sum, item) => sum + (item.cantidad_UMBas || 0), 0);
+      const totalDisponibleUMBase = todosLosDatos.reduce((sum, item) => sum + (item.disponible_UMBas || 0), 0);
+      const totalReservada = todosLosDatos.reduce((sum, item) => sum + (item.cantidadReservadaUmBas || 0), 0);
+      const totalCantidadPresentacion = todosLosDatos.reduce((sum, item) => sum + (item.cantidad_Presentacion || 0), 0);
+      const totalCosto = todosLosDatos.reduce((sum, item) => sum + (item.costo || 0), 0);
 
       // Crear el libro de trabajo
       const wb = XLSX.utils.book_new();
-      
-      // Crear la hoja con los datos
       const ws = XLSX.utils.json_to_sheet(datosExcel);
 
-      // Calcular la fila donde agregar los totales (después de los datos)
-      const filaInicial = datosExcel.length + 2; // +2 para dejar una fila vacía
-
-      // Agregar fila de totales
+      // Agregar totales
+      const filaInicial = datosExcel.length + 2;
       XLSX.utils.sheet_add_aoa(ws, [
-        [''], // Fila vacía
+        [''],
         ['TOTALES:', '', '', '', '', 
          formatNumber(totalCantidadUMBase, 2), 
          formatNumber(totalDisponibleUMBase, 2), 
@@ -434,10 +472,9 @@ function InventarioEnLinea() {
          '']
       ], { origin: `A${filaInicial}` });
 
-      // Agregar la hoja al libro
-      XLSX.utils.book_append_sheet(wb, ws, 'Inventario');
+      XLSX.utils.book_append_sheet(wb, ws, 'Inventario Completo');
 
-      // Generar nombre del archivo con formato mejorado
+      // Generar nombre del archivo
       const fechaHoy = new Date();
       const dia = fechaHoy.getDate().toString().padStart(2, '0');
       const mes = (fechaHoy.getMonth() + 1).toString().padStart(2, '0');
@@ -448,13 +485,28 @@ function InventarioEnLinea() {
         ? 'TodasBodegas' 
         : bodegas.find(b => b.idBodega === bodegaSeleccionada)?.codigo?.replace(/\s+/g, '') || 'Bodega';
 
-      const nombreArchivo = `InventarioEnLinea_${bodegaCodigo}_${fechaFormateada}.xlsx`;
+      const nombreArchivo = `InventarioCompleto_${bodegaCodigo}_${fechaFormateada}.xlsx`;
+      
+      // Descargar archivo
       XLSX.writeFile(wb, nombreArchivo);
+      
+      toast.dismiss(processToast);
+      toast.success(`✅ Descarga completada en ${elapsedTime}s\n📁 ${nombreArchivo}\n📊 ${todosLosDatos.length} registros`, {
+        duration: 5000
+      });
 
-      toast.success(`Archivo descargado: ${nombreArchivo}`);
     } catch (error) {
-      console.error('Error al generar el archivo Excel:', error);
-      toast.error('Error al generar el archivo Excel');
+      console.error('Error al descargar inventario completo:', error);
+      
+      if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
+        logout();
+        navigate('/login', { replace: true });
+        return;
+      }
+      
+      toast.error('❌ Error al descargar el inventario completo');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -629,12 +681,12 @@ function InventarioEnLinea() {
 
             <button
               onClick={descargarExcel}
-              disabled={inventario.length === 0}
+              disabled={loading || !isOnline}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              title="Descargar Excel"
+              title="Descargar inventario completo"
             >
               <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
-              Descargar Excel
+              {loading ? 'Descargando...' : 'Descargar Inventario'}
             </button>
           </div>
         </div>
