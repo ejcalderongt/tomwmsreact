@@ -43,11 +43,23 @@ function CambiarPassword() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
+          {/* Logo and Brand */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center mb-2">
+              <img 
+                src="/tom_wms.png" 
+                alt="TOM WMS Logo" 
+                className="w-32 h-32 object-contain"
+              />
+            </div>
+            <p className="text-gray-400">Administración de Bodegas</p>
+          </div>
+
           {/* Header */}
           <div className="text-center mb-8">
             <button
               onClick={() => navigate('/login')}
-              className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
+              className="inline-flex items-center text-blue-400 hover:text-blue-300 mb-4 transition-colors"
             >
               <ArrowLeftIcon className="h-5 w-5 mr-2" />
               Volver al Login
@@ -57,10 +69,10 @@ function CambiarPassword() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-10.712 3.712m0 0a6 6 0 01-9.546-3.976L3 12m0 0l3.546 3.546M3 12l3.546-3.546m0 0a6 6 0 0113.176 4.469M21 12l-3.546 3.546M21 12l-3.546-3.546" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl font-bold text-white mb-2">
               Restablecer Contraseña
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-400">
               Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
             </p>
           </div>
