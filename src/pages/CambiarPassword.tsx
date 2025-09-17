@@ -64,11 +64,6 @@ function CambiarPassword() {
               <ArrowLeftIcon className="h-5 w-5 mr-2" />
               Volver al Login
             </button>
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-10.712 3.712m0 0a6 6 0 01-9.546-3.976L3 12m0 0l3.546 3.546M3 12l3.546-3.546m0 0a6 6 0 0113.176 4.469M21 12l-3.546 3.546M21 12l-3.546-3.546" />
-              </svg>
-            </div>
             <h1 className="text-2xl font-bold text-white mb-2">
               Restablecer Contraseña
             </h1>
