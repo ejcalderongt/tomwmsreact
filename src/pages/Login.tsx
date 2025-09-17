@@ -145,7 +145,11 @@ function Login() {
           <div className="mt-4 text-center">
             <button
               type="button"
-              onClick={() => navigate('/cambiar-password')}
+              onClick={(e) => {
+                e.preventDefault();
+                console.log('Password reset button clicked');
+                navigate('/cambiar-password');
+              }}
               className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
             >
               ¿Olvidaste tu contraseña?

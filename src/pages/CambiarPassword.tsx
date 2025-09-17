@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '@heroicons/react/24/outline';
 import { passwordAPI } from '@/api/api';
 import toast from 'react-hot-toast';
-import Layout from '@/components/Layout';
 
 function CambiarPassword() {
   const [email, setEmail] = useState('');
@@ -42,8 +41,7 @@ function CambiarPassword() {
   };
 
   return (
-    <Layout>
-      <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center px-4">
         <div className="w-full max-w-md">
           {/* Header */}
           <div className="text-center mb-8">
@@ -163,7 +161,7 @@ function CambiarPassword() {
           </div>
         </div>
       </div>
-    </Layout>
+    </div>
   );
 }
 

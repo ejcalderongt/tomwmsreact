@@ -1,46 +1,37 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import Login from "@/pages/Login";
-import Ingresos from "@/pages/Ingresos";
-import DetalleDocumentoIngreso from "@/pages/DetalleDocumentoIngreso";
-import DetalleDocumentoSalida from "@/pages/DetalleDocumentoSalida";
-import Existencias from "@/pages/Existencias";
-import ResumenExistencias from "@/pages/ResumenExistencias";
-import InventarioEnLinea from '@/pages/InventarioEnLinea';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import Login from '@/pages/Login';
+import Existencias from '@/pages/Existencias';
+import ResumenExistencias from '@/pages/ResumenExistencias';
+import Ingresos from '@/pages/Ingresos';
+import Salidas from '@/pages/Salidas';
+import DetalleDocumentoIngreso from '@/pages/DetalleDocumentoIngreso';
+import DetalleDocumentoSalida from '@/pages/DetalleDocumentoSalida';
 import Movimientos from '@/pages/Movimientos';
-import Salidas from "@/pages/Salidas";
-import CambiarPassword from "@/pages/CambiarPassword";
-import SessionExpired from "@/pages/SessionExpired";
-import PrivateRoute from "@/routes/PrivateRoute";
-import ToastProvider from "@/components/ToastProvider";
+import InventarioEnLinea from '@/pages/InventarioEnLinea';
+import SessionExpired from '@/pages/SessionExpired';
+import CambiarPassword from '@/pages/CambiarPassword';
+import PrivateRoute from '@/components/PrivateRoute';
+import AuthWatcher from '@/components/AuthWatcher';
+import ToastProvider from '@/components/ToastProvider';
 
 function App() {
   return (
     <Router>
-      {/* Global toast notifications */}
       <ToastProvider />
-
+      <AuthWatcher />
       <Routes>
-        {/* Rutas públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/session-expired" element={<SessionExpired />} />
-
-        {/* Rutas protegidas */}
-        <Route element={<PrivateRoute />}>
-          <Route path="/ingresos" element={<Ingresos />} />
-          <Route path="/ingresos/detalle/:IdOrdenCompraEnc" element={<DetalleDocumentoIngreso />} />
-          <Route path="/salidas" element={<Salidas />} />
-          <Route path="/salidas/detalle/:IdDocumento" element={<DetalleDocumentoSalida />} />
-          <Route path="/existencias" element={<Navigate to="/inventario-en-linea" replace />} />
-          <Route path="/resumen-existencias" element={<ResumenExistencias />} />
-          <Route path="/inventario-en-linea" element={<InventarioEnLinea />} />
-          <Route path="/movimientos" element={<Movimientos />} />
-          <Route path="/cambiar-password" element={<CambiarPassword />} />
-        </Route>
-
-        {/* Default route - redirect to inventario-en-linea if authenticated, otherwise login */}
-        <Route path="/" element={<Navigate to="/inventario-en-linea" replace />} />
-
-        {/* Ruta fallback */}
+        <Route path="/cambiar-password" element={<CambiarPassword />} />
+        <Route path="/existencias" element={<PrivateRoute><Existencias /></PrivateRoute>} />
+        <Route path="/resumen-existencias" element={<PrivateRoute><ResumenExistencias /></PrivateRoute>} />
+        <Route path="/ingresos" element={<PrivateRoute><Ingresos /></PrivateRoute>} />
+        <Route path="/salidas" element={<PrivateRoute><Salidas /></PrivateRoute>} />
+        <Route path="/detalle-ingreso/:id" element={<PrivateRoute><DetalleDocumentoIngreso /></PrivateRoute>} />
+        <Route path="/detalle-salida/:id" element={<PrivateRoute><DetalleDocumentoSalida /></PrivateRoute>} />
+        <Route path="/movimientos" element={<PrivateRoute><Movimientos /></PrivateRoute>} />
+        <Route path="/inventario-en-linea" element={<PrivateRoute><InventarioEnLinea /></PrivateRoute>} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>
