@@ -9,20 +9,44 @@ function CambiarPassword() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
+  const [emailError, setEmailError] = useState('');
   const navigate = useNavigate();
+
+  // Validación de email en tiempo real
+  const validateEmail = (email: string) => {
+    if (!email) {
+      setEmailError('');
+      return false;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setEmailError('Por favor ingresa un correo electrónico válido');
+      return false;
+    }
+    
+    setEmailError('');
+    return true;
+  };
+
+  // Verificar si el botón debe estar habilitado
+  const isButtonEnabled = email && !emailError && !loading;
+
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    validateEmail(newEmail);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!email) {
-      toast.error('Por favor ingresa tu correo electrónico');
+      setEmailError('Por favor ingresa tu correo electrónico');
       return;
     }
 
-    // Validación básica de email
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      toast.error('Por favor ingresa un correo electrónico válido');
+    if (!validateEmail(email)) {
       return;
     }
 
@@ -90,17 +114,26 @@ function CambiarPassword() {
                       type="email"
                       id="email"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-md placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
+                      onChange={handleEmailChange}
+                      className={`block w-full pl-10 pr-3 py-3 border rounded-md placeholder-gray-400 focus:ring-2 transition-all duration-200 ${
+                        emailError 
+                          ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
+                          : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
+                      }`}
                       placeholder="usuario@empresa.com"
                       required
                     />
                   </div>
+                  {emailError && (
+                    <p className="mt-1 text-sm text-red-600">
+                      {emailError}
+                    </p>
+                  )}
                 </div>
 
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={!isButtonEnabled}
                   className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
                 >
                   {loading ? (
@@ -139,6 +172,7 @@ function CambiarPassword() {
                   onClick={() => {
                     setEmailSent(false);
                     setEmail('');
+                    setEmailError('');
                   }}
                   className="w-full px-4 py-2 text-sm font-medium text-green-700 bg-green-100 border border-green-300 rounded-md hover:bg-green-200 transition-colors"
                 >
@@ -159,7 +193,10 @@ function CambiarPassword() {
             <p className="text-sm text-gray-500">
               ¿No recibiste el correo? Revisa tu carpeta de spam o{' '}
               <button
-                onClick={() => setEmailSent(false)}
+                onClick={() => {
+                  setEmailSent(false);
+                  setEmailError('');
+                }}
                 className="font-medium text-blue-600 hover:text-blue-500"
               >
                 intenta de nuevo
