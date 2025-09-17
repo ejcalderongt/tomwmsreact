@@ -48,11 +48,11 @@ function CambiarPassword() {
           {/* Header */}
           <div className="text-center mb-8">
             <button
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/login')}
               className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
             >
               <ArrowLeftIcon className="h-5 w-5 mr-2" />
-              Volver
+              Volver al Login
             </button>
             <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
               <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -140,10 +140,10 @@ function CambiarPassword() {
                   Enviar a otro correo
                 </button>
                 <button
-                  onClick={() => navigate('/existencias')}
+                  onClick={() => navigate('/login')}
                   className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                 >
-                  Volver al inicio
+                  Volver al Login
                 </button>
               </div>
             </div>

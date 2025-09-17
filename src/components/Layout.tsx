@@ -32,7 +32,7 @@ function Layout({ children }: LayoutProps) {
 
   const handleLogout = () => {
     logout();
-    toast.success('Sesión cerrada correctamente');
+    toast.success('Sesión została zamknięta');
     navigate('/login');
   };
 

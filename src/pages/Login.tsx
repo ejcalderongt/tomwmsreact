@@ -141,6 +141,17 @@ function Login() {
             </button>
           </form>
 
+          {/* Password Reset Link */}
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => navigate('/cambiar-password')}
+              className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
+
           {/* Sign Up Link */}
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-400">
