@@ -160,7 +160,6 @@ function CambiarPassword() {
             </p>
           </div>
         </div>
-      </div>
     </div>
   );
 }
