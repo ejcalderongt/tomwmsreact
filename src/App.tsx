@@ -23,14 +23,30 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/session-expired" element={<SessionExpired />} />
         <Route path="/cambiar-password" element={<CambiarPassword />} />
-        <Route path="/existencias" element={<PrivateRoute><Existencias /></PrivateRoute>} />
-        <Route path="/resumen-existencias" element={<PrivateRoute><ResumenExistencias /></PrivateRoute>} />
-        <Route path="/ingresos" element={<PrivateRoute><Ingresos /></PrivateRoute>} />
-        <Route path="/salidas" element={<PrivateRoute><Salidas /></PrivateRoute>} />
-        <Route path="/detalle-ingreso/:id" element={<PrivateRoute><DetalleDocumentoIngreso /></PrivateRoute>} />
-        <Route path="/detalle-salida/:id" element={<PrivateRoute><DetalleDocumentoSalida /></PrivateRoute>} />
-        <Route path="/movimientos" element={<PrivateRoute><Movimientos /></PrivateRoute>} />
-        <Route path="/inventario-en-linea" element={<PrivateRoute><InventarioEnLinea /></PrivateRoute>} />
+        <Route path="/existencias" element={<PrivateRoute />}>
+          <Route index element={<Existencias />} />
+        </Route>
+        <Route path="/resumen-existencias" element={<PrivateRoute />}>
+          <Route index element={<ResumenExistencias />} />
+        </Route>
+        <Route path="/ingresos" element={<PrivateRoute />}>
+          <Route index element={<Ingresos />} />
+        </Route>
+        <Route path="/salidas" element={<PrivateRoute />}>
+          <Route index element={<Salidas />} />
+        </Route>
+        <Route path="/detalle-ingreso/:id" element={<PrivateRoute />}>
+          <Route index element={<DetalleDocumentoIngreso />} />
+        </Route>
+        <Route path="/detalle-salida/:id" element={<PrivateRoute />}>
+          <Route index element={<DetalleDocumentoSalida />} />
+        </Route>
+        <Route path="/movimientos" element={<PrivateRoute />}>
+          <Route index element={<Movimientos />} />
+        </Route>
+        <Route path="/inventario-en-linea" element={<PrivateRoute />}>
+          <Route index element={<InventarioEnLinea />} />
+        </Route>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
