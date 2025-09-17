@@ -8,6 +8,7 @@ import ResumenExistencias from "@/pages/ResumenExistencias";
 import InventarioEnLinea from '@/pages/InventarioEnLinea';
 import Movimientos from '@/pages/Movimientos';
 import Salidas from "@/pages/Salidas";
+import CambiarPassword from "@/pages/CambiarPassword";
 import SessionExpired from "@/pages/SessionExpired";
 import PrivateRoute from "@/routes/PrivateRoute";
 import ToastProvider from "@/components/ToastProvider";
@@ -33,6 +34,7 @@ function App() {
           <Route path="/resumen-existencias" element={<ResumenExistencias />} />
           <Route path="/inventario-en-linea" element={<InventarioEnLinea />} />
           <Route path="/movimientos" element={<Movimientos />} />
+          <Route path="/cambiar-password" element={<CambiarPassword />} />
         </Route>
 
         {/* Default route - redirect to inventario-en-linea if authenticated, otherwise login */}

@@ -121,7 +121,16 @@ function Layout({ children }: LayoutProps) {
               );
             })}
           </nav>
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-gray-200 p-4 space-y-2">
+            <Link
+              to="/cambiar-password"
+              className="w-full flex items-center px-2 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md"
+            >
+              <svg className="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-10.712 3.712m0 0a6 6 0 01-9.546-3.976L3 12m0 0l3.546 3.546M3 12l3.546-3.546m0 0a6 6 0 0113.176 4.469M21 12l-3.546 3.546M21 12l-3.546-3.546" />
+              </svg>
+              Cambiar Password
+            </Link>
             <button
               onClick={handleLogout}
               className="w-full flex items-center px-2 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md"
@@ -212,7 +221,16 @@ function Layout({ children }: LayoutProps) {
               );
             })}
           </nav>
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-gray-200 p-4 space-y-2">
+            <Link
+              to="/cambiar-password"
+              className="w-full flex items-center px-2 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md"
+            >
+              <svg className="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-10.712 3.712m0 0a6 6 0 01-9.546-3.976L3 12m0 0l3.546 3.546M3 12l3.546-3.546m0 0a6 6 0 0113.176 4.469M21 12l-3.546 3.546M21 12l-3.546-3.546" />
+              </svg>
+              Cambiar Password
+            </Link>
             <button
               onClick={handleLogout}
               className="w-full flex items-center px-2 py-2 text-sm font-medium text-red-600 hover:bg-red-50 rounded-md"
