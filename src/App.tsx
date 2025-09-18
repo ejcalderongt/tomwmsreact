@@ -10,6 +10,7 @@ import Movimientos from '@/pages/Movimientos';
 import InventarioEnLinea from '@/pages/InventarioEnLinea';
 import SessionExpired from '@/pages/SessionExpired';
 import CambiarPassword from '@/pages/CambiarPassword';
+import NewPassword from '@/pages/NewPassword';
 import PrivateRoute from '@/components/PrivateRoute';
 import AuthWatcher from '@/components/AuthWatcher';
 import ToastProvider from '@/components/ToastProvider';
@@ -23,6 +24,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/session-expired" element={<SessionExpired />} />
         <Route path="/cambiar-password" element={<CambiarPassword />} />
+        <Route path="/new-password/:token" element={<NewPassword />} />
         <Route path="/existencias" element={<PrivateRoute />}>
           <Route index element={<Existencias />} />
         </Route>

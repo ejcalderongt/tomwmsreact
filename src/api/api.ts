@@ -557,6 +557,55 @@ export const passwordAPI = {
       console.error('Password Reset API Error:', error);
       throw new Error(error instanceof Error ? error.message : 'Error al enviar el enlace de restablecimiento');
     }
+  },
+
+  validateResetToken: async (token: string): Promise<{ isValid: boolean; message?: string }> => {
+    try {
+      console.log('Validating reset token:', token);
+      const data = await apiRequest(`/Auth/validate-reset-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token }),
+      });
+
+      console.log('Token validation response:', data);
+      
+      return {
+        isValid: data.isValid || true,
+        message: data.message
+      };
+    } catch (error) {
+      console.error('Token validation error:', error);
+      return {
+        isValid: false,
+        message: error instanceof Error ? error.message : 'Token inválido o expirado'
+      };
+    }
+  },
+
+  updatePassword: async (token: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      console.log('Updating password with token:', token);
+      const data = await apiRequest(`/Auth/update-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ token, newPassword }),
+      });
+
+      console.log('Update password response:', data);
+      
+      return {
+        success: true,
+        message: data.message || 'Contraseña actualizada exitosamente'
+      };
+    } catch (error) {
+      console.error('Update password error:', error);
+      throw new Error(error instanceof Error ? error.message : 'Error al actualizar la contraseña');
+    }
   }
 };
 
