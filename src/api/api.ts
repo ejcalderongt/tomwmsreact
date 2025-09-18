@@ -562,18 +562,17 @@ export const passwordAPI = {
   validateResetToken: async (token: string): Promise<{ isValid: boolean; message?: string }> => {
     try {
       console.log('Validating reset token:', token);
-      const data = await apiRequest(`/Auth/validate-reset-token`, {
-        method: 'POST',
+      const data = await apiRequest(`/Auth/validate-reset-token?token=${encodeURIComponent(token)}`, {
+        method: 'GET',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token }),
       });
 
       console.log('Token validation response:', data);
       
       return {
-        isValid: data.isValid || true,
+        isValid: data.isValid !== false, // Assume valid unless explicitly false
         message: data.message
       };
     } catch (error) {
