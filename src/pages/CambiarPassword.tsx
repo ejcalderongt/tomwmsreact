@@ -92,7 +92,7 @@ function CambiarPassword() {
               Restablecer Contraseña
             </h1>
             <p className="text-gray-400">
-              Ingresa tu correo electrónico y te enviaremos un enlace para restablecer tu contraseña
+              Ingresa el correo electrónico registrado y enviaremos un enlace para restablecer la contraseña.
             </p>
           </div>
 
