@@ -24,7 +24,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/session-expired" element={<SessionExpired />} />
         <Route path="/cambiar-password" element={<CambiarPassword />} />
-        <Route path="/new-password/:token" element={<NewPassword />} />
+        <Route path="/new-password" element={<NewPassword />} />
         <Route path="/existencias" element={<PrivateRoute />}>
           <Route index element={<Existencias />} />
         </Route>

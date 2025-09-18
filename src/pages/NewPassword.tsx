@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowLeftIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { passwordAPI } from '@/api/api';
 import toast from 'react-hot-toast';
@@ -18,7 +18,8 @@ function NewPassword() {
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
   
   const navigate = useNavigate();
-  const { token } = useParams<{ token: string }>();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
   useEffect(() => {
     if (!token) {
