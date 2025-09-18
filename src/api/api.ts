@@ -538,29 +538,21 @@ export const productosAPI = {
 export const passwordAPI = {
   resetPassword: async (email: string): Promise<{ success: boolean; message: string }> => {
     try {
-      // Simulamos una llamada a la API con un delay
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      console.log('Attempting password reset for email:', email);
+      const data = await apiRequest(`/Auth/reset-password`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      console.log('Password Reset API Response:', data);
       
-      // Lista de emails válidos para la demo
-      const validEmails = [
-        'admin@empresa.com',
-        'usuario@empresa.com',
-        'test@test.com',
-        'demo@demo.com'
-      ];
-      
-      // Simulamos validación del email
-      const isValidEmail = validEmails.includes(email.toLowerCase()) || email.includes('@');
-      
-      if (isValidEmail) {
-        console.log(`[DEMO] Enlace de reset enviado a: ${email}`);
-        return {
-          success: true,
-          message: 'Enlace de restablecimiento enviado exitosamente'
-        };
-      } else {
-        throw new Error('Email no encontrado en el sistema');
-      }
+      return {
+        success: true,
+        message: data.message || 'Enlace de restablecimiento enviado exitosamente'
+      };
     } catch (error) {
       console.error('Password Reset API Error:', error);
       throw new Error(error instanceof Error ? error.message : 'Error al enviar el enlace de restablecimiento');
