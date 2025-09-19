@@ -48,11 +48,30 @@ const clearAuthAndRedirect = () => {
 
 // Configure API base URL based on environment
 const getApiBaseUrl = () => {
-  // In development (localhost), use proxy
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+  const hostname = window.location.hostname;
+  
+  console.log('=== API BASE URL CONFIGURATION ===');
+  console.log('Current hostname:', hostname);
+  console.log('Current protocol:', window.location.protocol);
+  console.log('Current port:', window.location.port);
+  console.log('Navigator online:', navigator.onLine);
+  
+  // Check if we're in development environment (localhost OR Replit dev server)
+  const isLocalDev = hostname === 'localhost' || 
+                    hostname === '127.0.0.1' ||
+                    hostname.includes('replit.dev') ||
+                    hostname.includes('riker.replit.dev') ||
+                    window.location.port === '5000';
+  
+  console.log('Is local development:', isLocalDev);
+  
+  if (isLocalDev) {
+    console.log('Using proxy: /api');
     return '/api';
   }
-  // In production (Replit or other deployment), use direct API URL with HTTP
+  
+  // Only use direct API URL for actual production deployment
+  console.log('Using direct API: http://52.41.114.122:8097/api');
   return 'http://52.41.114.122:8097/api';
 };
 
