@@ -46,6 +46,16 @@ const clearAuthAndRedirect = () => {
   }, 2000);
 };
 
+// Configure API base URL based on environment
+const getApiBaseUrl = () => {
+  // In development (localhost), use proxy
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return '/api';
+  }
+  // In production (Replit or other deployment), use direct API URL
+  return 'http://52.41.114.122:8097/api';
+};
+
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
   // Don't cache requests - this was causing issues
   const isLoginRequest = endpoint.includes('/Auth/login-propietario');
@@ -71,7 +81,13 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
   }
 
   try {
-    const response = await fetch(`/api${endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint}`, config);
+    const baseUrl = getApiBaseUrl();
+    const cleanEndpoint = endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint;
+    const fullUrl = `${baseUrl}${cleanEndpoint}`;
+    
+    console.log('API Request URL:', fullUrl);
+    
+    const response = await fetch(fullUrl, config);
 
     // Handle authentication errors
     if (response.status === 401 || response.status === 403) {
