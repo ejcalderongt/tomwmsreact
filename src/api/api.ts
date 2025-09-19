@@ -49,28 +49,38 @@ const clearAuthAndRedirect = () => {
 // Configure API base URL based on environment
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
+  const protocol = window.location.protocol;
   
   console.log('=== API BASE URL CONFIGURATION ===');
   console.log('Current hostname:', hostname);
-  console.log('Current protocol:', window.location.protocol);
+  console.log('Current protocol:', protocol);
   console.log('Current port:', window.location.port);
   console.log('Navigator online:', navigator.onLine);
   
-  // Check if we're in development environment (localhost OR Replit dev server)
+  // Check if we're in any Replit environment (dev or production)
+  const isReplit = hostname.includes('replit.dev') || 
+                   hostname.includes('riker.replit.dev') ||
+                   hostname.includes('replit.app');
+  
+  // Check if we're in local development
   const isLocalDev = hostname === 'localhost' || 
                     hostname === '127.0.0.1' ||
-                    hostname.includes('replit.dev') ||
-                    hostname.includes('riker.replit.dev') ||
                     window.location.port === '5000';
   
+  console.log('Is Replit environment:', isReplit);
   console.log('Is local development:', isLocalDev);
+  console.log('Protocol is HTTPS:', protocol === 'https:');
   
-  if (isLocalDev) {
-    console.log('Using proxy: /api');
+  // Use proxy in any of these cases:
+  // 1. Local development
+  // 2. Any Replit environment (to avoid mixed content issues)
+  // 3. HTTPS environment (to avoid mixed content)
+  if (isLocalDev || isReplit || protocol === 'https:') {
+    console.log('Using proxy: /api (to avoid mixed content issues)');
     return '/api';
   }
   
-  // Only use direct API URL for actual production deployment
+  // Only use direct API URL for HTTP production environments outside Replit
   console.log('Using direct API: http://52.41.114.122:8097/api');
   return 'http://52.41.114.122:8097/api';
 };

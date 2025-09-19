@@ -21,7 +21,40 @@ export default defineConfig({
         target: "http://52.41.114.122:8097",
         changeOrigin: true,
         secure: false,
-        ws: false, // No se requiere WebSocket
+        ws: false,
+        configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('Proxy error:', err);
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('Sending Request to the Target:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+          });
+        },
+        timeout: 10000,
+        proxyTimeout: 10000,
+      },
+    },
+  },
+  preview: {
+    port: 5000,
+    host: "0.0.0.0",
+    strictPort: true,
+    proxy: {
+      "/api": {
+        target: "http://52.41.114.122:8097",
+        changeOrigin: true,
+        secure: false,
+        ws: false,
+        configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.log('Preview Proxy error:', err);
+          });
+        },
+        timeout: 10000,
+        proxyTimeout: 10000,
       },
     },
   },
