@@ -59,6 +59,11 @@ function CambiarPassword() {
     } catch (error) {
       console.error('Error al enviar enlace de reset:', error);
       toast.error('Error al enviar el enlace. Verifica que el correo sea correcto.');
+      
+      // Esperar 5 segundos antes de redirigir al login en caso de error
+      setTimeout(() => {
+        navigate('/login');
+      }, 5000);
     } finally {
       setLoading(false);
     }
