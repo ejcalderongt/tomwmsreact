@@ -56,8 +56,13 @@ function NewPassword() {
       return false;
     }
     
-    if (password.length < 6) {
-      setPasswordError('La contraseña debe tener al menos 6 caracteres');
+    if (password.includes(' ')) {
+      setPasswordError('La contraseña no puede contener espacios en blanco');
+      return false;
+    }
+    
+    if (password.length < 8) {
+      setPasswordError('La contraseña debe tener al menos 8 caracteres');
       return false;
     }
     
@@ -254,7 +259,7 @@ function NewPassword() {
                       ? 'border-red-500 focus:ring-red-500 focus:border-red-500' 
                       : 'border-gray-300 focus:ring-blue-500 focus:border-blue-500'
                   }`}
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Mínimo 8 caracteres"
                   required
                 />
                 <button
@@ -337,7 +342,8 @@ function NewPassword() {
           <div className="mt-6 p-4 bg-gray-50 rounded-lg">
             <h4 className="text-sm font-medium text-gray-900 mb-2">Requisitos de contraseña:</h4>
             <ul className="text-xs text-gray-600 space-y-1">
-              <li>• Mínimo 6 caracteres</li>
+              <li>• Mínimo 8 caracteres</li>
+              <li>• No puede contener espacios en blanco</li>
               <li>• Las contraseñas deben coincidir</li>
             </ul>
           </div>
