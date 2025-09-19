@@ -52,8 +52,8 @@ const getApiBaseUrl = () => {
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
     return '/api';
   }
-  // In production (Replit or other deployment), use direct API URL with HTTPS
-  return 'https://52.41.114.122:8097/api';
+  // In production (Replit or other deployment), use direct API URL with HTTP
+  return 'http://52.41.114.122:8097/api';
 };
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
