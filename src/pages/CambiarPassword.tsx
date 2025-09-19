@@ -56,6 +56,11 @@ function CambiarPassword() {
       await passwordAPI.resetPassword(email);
       setEmailSent(true);
       toast.success('¡Enlace de restablecimiento enviado! Revisa tu correo electrónico.');
+      
+      // Esperar 5 segundos antes de redirigir al login en caso de éxito
+      setTimeout(() => {
+        navigate('/login');
+      }, 5000);
     } catch (error) {
       console.error('Error al enviar enlace de reset:', error);
       toast.error('Error al enviar el enlace. Verifica que el correo sea correcto.');
@@ -173,41 +178,21 @@ function CambiarPassword() {
                 Revisa tu bandeja de entrada y sigue las instrucciones para restablecer tu contraseña.
               </p>
               <div className="space-y-3">
-                <button
-                  onClick={() => {
-                    setEmailSent(false);
-                    setEmail('');
-                    setEmailError('');
-                  }}
-                  className="w-full px-4 py-2 text-sm font-medium text-green-700 bg-green-100 border border-green-300 rounded-md hover:bg-green-200 transition-colors"
-                >
-                  Enviar a otro correo
-                </button>
-                <button
-                  onClick={() => navigate('/login')}
-                  className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  Volver al Login
-                </button>
+                <p className="text-sm text-green-600">
+                  Serás redirigido al login automáticamente en unos segundos...
+                </p>
               </div>
             </div>
           )}
 
           {/* Información adicional */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-500">
-              ¿No recibiste el correo? Revisa tu carpeta de spam o{' '}
-              <button
-                onClick={() => {
-                  setEmailSent(false);
-                  setEmailError('');
-                }}
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                intenta de nuevo
-              </button>
-            </p>
-          </div>
+          {!emailSent && (
+            <div className="mt-6 text-center">
+              <p className="text-sm text-gray-500">
+                ¿No recibiste el correo? Revisa tu carpeta de spam.
+              </p>
+            </div>
+          )}
         </div>
     </div>
   );
