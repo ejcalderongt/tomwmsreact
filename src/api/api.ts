@@ -24,22 +24,22 @@ let isRedirecting = false;
 const clearAuthAndRedirect = () => {
   if (isRedirecting) return;
   isRedirecting = true;
-  
+
   // Clear localStorage
   if (typeof window !== 'undefined') {
     localStorage.removeItem('wms_token');
     localStorage.removeItem('wms_user');
     localStorage.removeItem('wms_idPropietario');
   }
-  
+
   // Clear request cache
   requestCache.clear();
-  
+
   // Only redirect if not already on login page
   if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
     window.location.href = '/login';
   }
-  
+
   // Reset redirecting flag after timeout
   setTimeout(() => {
     isRedirecting = false;
@@ -72,7 +72,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
 
   try {
     const response = await fetch(`/api${endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint}`, config);
-    
+
     // Handle authentication errors
     if (response.status === 401 || response.status === 403) {
       console.log('Authentication failed, clearing session');
@@ -119,7 +119,7 @@ export const authAPI = {
       });
 
       console.log('Login API Response:', data);
-      
+
       // Ensure we return the expected format with propietario data
       const user = {
         username: credentials.username,
@@ -139,7 +139,7 @@ export const authAPI = {
     }
   },
 
-  
+
 };
 
 // Ingresos API
@@ -335,7 +335,7 @@ export const existenciasAPI = {
       });
 
       const endpoint = `/Stock/listar?${params.toString()}`;
-      
+
       console.log('=== EXISTENCIAS API REQUEST DEBUG ===');
       console.log('Endpoint:', endpoint);
       console.log('Full URL will be:', `/api${endpoint}`);
@@ -448,10 +448,10 @@ export const movimientosAPI = {
       }
 
       const endpoint = `/Movimientos/listar?${params.toString()}`;
-      
+
       // Create cache key for this request
       const cacheKey = `movimientos_${endpoint}_${token.substring(0, 20)}`;
-      
+
       // Check if request is already in progress
       if (requestCache.has(cacheKey)) {
         console.log('Movimientos request already in progress, waiting for result...');
@@ -548,7 +548,7 @@ export const passwordAPI = {
       });
 
       console.log('Password Reset API Response:', data);
-      
+
       return {
         success: true,
         message: data.message || 'Enlace de restablecimiento enviado exitosamente'
@@ -570,7 +570,7 @@ export const passwordAPI = {
       });
 
       console.log('Token validation response:', data);
-      
+
       return {
         isValid: data.isValid !== false, // Assume valid unless explicitly false
         message: data.message
@@ -587,16 +587,21 @@ export const passwordAPI = {
   updatePassword: async (token: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
     try {
       console.log('Updating password with token:', token);
+      const dto = {
+        Token: token,
+        NewPassword: newPassword
+      };
+
       const data = await apiRequest(`/Auth/update-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ token, newPassword }),
+        body: JSON.stringify(dto),
       });
 
       console.log('Update password response:', data);
-      
+
       return {
         success: true,
         message: data.message || 'Contraseña actualizada exitosamente'
