@@ -55,19 +55,23 @@ const getApiBaseUrl = () => {
   console.log('Current hostname:', hostname);
   console.log('Current protocol:', protocol);
   console.log('Current port:', window.location.port);
+  console.log('Current URL:', window.location.href);
   console.log('Navigator online:', navigator.onLine);
+  console.log('User agent:', navigator.userAgent);
   
   // Check if we're in any Replit environment (dev or production)
-  const isReplit = hostname.includes('replit.dev') || 
-                   hostname.includes('riker.replit.dev') ||
-                   hostname.includes('replit.app');
+  const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
+  const isReplitProd = hostname.includes('replit.app');
+  const isReplit = isReplitDev || isReplitProd;
   
   // Check if we're in local development
   const isLocalDev = hostname === 'localhost' || 
                     hostname === '127.0.0.1' ||
                     window.location.port === '5000';
   
-  console.log('Is Replit environment:', isReplit);
+  console.log('Is Replit DEV environment:', isReplitDev);
+  console.log('Is Replit PROD environment:', isReplitProd);
+  console.log('Is Replit environment (any):', isReplit);
   console.log('Is local development:', isLocalDev);
   console.log('Protocol is HTTPS:', protocol === 'https:');
   
@@ -76,12 +80,14 @@ const getApiBaseUrl = () => {
   // 2. Any Replit environment (to avoid mixed content issues)
   // 3. HTTPS environment (to avoid mixed content)
   if (isLocalDev || isReplit || protocol === 'https:') {
-    console.log('Using proxy: /api (to avoid mixed content issues)');
+    console.log('✅ Using proxy: /api (to avoid mixed content issues)');
+    console.log('Environment type:', isReplitProd ? 'REPLIT PRODUCTION' : isReplitDev ? 'REPLIT DEV' : isLocalDev ? 'LOCAL DEV' : 'HTTPS ENVIRONMENT');
     return '/api';
   }
   
   // Only use direct API URL for HTTP production environments outside Replit
-  console.log('Using direct API: http://52.41.114.122:8097/api');
+  console.log('⚠️ Using direct API: http://52.41.114.122:8097/api');
+  console.log('Environment type: EXTERNAL HTTP');
   return 'http://52.41.114.122:8097/api';
 };
 
@@ -154,7 +160,12 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
-      console.log('Attempting login with credentials:', { username: credentials.username });
+      console.log('🔐 === STARTING LOGIN ATTEMPT ===');
+      console.log('Username:', credentials.username);
+      console.log('Environment URL:', window.location.href);
+      console.log('API Base URL will be:', getApiBaseUrl());
+      console.log('Timestamp:', new Date().toISOString());
+      
       const data = await apiRequest(`/Auth/login-propietario`, {
         method: 'POST',
         headers: {
@@ -163,7 +174,10 @@ export const authAPI = {
         body: JSON.stringify(credentials),
       });
 
+      console.log('✅ === LOGIN SUCCESS ===');
       console.log('Login API Response:', data);
+      console.log('Token received:', data.token ? `${data.token.substring(0, 50)}...` : 'NO TOKEN');
+      console.log('Propietario data:', data.propietario);
 
       // Ensure we return the expected format with propietario data
       const user = {
@@ -175,11 +189,24 @@ export const authAPI = {
       // Store propietario info for later use
       if (data.propietario?.idPropietario) {
         localStorage.setItem('wms_idPropietario', data.propietario.idPropietario.toString());
+        console.log('💾 Propietario ID stored:', data.propietario.idPropietario);
       }
 
+      console.log('=== LOGIN PROCESS COMPLETED ===');
       return user;
     } catch (error) {
-      console.error('Login API Error:', error);
+      console.error('❌ === LOGIN ERROR ===');
+      console.error('Error type:', error instanceof Error ? error.constructor.name : typeof error);
+      console.error('Error message:', error instanceof Error ? error.message : error);
+      console.error('Full error object:', error);
+      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
+      console.error('Environment:', {
+        hostname: window.location.hostname,
+        protocol: window.location.protocol,
+        href: window.location.href,
+        timestamp: new Date().toISOString()
+      });
+      console.error('======================');
       throw new Error('Usuario o contraseña incorrectos');
     }
   },
