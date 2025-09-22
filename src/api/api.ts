@@ -132,14 +132,29 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     }
 
     if (!response.ok) {
-      console.error(`API request failed for ${endpoint}:`, response.status, response.statusText);
+      console.error(`🔴 API request failed for ${endpoint}:`, response.status, response.statusText);
+      console.error('Request URL:', fullUrl);
+      console.error('Request method:', config.method || 'GET');
+      console.error('Request headers:', config.headers);
+      
       try {
-        const errorBody = await response.json();
-        console.error("Error details:", errorBody);
-        throw new Error(errorBody.message || `Request failed with status ${response.status}`);
+        const errorBody = await response.text(); // Use text() first to see raw response
+        console.error("Raw error response:", errorBody);
+        
+        // Try to parse as JSON
+        let parsedError;
+        try {
+          parsedError = JSON.parse(errorBody);
+          console.error("Parsed error details:", parsedError);
+        } catch (jsonError) {
+          console.error("Response is not valid JSON:", jsonError);
+          parsedError = { message: errorBody };
+        }
+        
+        throw new Error(parsedError.message || errorBody || `Request failed with status ${response.status}`);
       } catch (parseError) {
-        console.error("Failed to parse error body:", parseError);
-        throw new Error(`Request failed with status ${response.status}`);
+        console.error("Failed to read error response:", parseError);
+        throw new Error(`Request failed with status ${response.status}: ${response.statusText}`);
       }
     }
 

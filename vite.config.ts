@@ -24,13 +24,20 @@ export default defineConfig({
         ws: false,
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
-            console.log('Proxy error:', err);
+            console.error('🔴 Proxy error:', err.message);
+            console.error('Request URL:', req.url);
+            console.error('Request method:', req.method);
           });
           proxy.on('proxyReq', (proxyReq, req, res) => {
-            console.log('Sending Request to the Target:', req.method, req.url);
+            console.log('🟡 Sending Request to Target:', req.method, req.url);
+            console.log('   Headers:', JSON.stringify(req.headers, null, 2));
           });
           proxy.on('proxyRes', (proxyRes, req, res) => {
-            console.log('Received Response from the Target:', proxyRes.statusCode, req.url);
+            const statusColor = proxyRes.statusCode >= 400 ? '🔴' : '🟢';
+            console.log(`${statusColor} Response from Target:`, proxyRes.statusCode, req.url);
+            if (proxyRes.statusCode >= 400) {
+              console.log('   Response Headers:', JSON.stringify(proxyRes.headers, null, 2));
+            }
           });
         },
         timeout: 10000,
@@ -50,7 +57,16 @@ export default defineConfig({
         ws: false,
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
-            console.log('Preview Proxy error:', err);
+            console.error('🔴 Preview Proxy error:', err.message);
+            console.error('Request URL:', req.url);
+            console.error('Request method:', req.method);
+          });
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            console.log('🟡 Preview Sending Request to Target:', req.method, req.url);
+          });
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            const statusColor = proxyRes.statusCode >= 400 ? '🔴' : '🟢';
+            console.log(`${statusColor} Preview Response from Target:`, proxyRes.statusCode, req.url);
           });
         },
         timeout: 10000,
