@@ -11,7 +11,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5000,
+    port: 5001,
     host: "0.0.0.0",
     strictPort: true,
     hmr: false, // Desactiva WebSocket HMR por problemas con Replit
@@ -46,7 +46,7 @@ export default defineConfig({
     },
   },
   preview: {
-    port: 5000,
+    port: 5001,
     host: "0.0.0.0",
     strictPort: true,
     proxy: {

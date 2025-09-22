@@ -62,7 +62,7 @@ const getApiBaseUrl = () => {
   // Check if we're in development environment (local or Replit dev)
   const isLocalDev = hostname === 'localhost' || 
                     hostname === '127.0.0.1' ||
-                    window.location.port === '5000';
+                    window.location.port === '5001';
                     
   const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
   const isReplitProd = hostname.includes('replit.app');
