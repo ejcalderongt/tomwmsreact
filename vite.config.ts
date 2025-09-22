@@ -74,6 +74,10 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+  },
   optimizeDeps: {
     exclude: ["react-hot-toast", "@heroicons/react"], // Previene errores MIME
   },

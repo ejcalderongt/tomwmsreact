@@ -75,18 +75,16 @@ const getApiBaseUrl = () => {
   console.log('Is local development:', isLocalDev);
   console.log('Protocol is HTTPS:', protocol === 'https:');
 
-  // In development environments (local or Replit dev), use proxy
-  if (isLocalDev || isReplitDev) {
-    console.log('✅ Using proxy: /api (development environment)');
-    console.log('Environment type:', isReplitDev ? 'REPLIT DEV' : 'LOCAL DEV');
+  // In any Replit environment (dev or production), use proxy to avoid mixed content issues
+  if (isLocalDev || isReplit) {
+    console.log('✅ Using proxy: /api (to avoid mixed content issues)');
+    console.log('Environment type:', isReplitDev ? 'REPLIT DEV' : isReplitProd ? 'REPLIT PRODUCTION' : 'LOCAL DEV');
     return '/api';
   }
 
-  // In production environments (Replit production or external), use direct HTTP API
-  // Note: Using HTTP even in HTTPS environment because the API server doesn't support HTTPS
-  console.log('✅ Using HTTP API: http://52.41.114.122:8097/api (production environment)');
-  console.log('Environment type:', isReplitProd ? 'REPLIT PRODUCTION' : 'EXTERNAL PRODUCTION');
-  console.log('⚠️ Note: Using HTTP to API server even in HTTPS environment');
+  // Only for external non-Replit environments, use direct API
+  console.log('✅ Using HTTP API: http://52.41.114.122:8097/api (external environment)');
+  console.log('Environment type: EXTERNAL');
   return 'http://52.41.114.122:8097/api';
 };
 
