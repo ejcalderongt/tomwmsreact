@@ -29,6 +29,10 @@ export default defineConfig({
             console.error('Request method:', req.method);
           });
           proxy.on('proxyReq', (proxyReq, req, res) => {
+            // Remove problematic headers that cause CORS issues
+            proxyReq.removeHeader('referer');
+            proxyReq.removeHeader('origin');
+            
             console.log('🟡 Sending Request to Target:', req.method, req.url);
             console.log('   Headers:', JSON.stringify(req.headers, null, 2));
           });
@@ -62,6 +66,10 @@ export default defineConfig({
             console.error('Request method:', req.method);
           });
           proxy.on('proxyReq', (proxyReq, req, res) => {
+            // Remove problematic headers that cause CORS issues
+            proxyReq.removeHeader('referer');
+            proxyReq.removeHeader('origin');
+            
             console.log('🟡 Preview Sending Request to Target:', req.method, req.url);
           });
           proxy.on('proxyRes', (proxyRes, req, res) => {
