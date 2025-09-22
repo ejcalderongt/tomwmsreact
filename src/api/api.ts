@@ -51,45 +51,24 @@ const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
 
-  console.log('=== API BASE URL CONFIGURATION ===');
-  console.log('Current hostname:', hostname);
-  console.log('Current protocol:', protocol);
-  console.log('Current port:', window.location.port);
-  console.log('Current URL:', window.location.href);
-  console.log('Navigator online:', navigator.onLine);
-  console.log('User agent:', navigator.userAgent);
-
-  // Check if we're in any Replit environment (dev or production)
-  const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
-  const isReplitProd = hostname.includes('replit.app');
-  const isReplit = isReplitDev || isReplitProd;
-
-  // Check if we're in local development
+  // Check if we're in development environment (local or Replit dev)
   const isLocalDev = hostname === 'localhost' || 
                     hostname === '127.0.0.1' ||
                     window.location.port === '5000';
+                    
+  const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
 
-  console.log('Is Replit DEV environment:', isReplitDev);
-  console.log('Is Replit PROD environment:', isReplitProd);
-  console.log('Is Replit environment (any):', isReplit);
-  console.log('Is local development:', isLocalDev);
-  console.log('Protocol is HTTPS:', protocol === 'https:');
-
-  // In any Replit environment (dev or production), use proxy to avoid mixed content issues
-  if (isLocalDev || isReplit) {
-    console.log('✅ Using proxy: /api (to avoid mixed content issues)');
-    console.log('Environment type:', isReplitDev ? 'REPLIT DEV' : isReplitProd ? 'REPLIT PRODUCTION' : 'LOCAL DEV');
+  // In development environments (local or Replit dev), use proxy
+  if (isLocalDev || isReplitDev) {
     return '/api';
   }
 
-  // Only for external non-Replit environments, use direct API
-  console.log('✅ Using HTTP API: http://52.41.114.122:8097/api (external environment)');
-  console.log('Environment type: EXTERNAL');
+  // In production environments (Replit production or external), use direct HTTP API
+  // Note: Using HTTP even in HTTPS environment because the API server doesn't support HTTPS
   return 'http://52.41.114.122:8097/api';
 };
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
-  // Don't cache requests - this was causing issues
   const isLoginRequest = endpoint.includes('/Auth/login-propietario');
 
   const config: RequestInit = {
@@ -117,53 +96,34 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     const cleanEndpoint = endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint;
     const fullUrl = `${baseUrl}${cleanEndpoint}`;
 
-    console.log('API Request URL:', fullUrl);
-
     const response = await fetch(fullUrl, config);
 
     // Handle authentication errors
     if (response.status === 401 || response.status === 403) {
-      console.log('Authentication failed, clearing session');
       clearAuthAndRedirect();
       throw new Error(`Authentication failed: ${response.status}`);
     }
 
     if (!response.ok) {
-      console.error(`🔴 API request failed for ${endpoint}:`, response.status, response.statusText);
-      console.error('Request URL:', fullUrl);
-      console.error('Request method:', config.method || 'GET');
-      console.error('Request headers:', config.headers);
-
+      let errorMessage = `Request failed with status ${response.status}`;
+      
       try {
-        const errorBody = await response.text(); // Use text() first to see raw response
-        console.error("Raw error response:", errorBody);
-
-        // Try to parse as JSON
-        let parsedError;
+        const errorBody = await response.text();
         try {
-          parsedError = JSON.parse(errorBody);
-          console.error("Parsed error details:", parsedError);
-        } catch (jsonError) {
-          console.error("Response is not valid JSON:", jsonError);
-          parsedError = { message: errorBody };
+          const parsedError = JSON.parse(errorBody);
+          errorMessage = parsedError.message || errorBody || errorMessage;
+        } catch {
+          errorMessage = errorBody || errorMessage;
         }
-
-        throw new Error(parsedError.message || errorBody || `Request failed with status ${response.status}`);
-      } catch (parseError) {
-        console.error("Failed to read error response:", parseError);
-        throw new Error(`Request failed with status ${response.status}: ${response.statusText}`);
+      } catch {
+        errorMessage = `${response.status}: ${response.statusText}`;
       }
+
+      throw new Error(errorMessage);
     }
 
-    try {
-      const data = await response.json();
-      return data;
-    } catch (jsonError) {
-      console.error("Failed to parse JSON response:", jsonError);
-      throw new Error("Failed to parse JSON response");
-    }
+    return await response.json();
   } catch (error) {
-    console.error('API Request Error:', error);
     throw error;
   }
 };
@@ -172,12 +132,6 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
-      console.log('🔐 === STARTING LOGIN ATTEMPT ===');
-      console.log('Username:', credentials.username);
-      console.log('Environment URL:', window.location.href);
-      console.log('API Base URL will be:', getApiBaseUrl());
-      console.log('Timestamp:', new Date().toISOString());
-
       const data = await apiRequest(`/Auth/login-propietario`, {
         method: 'POST',
         headers: {
@@ -185,11 +139,6 @@ export const authAPI = {
         },
         body: JSON.stringify(credentials),
       });
-
-      console.log('✅ === LOGIN SUCCESS ===');
-      console.log('Login API Response:', data);
-      console.log('Token received:', data.token ? `${data.token.substring(0, 50)}...` : 'NO TOKEN');
-      console.log('Propietario data:', data.propietario);
 
       // Ensure we return the expected format with propietario data
       const user = {
@@ -201,29 +150,13 @@ export const authAPI = {
       // Store propietario info for later use
       if (data.propietario?.idPropietario) {
         localStorage.setItem('wms_idPropietario', data.propietario.idPropietario.toString());
-        console.log('💾 Propietario ID stored:', data.propietario.idPropietario);
       }
 
-      console.log('=== LOGIN PROCESS COMPLETED ===');
       return user;
     } catch (error) {
-      console.error('❌ === LOGIN ERROR ===');
-      console.error('Error type:', error instanceof Error ? error.constructor.name : typeof error);
-      console.error('Error message:', error instanceof Error ? error.message : error);
-      console.error('Full error object:', error);
-      console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace');
-      console.error('Environment:', {
-        hostname: window.location.hostname,
-        protocol: window.location.protocol,
-        href: window.location.href,
-        timestamp: new Date().toISOString()
-      });
-      console.error('======================');
       throw new Error('Usuario o contraseña incorrectos');
     }
   },
-
-
 };
 
 // Ingresos API
