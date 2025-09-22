@@ -3,7 +3,7 @@ run = "npm run dev"
 
 [nix]
 channel = "stable-24_05"
-packages = ["lsof"]
+packages = ["lsof", "psmisc"]
 
 [deployment]
 run = ["sh", "-c", "npm start"]
