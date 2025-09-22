@@ -82,9 +82,16 @@ const getApiBaseUrl = () => {
     return '/api';
   }
 
-  // In production environments (Replit production or external), use direct API
-  console.log('✅ Using direct API: http://52.41.114.122:8097/api (production environment)');
-  console.log('Environment type:', isReplitProd ? 'REPLIT PRODUCTION' : 'EXTERNAL PRODUCTION');
+  // In HTTPS environments (including Replit production), use HTTPS API to avoid mixed content
+  if (protocol === 'https:' || isReplitProd) {
+    console.log('✅ Using HTTPS API: https://52.41.114.122:8097/api (HTTPS environment - avoiding mixed content)');
+    console.log('Environment type:', isReplitProd ? 'REPLIT PRODUCTION' : 'HTTPS ENVIRONMENT');
+    return 'https://52.41.114.122:8097/api';
+  }
+
+  // Fallback for HTTP environments
+  console.log('⚠️ Using HTTP API: http://52.41.114.122:8097/api (HTTP fallback)');
+  console.log('Environment type: HTTP ENVIRONMENT');
   return 'http://52.41.114.122:8097/api';
 };
 
