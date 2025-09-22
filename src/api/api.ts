@@ -50,7 +50,7 @@ const clearAuthAndRedirect = () => {
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
-  
+
   console.log('=== API BASE URL CONFIGURATION ===');
   console.log('Current hostname:', hostname);
   console.log('Current protocol:', protocol);
@@ -58,36 +58,33 @@ const getApiBaseUrl = () => {
   console.log('Current URL:', window.location.href);
   console.log('Navigator online:', navigator.onLine);
   console.log('User agent:', navigator.userAgent);
-  
+
   // Check if we're in any Replit environment (dev or production)
   const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
   const isReplitProd = hostname.includes('replit.app');
   const isReplit = isReplitDev || isReplitProd;
-  
+
   // Check if we're in local development
   const isLocalDev = hostname === 'localhost' || 
                     hostname === '127.0.0.1' ||
                     window.location.port === '5000';
-  
+
   console.log('Is Replit DEV environment:', isReplitDev);
   console.log('Is Replit PROD environment:', isReplitProd);
   console.log('Is Replit environment (any):', isReplit);
   console.log('Is local development:', isLocalDev);
   console.log('Protocol is HTTPS:', protocol === 'https:');
-  
-  // Use proxy in any of these cases:
-  // 1. Local development
-  // 2. Any Replit environment (to avoid mixed content issues)
-  // 3. HTTPS environment (to avoid mixed content)
-  if (isLocalDev || isReplit || protocol === 'https:') {
-    console.log('✅ Using proxy: /api (to avoid mixed content issues)');
-    console.log('Environment type:', isReplitProd ? 'REPLIT PRODUCTION' : isReplitDev ? 'REPLIT DEV' : isLocalDev ? 'LOCAL DEV' : 'HTTPS ENVIRONMENT');
+
+  // In development environments (local or Replit dev), use proxy
+  if (isLocalDev || isReplitDev) {
+    console.log('✅ Using proxy: /api (development environment)');
+    console.log('Environment type:', isReplitDev ? 'REPLIT DEV' : 'LOCAL DEV');
     return '/api';
   }
-  
-  // Only use direct API URL for HTTP production environments outside Replit
-  console.log('⚠️ Using direct API: http://52.41.114.122:8097/api');
-  console.log('Environment type: EXTERNAL HTTP');
+
+  // In production environments (Replit production or external), use direct API
+  console.log('✅ Using direct API: http://52.41.114.122:8097/api (production environment)');
+  console.log('Environment type:', isReplitProd ? 'REPLIT PRODUCTION' : 'EXTERNAL PRODUCTION');
   return 'http://52.41.114.122:8097/api';
 };
 
@@ -119,9 +116,9 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     const baseUrl = getApiBaseUrl();
     const cleanEndpoint = endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint;
     const fullUrl = `${baseUrl}${cleanEndpoint}`;
-    
+
     console.log('API Request URL:', fullUrl);
-    
+
     const response = await fetch(fullUrl, config);
 
     // Handle authentication errors
@@ -136,11 +133,11 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
       console.error('Request URL:', fullUrl);
       console.error('Request method:', config.method || 'GET');
       console.error('Request headers:', config.headers);
-      
+
       try {
         const errorBody = await response.text(); // Use text() first to see raw response
         console.error("Raw error response:", errorBody);
-        
+
         // Try to parse as JSON
         let parsedError;
         try {
@@ -150,7 +147,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
           console.error("Response is not valid JSON:", jsonError);
           parsedError = { message: errorBody };
         }
-        
+
         throw new Error(parsedError.message || errorBody || `Request failed with status ${response.status}`);
       } catch (parseError) {
         console.error("Failed to read error response:", parseError);
@@ -180,7 +177,7 @@ export const authAPI = {
       console.log('Environment URL:', window.location.href);
       console.log('API Base URL will be:', getApiBaseUrl());
       console.log('Timestamp:', new Date().toISOString());
-      
+
       const data = await apiRequest(`/Auth/login-propietario`, {
         method: 'POST',
         headers: {
