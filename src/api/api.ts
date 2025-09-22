@@ -51,20 +51,41 @@ const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
 
+  console.log('=== API BASE URL CONFIGURATION ===');
+  console.log('Current hostname:', hostname);
+  console.log('Current protocol:', protocol);
+  console.log('Current port:', window.location.port);
+  console.log('Current URL:', window.location.href);
+  console.log('Navigator online:', navigator.onLine);
+  console.log('User agent:', navigator.userAgent);
+
   // Check if we're in development environment (local or Replit dev)
   const isLocalDev = hostname === 'localhost' || 
                     hostname === '127.0.0.1' ||
                     window.location.port === '5000';
                     
   const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
+  const isReplitProd = hostname.includes('replit.app');
+  const isReplit = isReplitDev || isReplitProd;
+
+  console.log('Is Replit DEV environment:', isReplitDev);
+  console.log('Is Replit PROD environment:', isReplitProd);
+  console.log('Is Replit environment (any):', isReplit);
+  console.log('Is local development:', isLocalDev);
+  console.log('Protocol is HTTPS:', protocol === 'https:');
 
   // In development environments (local or Replit dev), use proxy
   if (isLocalDev || isReplitDev) {
+    console.log('✅ Using proxy: /api (development environment)');
+    console.log('Environment type:', isReplitDev ? 'REPLIT DEV' : 'LOCAL DEV');
     return '/api';
   }
 
   // In production environments (Replit production or external), use direct HTTP API
   // Note: Using HTTP even in HTTPS environment because the API server doesn't support HTTPS
+  console.log('✅ Using HTTP API: http://52.41.114.122:8097/api (production environment)');
+  console.log('Environment type:', isReplitProd ? 'REPLIT PRODUCTION' : 'EXTERNAL PRODUCTION');
+  console.log('⚠️ Note: Using HTTP to API server even in HTTPS environment');
   return 'http://52.41.114.122:8097/api';
 };
 
@@ -105,20 +126,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     }
 
     if (!response.ok) {
-      let errorMessage = `Request failed with status ${response.status}`;
-      
-      try {
-        const errorBody = await response.text();
-        try {
-          const parsedError = JSON.parse(errorBody);
-          errorMessage = parsedError.message || errorBody || errorMessage;
-        } catch {
-          errorMessage = errorBody || errorMessage;
-        }
-      } catch {
-        errorMessage = `${response.status}: ${response.statusText}`;
-      }
-
+      const errorMessage = `Request failed with status ${response.status}: ${response.statusText}`;
       throw new Error(errorMessage);
     }
 
@@ -132,6 +140,15 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<User> => {
     try {
+      console.log('🔐 === STARTING LOGIN ATTEMPT ===');
+      console.log('Username:', credentials.username);
+      console.log('Environment URL:', window.location.href);
+
+      const baseUrl = getApiBaseUrl();
+      console.log('API Base URL will be:', baseUrl);
+      console.log('Timestamp:', new Date().toISOString());
+      console.log('API Request URL:', `${baseUrl}/Auth/login-propietario`);
+
       const data = await apiRequest(`/Auth/login-propietario`, {
         method: 'POST',
         headers: {
@@ -140,6 +157,9 @@ export const authAPI = {
         body: JSON.stringify(credentials),
       });
 
+      console.log('✅ === LOGIN SUCCESS ===');
+      console.log('Login API Response:', data);
+
       // Ensure we return the expected format with propietario data
       const user = {
         username: credentials.username,
@@ -147,13 +167,20 @@ export const authAPI = {
         propietario: data.propietario
       };
 
+      console.log('Token received:', data.token ? `${data.token.substring(0, 50)}...` : 'No token');
+      console.log('Propietario data:', data.propietario);
+
       // Store propietario info for later use
       if (data.propietario?.idPropietario) {
         localStorage.setItem('wms_idPropietario', data.propietario.idPropietario.toString());
+        console.log('💾 Propietario ID stored:', data.propietario.idPropietario);
       }
 
+      console.log('=== LOGIN PROCESS COMPLETED ===');
       return user;
     } catch (error) {
+      console.error('❌ === LOGIN FAILED ===');
+      console.error('Login error details:', error);
       throw new Error('Usuario o contraseña incorrectos');
     }
   },
