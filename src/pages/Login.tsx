@@ -13,51 +13,50 @@ function Login() {
   useEffect(() => {
     document.title = "TOMWMSUX - Iniciar Sesión";
 
-    // Solo verificar una vez al montar si ya está autenticado
-    let hasChecked = false;
-    
-    const checkAuth = () => {
-      if (hasChecked) return false;
-      hasChecked = true;
-      
-      if (isAuthenticated()) {
-        const token = getToken();
-        if (token) {
-          console.log('User already authenticated, redirecting to existencias');
-          navigate("/existencias", { replace: true });
-          return true;
-        }
+    // Check once if already authenticated
+    if (isAuthenticated()) {
+      const token = getToken();
+      if (token) {
+        console.log('User already authenticated, redirecting to existencias');
+        navigate("/existencias", { replace: true });
       }
-      return false;
-    };
-
-    // Only check once on mount
-    const timer = setTimeout(() => {
-      checkAuth();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Prevent multiple submissions
     if (loading) {
+      console.log('Login already in progress, ignoring submission');
+      return;
+    }
+
+    // Validate inputs
+    if (!username.trim() || !password.trim()) {
+      toast.error("Por favor complete todos los campos");
       return;
     }
     
     setLoading(true);
+    console.log('🔐 Starting login process for user:', username);
 
     try {
-      const user = await authAPI.login({ username, password });
+      const user = await authAPI.login({ username: username.trim(), password });
+      console.log('✅ Login successful, saving user and redirecting');
       saveUser(user);
       toast.success("¡Bienvenido! Sesión iniciada correctamente");
-      // Usar replace para evitar que el usuario regrese al login con el botón atrás
+      
+      // Clear form
+      setUsername("");
+      setPassword("");
+      
+      // Navigate with replace to prevent back button issues
       navigate("/existencias", { replace: true });
     } catch (error) {
-      console.error("Login error:", error);
-      toast.error("Usuario o contraseña incorrectos");
+      console.error("❌ Login failed:", error);
+      const errorMessage = error instanceof Error ? error.message : "Error de conexión";
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }

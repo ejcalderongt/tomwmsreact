@@ -191,15 +191,12 @@ export const authAPI = {
       const requestBody = JSON.stringify(credentials);
       console.log('Request body:', requestBody);
 
-      // Try multiple possible login endpoints
+      // Try login endpoints in order of likelihood to work
       const loginEndpoints = [
-        '/Auth/login-propietario',
+        '/Auth/login-propietario',  // This one is working based on logs
         '/auth/login-propietario', 
         '/Auth/login',
-        '/auth/login',
-        '/api/Auth/login-propietario',
-        '/login-propietario',
-        '/login'
+        '/auth/login'
       ];
 
       let lastError: Error | null = null;
