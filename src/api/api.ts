@@ -182,7 +182,6 @@ export const authAPI = {
 
       const baseUrl = getApiBaseUrl();
       console.log('API Base URL will be:', baseUrl);
-      console.log('Full login URL:', `${baseUrl}/Auth/login-propietario`);
 
       // Clear any existing auth data before login attempt
       localStorage.removeItem('wms_token');
@@ -192,50 +191,92 @@ export const authAPI = {
       const requestBody = JSON.stringify(credentials);
       console.log('Request body:', requestBody);
 
-      const data = await apiRequest(`/Auth/login-propietario`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: requestBody,
-      });
+      // Try multiple possible login endpoints
+      const loginEndpoints = [
+        '/Auth/login-propietario',
+        '/auth/login-propietario', 
+        '/Auth/login',
+        '/auth/login',
+        '/api/Auth/login-propietario',
+        '/login-propietario',
+        '/login'
+      ];
+
+      let lastError: Error | null = null;
+
+      for (const endpoint of loginEndpoints) {
+        try {
+          console.log(`🔄 Trying login endpoint: ${endpoint}`);
+          console.log('Full login URL:', `${baseUrl}${endpoint}`);
+
+          const data = await apiRequest(endpoint, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
+            },
+            body: requestBody,
+          });
 
       console.log('✅ === LOGIN SUCCESS ===');
-      console.log('Login API Response received');
-      console.log('Response type:', typeof data);
-      console.log('Response keys:', data ? Object.keys(data) : 'No data');
-      console.log('Full response data:', JSON.stringify(data, null, 2));
+          console.log(`Successful with endpoint: ${endpoint}`);
+          console.log('Login API Response received');
+          console.log('Response type:', typeof data);
+          console.log('Response keys:', data ? Object.keys(data) : 'No data');
+          console.log('Full response data:', JSON.stringify(data, null, 2));
 
-      // Validate response structure
-      if (!data) {
-        throw new Error('Respuesta vacía del servidor');
+          // Validate response structure
+          if (!data) {
+            throw new Error('Respuesta vacía del servidor');
+          }
+
+          const token = data.token || data.accessToken;
+          if (!token) {
+            console.error('No token found in response:', data);
+            throw new Error('Token no recibido del servidor');
+          }
+
+          // Ensure we return the expected format with propietario data
+          const user = {
+            username: credentials.username,
+            token: token,
+            propietario: data.propietario
+          };
+
+          console.log('Token received:', token.substring(0, 20) + '...');
+          console.log('Propietario data available:', !!data.propietario);
+
+          // Store propietario info for later use
+          if (data.propietario?.idPropietario) {
+            localStorage.setItem('wms_idPropietario', data.propietario.idPropietario.toString());
+            console.log('💾 Propietario ID stored:', data.propietario.idPropietario);
+          }
+
+          console.log('=== LOGIN PROCESS COMPLETED SUCCESSFULLY ===');
+          return user;
+
+        } catch (endpointError) {
+          console.log(`❌ Failed with endpoint ${endpoint}:`, endpointError instanceof Error ? endpointError.message : 'Unknown error');
+          lastError = endpointError instanceof Error ? endpointError : new Error('Unknown error');
+          
+          // If this is a 404, continue to next endpoint
+          if (endpointError instanceof Error && endpointError.message.includes('404')) {
+            continue;
+          }
+          
+          // If it's not a 404, it might be a real auth error, so break
+          if (endpointError instanceof Error && (
+            endpointError.message.includes('401') || 
+            endpointError.message.includes('403') ||
+            endpointError.message.includes('400')
+          )) {
+            throw endpointError;
+          }
+        }
       }
 
-      const token = data.token || data.accessToken;
-      if (!token) {
-        console.error('No token found in response:', data);
-        throw new Error('Token no recibido del servidor');
-      }
-
-      // Ensure we return the expected format with propietario data
-      const user = {
-        username: credentials.username,
-        token: token,
-        propietario: data.propietario
-      };
-
-      console.log('Token received:', token.substring(0, 20) + '...');
-      console.log('Propietario data available:', !!data.propietario);
-
-      // Store propietario info for later use
-      if (data.propietario?.idPropietario) {
-        localStorage.setItem('wms_idPropietario', data.propietario.idPropietario.toString());
-        console.log('💾 Propietario ID stored:', data.propietario.idPropietario);
-      }
-
-      console.log('=== LOGIN PROCESS COMPLETED SUCCESSFULLY ===');
-      return user;
+      // If we get here, all endpoints failed
+      throw lastError || new Error('No se pudo conectar con ningún endpoint de login');
     } catch (error) {
       console.error('❌ === LOGIN FAILED ===');
       console.error('Error type:', typeof error);

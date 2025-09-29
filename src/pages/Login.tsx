@@ -165,25 +165,51 @@ function Login() {
               )}
             </button>
 
-            {/* Test API Button - Only for debugging */}
-            <button
-              type="button"
-              onClick={async (e) => {
-                e.preventDefault();
-                console.log('🧪 Testing API directly...');
-                try {
-                  const testUser = await authAPI.login({ username: "nuevos_eticos", password: "Admin1965!*" });
-                  console.log('✅ Test login successful:', testUser);
-                  toast.success("Test login successful!");
-                } catch (error) {
-                  console.error('❌ Test login failed:', error);
-                  toast.error("Test login failed: " + (error instanceof Error ? error.message : 'Unknown error'));
-                }
-              }}
-              className="w-full mt-2 py-2 px-4 text-sm text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors"
-            >
-              🧪 Test API Connection
-            </button>
+            {/* API Test Buttons - Only for debugging */}
+            <div className="mt-4 space-y-2">
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  console.log('🧪 Testing API connectivity...');
+                  try {
+                    // Test basic connectivity to the API server
+                    const baseUrl = window.location.hostname.includes('replit') ? '/api' : '/api';
+                    const response = await fetch(`${baseUrl}/health`, { 
+                      method: 'GET',
+                      headers: { 'Accept': 'application/json' }
+                    });
+                    console.log('API Health Response:', response.status, response.statusText);
+                    toast.success(`API server reachable: ${response.status}`);
+                  } catch (error) {
+                    console.error('❌ API connectivity test failed:', error);
+                    toast.error("API server not reachable: " + (error instanceof Error ? error.message : 'Unknown error'));
+                  }
+                }}
+                className="w-full py-2 px-4 text-sm text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors"
+              >
+                🔍 Test API Server
+              </button>
+              
+              <button
+                type="button"
+                onClick={async (e) => {
+                  e.preventDefault();
+                  console.log('🧪 Testing login with hardcoded credentials...');
+                  try {
+                    const testUser = await authAPI.login({ username: "nuevos_eticos", password: "Admin1965!*" });
+                    console.log('✅ Test login successful:', testUser);
+                    toast.success("Test login successful!");
+                  } catch (error) {
+                    console.error('❌ Test login failed:', error);
+                    toast.error("Test login failed: " + (error instanceof Error ? error.message : 'Unknown error'));
+                  }
+                }}
+                className="w-full py-2 px-4 text-sm text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors"
+              >
+                🧪 Test Login
+              </button>
+            </div>
           </form>
 
           {/* Password Reset Link */}
