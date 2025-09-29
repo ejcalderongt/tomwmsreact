@@ -14,10 +14,20 @@ function Login() {
     document.title = "TOMWMSUX - Iniciar Sesión";
 
     // Solo verificar una vez al montar si ya está autenticado
-    if (isAuthenticated()) {
-      console.log('User already authenticated, redirecting to existencias');
-      navigate("/existencias", { replace: true });
-    }
+    const checkAuth = () => {
+      if (isAuthenticated()) {
+        const token = getToken();
+        if (token) {
+          console.log('User already authenticated, redirecting to existencias');
+          navigate("/existencias", { replace: true });
+          return true;
+        }
+      }
+      return false;
+    };
+
+    // Only check once on mount
+    checkAuth();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {

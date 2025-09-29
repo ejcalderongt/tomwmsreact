@@ -48,18 +48,45 @@ export const getToken = (): string | null => {
 export const isAuthenticated = (): boolean => {
   try {
     const token = localStorage.getItem(TOKEN_KEY);
+    const user = localStorage.getItem(USER_KEY);
+    
+    console.log('=== AUTH CHECK DEBUG ===');
+    console.log('Token exists:', !!token);
+    console.log('User exists:', !!user);
+    
     if (!token || token === 'undefined' || token === 'null') {
+      console.log('❌ No valid token found');
       return false;
     }
 
     // Basic token format check (JWT should have 3 parts)
     const parts = token.split('.');
     if (parts.length !== 3) {
+      console.log('❌ Invalid token format');
       return false;
     }
 
+    // Check token expiration
+    try {
+      const payload = JSON.parse(atob(parts[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      
+      console.log('Token exp:', payload.exp);
+      console.log('Current time:', currentTime);
+      
+      if (payload.exp && payload.exp < currentTime) {
+        console.log('❌ Token expired');
+        return false;
+      }
+    } catch (e) {
+      console.log('❌ Could not parse token payload');
+      return false;
+    }
+
+    console.log('✅ Token is valid');
     return true;
   } catch (error) {
+    console.error('Auth check error:', error);
     return false;
   }
 };

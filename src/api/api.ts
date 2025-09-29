@@ -68,8 +68,8 @@ const getApiBaseUrl = () => {
   const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
 
   if (isReplit) {
-    console.log('Environment type: REPLIT (ALL)');
-    console.log('✅ Using proxy: /api');
+    console.log('Environment type: REPLIT DEV');
+    console.log('✅ Using proxy: /api (universal proxy for mixed content protection)');
     return '/api';
   } else if (isLocal) {
     console.log('Environment type: LOCAL DEV');
