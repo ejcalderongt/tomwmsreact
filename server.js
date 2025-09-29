@@ -17,12 +17,8 @@ app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
-  res.header('Access-Control-Allow-Credentials', 'true');
   
-  // Allow mixed content (HTTP backend from HTTPS frontend)
-  res.header('Content-Security-Policy', "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;");
-  
-  // Disable cache for development
+  // Disable cache
   res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.header('Pragma', 'no-cache');
   res.header('Expires', '0');
@@ -45,45 +41,49 @@ const apiProxy = createProxyMiddleware({
   followRedirects: true,
   timeout: 30000,
   proxyTimeout: 30000,
-  // Allow insecure connections (HTTP backend from HTTPS frontend)
-  agent: false,
   // Keep the /api prefix that the backend expects
   pathRewrite: (path, req) => {
     // Express strips the /api mount, so we add it back
     const newPath = `/api${path}`;
-    console.log(`🔀 Path rewrite: ${path} → ${newPath}`);
+    console.log(`🔀 [${new Date().toISOString()}] Path rewrite: ${path} → ${newPath}`);
     return newPath;
   },
   onProxyReq: (proxyReq, req, res) => {
     // Remove headers that can cause CORS issues
     proxyReq.removeHeader('referer');
     proxyReq.removeHeader('origin');
-
-    console.log(`🟡 Proxy Request: ${req.method} ${req.url} → ${proxyReq.path}`);
+    proxyReq.removeHeader('host');
+    
+    // Set explicit headers for the backend
+    proxyReq.setHeader('Accept', 'application/json');
+    
+    console.log(`🟡 [${new Date().toISOString()}] Proxy Request: ${req.method} ${req.url} → ${proxyReq.path}`);
+    console.log(`   Headers:`, JSON.stringify(req.headers, null, 2));
   },
   onProxyRes: (proxyRes, req, res) => {
     const statusColor = proxyRes.statusCode >= 400 ? '🔴' : '🟢';
-    console.log(`${statusColor} Proxy Response: ${proxyRes.statusCode} ${req.url}`);
+    console.log(`${statusColor} [${new Date().toISOString()}] Proxy Response: ${proxyRes.statusCode} for ${req.url}`);
+    console.log(`   Response Headers:`, JSON.stringify(proxyRes.headers, null, 2));
 
-    // Add CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    if (proxyRes.statusCode >= 400) {
-      console.log('🔴 Response Headers:', proxyRes.headers);
-    }
+    // Force CORS headers on response
+    proxyRes.headers['access-control-allow-origin'] = '*';
+    proxyRes.headers['access-control-allow-methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+    proxyRes.headers['access-control-allow-headers'] = 'Content-Type, Authorization, Accept';
   },
   onError: (err, req, res) => {
-    console.error('🔴 Proxy Error:', err.message);
-    console.error('🔴 Request URL:', req.url);
-    console.error('🔴 Request Method:', req.method);
+    console.error(`🔴 [${new Date().toISOString()}] Proxy Error:`, err.message);
+    console.error(`   Stack:`, err.stack);
+    console.error(`   Request URL:`, req.url);
+    console.error(`   Request Method:`, req.method);
 
     if (!res.headersSent) {
-      res.status(500).json({ 
-        error: 'Proxy error', 
+      res.setHeader('Content-Type', 'application/json');
+      res.status(502).json({ 
+        error: 'Backend proxy error', 
         message: err.message,
-        url: req.url 
+        details: 'Cannot connect to backend server',
+        url: req.url,
+        timestamp: new Date().toISOString()
       });
     }
   }
