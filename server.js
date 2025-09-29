@@ -10,11 +10,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Add JSON body parser middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Add CORS middleware for all routes
+// Add CORS middleware for all routes FIRST
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
@@ -29,37 +25,28 @@ app.use((req, res, next) => {
   next();
 });
 
-// API proxy middleware
+// API proxy middleware - Allows HTTP backend access from HTTPS frontend
 const apiProxy = createProxyMiddleware({
   target: 'http://52.41.114.122:8097',
   changeOrigin: true,
   secure: false,
+  ws: true,
   followRedirects: true,
-  timeout: 10000,
-  proxyTimeout: 10000,
-  pathRewrite: {
-    '^/': '/api/'  // Add /api prefix since Express strips the mount path
+  timeout: 30000,
+  proxyTimeout: 30000,
+  // Keep the /api prefix that the backend expects
+  pathRewrite: (path, req) => {
+    // Express strips the /api mount, so we add it back
+    const newPath = `/api${path}`;
+    console.log(`🔀 Path rewrite: ${path} → ${newPath}`);
+    return newPath;
   },
   onProxyReq: (proxyReq, req, res) => {
-    // Remove problematic headers
+    // Remove headers that can cause CORS issues
     proxyReq.removeHeader('referer');
     proxyReq.removeHeader('origin');
 
-    // Set proper headers for the target server
-    proxyReq.setHeader('Host', '52.41.114.122:8097');
-    proxyReq.setHeader('User-Agent', 'TomWMSReact/1.0');
-    
-    // Force HTTP protocol
-    proxyReq.setHeader('X-Forwarded-Proto', 'http');
-    proxyReq.setHeader('X-Forwarded-Port', '8097');
-
-    console.log(`🟡 Proxy Request: ${req.method} ${req.url}`);
-    console.log('🟡 Request Headers:', req.headers);
-
-    // Log request body for POST requests
-    if (req.method === 'POST' && req.body) {
-      console.log('🟡 Request Body:', req.body);
-    }
+    console.log(`🟡 Proxy Request: ${req.method} ${req.url} → ${proxyReq.path}`);
   },
   onProxyRes: (proxyRes, req, res) => {
     const statusColor = proxyRes.statusCode >= 400 ? '🔴' : '🟢';
