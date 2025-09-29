@@ -59,31 +59,27 @@ const getApiBaseUrl = () => {
   console.log('Current URL:', window.location.href);
   console.log('Navigator online:', navigator.onLine);
 
-  // Check if we're in Replit production (deployed app)
-  const isReplitProduction = hostname.includes('replit.app');
-  const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
-  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || port === '5001';
+  // Always use proxy for all Replit environments
+  const isReplit = hostname.includes('replit.app') || 
+                  hostname.includes('replit.dev') || 
+                  hostname.includes('riker.replit.dev') ||
+                  hostname.includes('replit.co');
+                  
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
 
-  if (isReplitProduction) {
-    // In production deployment, use proxy to avoid CORS issues
-    console.log('Environment type: REPLIT PRODUCTION');
-    console.log('✅ Using proxy: /api (production deployment)');
-    return '/api';
-  } else if (isReplitDev) {
-    // Development environment - proxy should work
-    console.log('Environment type: REPLIT DEV');
-    console.log('✅ Using proxy: /api (development environment)');
+  if (isReplit) {
+    console.log('Environment type: REPLIT (ALL)');
+    console.log('✅ Using proxy: /api');
     return '/api';
   } else if (isLocal) {
-    // Local development
     console.log('Environment type: LOCAL DEV');
-    console.log('✅ Using proxy: /api (local development)');
+    console.log('✅ Using proxy: /api');
     return '/api';
   } else {
-    // Other environments - fallback to direct API
-    console.log('Environment type: OTHER');
-    console.log('✅ Using direct API: http://52.41.114.122:8097/api');
-    return 'http://52.41.114.122:8097/api';
+    // Fallback to proxy for unknown environments
+    console.log('Environment type: UNKNOWN - Using proxy');
+    console.log('✅ Using proxy: /api');
+    return '/api';
   }
 };
 
@@ -252,14 +248,24 @@ export const authAPI = {
 
       // Provide more specific error messages
       if (error instanceof Error) {
+        console.error('Login error details:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+        
         if (error.message.includes('500')) {
-          throw new Error('Error interno del servidor. Intente nuevamente.');
+          throw new Error('Error interno del servidor. Verifique que la API esté funcionando correctamente.');
         } else if (error.message.includes('401') || error.message.includes('403')) {
-          throw new Error('Usuario o contraseña incorrectos');
-        } else if (error.message.includes('Network')) {
-          throw new Error('Error de conexión. Verifique su conexión a internet.');
+          throw new Error('Credenciales incorrectas. Verifique usuario y contraseña.');
+        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+          throw new Error('Error de conexión. No se puede conectar al servidor API.');
+        } else if (error.message.includes('CORS')) {
+          throw new Error('Error de configuración del servidor. Contacte al administrador.');
+        } else if (error.message.includes('404')) {
+          throw new Error('Servicio de autenticación no disponible.');
         }
-        throw new Error(error.message);
+        throw new Error(`Error de login: ${error.message}`);
       }
       
       throw new Error('Error desconocido durante el login');
