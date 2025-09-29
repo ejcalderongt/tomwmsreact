@@ -26,39 +26,74 @@ function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('🚀 === LOGIN FORM SUBMITTED ===');
+    console.log('Form submission time:', new Date().toISOString());
+    console.log('Current loading state:', loading);
+    
     // Prevent multiple submissions
     if (loading) {
-      console.log('Login already in progress, ignoring submission');
+      console.log('❌ Login already in progress, ignoring duplicate submission');
+      toast.error("Login en progreso, por favor espere...");
       return;
     }
 
     // Validate inputs
+    console.log('📝 Validating form inputs...');
+    console.log('Username provided:', !!username.trim(), 'Length:', username.trim().length);
+    console.log('Password provided:', !!password.trim(), 'Length:', password.trim().length);
+    
     if (!username.trim() || !password.trim()) {
+      console.log('❌ Form validation failed - empty fields');
       toast.error("Por favor complete todos los campos");
       return;
     }
     
+    console.log('✅ Form validation passed');
     setLoading(true);
-    console.log('🔐 Starting login process for user:', username);
+    console.log('🔐 === STARTING LOGIN PROCESS ===');
+    console.log('Target user:', username.trim());
+    console.log('Login attempt ID:', Date.now());
 
     try {
+      console.log('📡 Calling authAPI.login...');
       const user = await authAPI.login({ username: username.trim(), password });
-      console.log('✅ Login successful, saving user and redirecting');
+      
+      console.log('✅ === LOGIN FORM SUCCESS ===');
+      console.log('✅ API login returned successfully');
+      console.log('✅ User object received:', user);
+      console.log('✅ Token length:', user.token ? user.token.length : 'No token');
+      
+      console.log('💾 Saving user to localStorage...');
       saveUser(user);
+      
+      console.log('🎉 Showing success toast...');
       toast.success("¡Bienvenido! Sesión iniciada correctamente");
       
       // Clear form
+      console.log('🧹 Clearing form fields...');
       setUsername("");
       setPassword("");
       
+      console.log('🚀 Navigating to existencias page...');
       // Navigate with replace to prevent back button issues
       navigate("/existencias", { replace: true });
+      
+      console.log('✅ === LOGIN FORM PROCESS COMPLETED ===');
     } catch (error) {
-      console.error("❌ Login failed:", error);
+      console.error("❌ === LOGIN FORM ERROR ===");
+      console.error("❌ Login attempt failed");
+      console.error("❌ Error type:", typeof error);
+      console.error("❌ Error instanceof Error:", error instanceof Error);
+      console.error("❌ Error message:", error instanceof Error ? error.message : "Unknown error");
+      console.error("❌ Full error object:", error);
+      
       const errorMessage = error instanceof Error ? error.message : "Error de conexión";
+      console.error("❌ Displaying error to user:", errorMessage);
       toast.error(errorMessage);
     } finally {
+      console.log('🏁 Setting loading to false...');
       setLoading(false);
+      console.log('🏁 Login form process finished');
     }
   };
 

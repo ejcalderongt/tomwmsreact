@@ -191,6 +191,21 @@ export const authAPI = {
       const requestBody = JSON.stringify(credentials);
       console.log('Request body:', requestBody);
 
+      // Validate credentials first
+      console.log('🔍 === CREDENTIAL VALIDATION ===');
+      if (!credentials.username || credentials.username.trim() === '') {
+        console.error('❌ Username is empty or invalid');
+        throw new Error('El nombre de usuario es requerido');
+      }
+      if (!credentials.password || credentials.password.trim() === '') {
+        console.error('❌ Password is empty or invalid');
+        throw new Error('La contraseña es requerida');
+      }
+      console.log('✅ Credentials format validation passed');
+      console.log('Username length:', credentials.username.length);
+      console.log('Password length:', credentials.password.length);
+      console.log('Username contains special chars:', /[^a-zA-Z0-9_.-]/.test(credentials.username));
+
       // Try login endpoints in order of likelihood to work
       const loginEndpoints = [
         '/Auth/login-propietario',  // This one is working based on logs
@@ -203,8 +218,9 @@ export const authAPI = {
 
       for (const endpoint of loginEndpoints) {
         try {
-          console.log(`🔄 Trying login endpoint: ${endpoint}`);
+          console.log(`🔄 === TRYING LOGIN ENDPOINT: ${endpoint} ===`);
           console.log('Full login URL:', `${baseUrl}${endpoint}`);
+          console.log('Attempt time:', new Date().toISOString());
 
           const data = await apiRequest(endpoint, {
             method: 'POST',
@@ -216,7 +232,9 @@ export const authAPI = {
           });
 
       console.log('✅ === LOGIN SUCCESS ===');
-          console.log(`Successful with endpoint: ${endpoint}`);
+          console.log(`✅ Successful with endpoint: ${endpoint}`);
+          console.log('✅ Credentials are VALID and accepted by server');
+          console.log('✅ Server authentication: PASSED');
           console.log('Login API Response received');
           console.log('Response type:', typeof data);
           console.log('Response keys:', data ? Object.keys(data) : 'No data');
@@ -224,12 +242,14 @@ export const authAPI = {
 
           // Validate response structure
           if (!data) {
+            console.error('❌ Empty response from server after successful auth');
             throw new Error('Respuesta vacía del servidor');
           }
 
           const token = data.token || data.accessToken;
           if (!token) {
-            console.error('No token found in response:', data);
+            console.error('❌ No token found in response after successful auth:', data);
+            console.error('❌ Available fields in response:', Object.keys(data));
             throw new Error('Token no recibido del servidor');
           }
 
@@ -253,21 +273,44 @@ export const authAPI = {
           return user;
 
         } catch (endpointError) {
-          console.log(`❌ Failed with endpoint ${endpoint}:`, endpointError instanceof Error ? endpointError.message : 'Unknown error');
+          console.log(`❌ === ENDPOINT ${endpoint} FAILED ===`);
+          console.log('❌ Error type:', typeof endpointError);
+          console.log('❌ Error message:', endpointError instanceof Error ? endpointError.message : 'Unknown error');
+          console.log('❌ Full error object:', endpointError);
+          
           lastError = endpointError instanceof Error ? endpointError : new Error('Unknown error');
           
-          // If this is a 404, continue to next endpoint
-          if (endpointError instanceof Error && endpointError.message.includes('404')) {
-            continue;
-          }
-          
-          // If it's not a 404, it might be a real auth error, so break
-          if (endpointError instanceof Error && (
-            endpointError.message.includes('401') || 
-            endpointError.message.includes('403') ||
-            endpointError.message.includes('400')
-          )) {
-            throw endpointError;
+          // Analyze the specific error
+          if (endpointError instanceof Error) {
+            const errorMsg = endpointError.message.toLowerCase();
+            
+            if (errorMsg.includes('404')) {
+              console.log('⚠️  Endpoint not found (404) - trying next endpoint...');
+              continue;
+            } else if (errorMsg.includes('401')) {
+              console.log('🔒 CREDENTIALS REJECTED (401) - Invalid username/password');
+              console.log('❌ The credentials provided are INCORRECT');
+              throw new Error('Credenciales incorrectas. Verifique usuario y contraseña.');
+            } else if (errorMsg.includes('403')) {
+              console.log('🚫 ACCESS FORBIDDEN (403) - Account may be disabled');
+              console.log('❌ The credentials may be correct but access is denied');
+              throw new Error('Acceso denegado. La cuenta puede estar deshabilitada.');
+            } else if (errorMsg.includes('400')) {
+              console.log('📝 BAD REQUEST (400) - Invalid request format');
+              console.log('❌ Request format issue, not credential issue');
+              throw new Error('Error en el formato de la solicitud.');
+            } else if (errorMsg.includes('500')) {
+              console.log('🔥 SERVER ERROR (500) - API internal error');
+              console.log('❌ Server-side issue, credentials cannot be validated');
+              throw new Error('Error interno del servidor. Intente nuevamente.');
+            } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
+              console.log('🌐 NETWORK ERROR - Connection issue');
+              console.log('❌ Cannot reach server to validate credentials');
+              throw new Error('Error de conexión. No se puede conectar al servidor.');
+            } else {
+              console.log('❓ UNKNOWN ERROR - Unexpected response');
+              console.log('❌ Unclear if credentials are valid due to unexpected error');
+            }
           }
         }
       }
