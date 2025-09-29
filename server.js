@@ -31,7 +31,7 @@ app.use((req, res, next) => {
 
 // API proxy middleware
 const apiProxy = createProxyMiddleware({
-  target: 'http://52.41.114.122:8091',
+  target: 'http://52.41.114.122:8097',
   changeOrigin: true,
   secure: false,
   followRedirects: true,
@@ -46,12 +46,12 @@ const apiProxy = createProxyMiddleware({
     proxyReq.removeHeader('origin');
 
     // Set proper headers for the target server
-    proxyReq.setHeader('Host', '52.41.114.122:8091');
+    proxyReq.setHeader('Host', '52.41.114.122:8097');
     proxyReq.setHeader('User-Agent', 'TomWMSReact/1.0');
     
     // Force HTTP protocol
     proxyReq.setHeader('X-Forwarded-Proto', 'http');
-    proxyReq.setHeader('X-Forwarded-Port', '8091');
+    proxyReq.setHeader('X-Forwarded-Port', '8097');
 
     console.log(`🟡 Proxy Request: ${req.method} ${req.url}`);
     console.log('🟡 Request Headers:', req.headers);
@@ -103,5 +103,5 @@ app.use((req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Production server running on http://0.0.0.0:${PORT}`);
   console.log(`📁 Serving static files from: ${path.join(__dirname, 'dist')}`);
-  console.log(`🔄 API proxy configured for: http://52.41.114.122:8091`);
+  console.log(`🔄 API proxy configured for: http://52.41.114.122:8097`);
 });
