@@ -22,6 +22,12 @@ function Login() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent multiple submissions
+    if (loading) {
+      return;
+    }
+    
     setLoading(true);
 
     try {

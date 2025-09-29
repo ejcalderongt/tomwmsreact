@@ -205,6 +205,7 @@ export const authAPI = {
       console.log('Login API Response received');
       console.log('Response type:', typeof data);
       console.log('Response keys:', data ? Object.keys(data) : 'No data');
+      console.log('Full response data:', data);
 
       // Validate response structure
       if (!data) {
