@@ -8,13 +8,24 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+// Use environment PORT or default to 5000 (configured in .replit)
 const PORT = process.env.PORT || 5000;
 
 // Add CORS middleware for all routes FIRST
 app.use((req, res, next) => {
+  // Allow all origins
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS,PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  
+  // Allow mixed content (HTTP backend from HTTPS frontend)
+  res.header('Content-Security-Policy', "default-src * 'unsafe-inline' 'unsafe-eval' data: blob:;");
+  
+  // Disable cache for development
+  res.header('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.header('Pragma', 'no-cache');
+  res.header('Expires', '0');
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -34,6 +45,8 @@ const apiProxy = createProxyMiddleware({
   followRedirects: true,
   timeout: 30000,
   proxyTimeout: 30000,
+  // Allow insecure connections (HTTP backend from HTTPS frontend)
+  agent: false,
   // Keep the /api prefix that the backend expects
   pathRewrite: (path, req) => {
     // Express strips the /api mount, so we add it back
