@@ -10,6 +10,7 @@ export interface DocumentoIngresoFiltro {
 export interface User {
   username: string;
   token: string;
+  propietario?: any;
 }
 
 export interface LoginCredentials {
@@ -233,7 +234,7 @@ const authenticatedCall = async (endpoint: string, token: string, options: Reque
 export const ingresosAPI = {
   listarDocumentos: async (filtro: DocumentoIngresoFiltro, token: string) => {
     try {
-      const data = await authenticatedCall(`/sync/ingresos/documentos-ingreso/listar`, {
+      const data = await authenticatedCall(`/sync/ingresos/documentos-ingreso/listar`, token, {
         method: 'POST',
         body: JSON.stringify(filtro),
       });
@@ -273,7 +274,7 @@ export const ingresosAPI = {
 export const salidasAPI = {
   listarDocumentos: async (filtro: DocumentoIngresoFiltro, token: string) => {
     try {
-      const data = await authenticatedCall(`/sync/salidas/documentos-salida/listar`, {
+      const data = await authenticatedCall(`/sync/salidas/documentos-salida/listar`, token, {
         method: 'POST',
         body: JSON.stringify(filtro),
       });
@@ -496,7 +497,7 @@ export const movimientosAPI = {
 export const productosAPI = {
   sincronizar: async (productos: any[], token: string) => {
     try {
-      const data = await authenticatedCall(`/Productos/sincronizar`, {
+      const data = await authenticatedCall(`/Productos/sincronizar`, token, {
         method: 'POST',
         body: JSON.stringify(productos),
       });

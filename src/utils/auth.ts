@@ -40,3 +40,24 @@ export const logout = () => {
   localStorage.removeItem(USER_KEY);
   localStorage.removeItem('wms_idPropietario');
 };
+
+// Función para formatear fecha desde input (YYYY-MM-DD) a formato de visualización
+export const formatDateFromInput = (dateString: string): string => {
+  if (!dateString) return '';
+  // Si ya está en formato YYYY-MM-DD, mantenerlo
+  return dateString;
+};
+
+// Función para formatear fecha a formato de visualización (DD/MM/YYYY)
+export const formatDateToDisplay = (dateString: string): string => {
+  if (!dateString) return '';
+  
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return dateString;
+  
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  
+  return `${day}/${month}/${year}`;
+};
