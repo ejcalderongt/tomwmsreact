@@ -49,6 +49,15 @@ const clearAuthAndRedirect = () => {
 // Configuración simple de API
 const API_BASE = '/api';
 
+// Helper function to get the API base URL.
+// This is crucial for distinguishing between local development and Replit deployment.
+const getApiBaseUrl = (): string => {
+  // In a Replit environment, the API calls should go through the '/api' proxy.
+  // In local development, you might want to point directly to a local backend.
+  // For this fix, we are assuming '/api' is the correct proxy for Replit.
+  return API_BASE;
+};
+
 // Función simple para hacer requests
 const apiCall = async (endpoint: string, options: RequestInit = {}) => {
   const url = `${API_BASE}${endpoint}`;
@@ -113,28 +122,65 @@ export const authAPI = {
     console.log('🔐 Login attempt for:', credentials.username);
 
     try {
-      const response = await apiCall('/Auth/login-propietario', {
+      // Use the working login endpoint with proper proxy path
+      const endpoint = '/Auth/login-propietario';
+      const baseUrl = getApiBaseUrl();
+      const cleanEndpoint = endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint;
+      const fullUrl = `${baseUrl}${cleanEndpoint}`;
+
+      // Debug the URL construction for login
+      if (endpoint.includes('login')) {
+        console.log('🔍 LOGIN URL DEBUG:');
+        console.log('  - Original endpoint:', endpoint);
+        console.log('  - Base URL:', baseUrl);
+        console.log('  - Clean endpoint:', cleanEndpoint);
+        console.log('  - Final URL:', fullUrl);
+        console.log('  - Should be using proxy:', baseUrl === '/api');
+      }
+
+      const response = await fetch(fullUrl, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
         body: JSON.stringify(credentials),
       });
 
-      console.log('✅ Login successful:', response);
+      console.log(`📡 Response: ${response.status}`);
 
-      if (!response.token) {
-        console.error('❌ No token received from server:', response);
+      if (!response.ok) {
+        let errorDetails = '';
+        try {
+          const errorText = await response.text();
+          errorDetails = errorText ? ` - ${errorText}` : '';
+          console.error('Error response body:', errorText);
+        } catch (e) {
+          console.error('Could not read error response body');
+        }
+        const errorMessage = `API Error: ${response.status} ${response.statusText}${errorDetails}`;
+        console.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+
+      const responseData = await response.json();
+      console.log('✅ Login successful:', responseData);
+
+      if (!responseData.token) {
+        console.error('❌ No token received from server:', responseData);
         throw new Error('Token no recibido del servidor');
       }
 
       const user: User = {
         username: credentials.username,
-        token: response.token,
-        propietario: response.propietario
+        token: responseData.token,
+        propietario: responseData.propietario
       };
 
       // Guardar ID del propietario si está disponible
-      if (response.propietario?.idPropietario) {
-        localStorage.setItem('wms_idPropietario', response.propietario.idPropietario.toString());
-        console.log('💾 Propietario ID stored:', response.propietario.idPropietario);
+      if (responseData.propietario?.idPropietario) {
+        localStorage.setItem('wms_idPropietario', responseData.propietario.idPropietario.toString());
+        console.log('💾 Propietario ID stored:', responseData.propietario.idPropietario);
       } else {
         console.log('No propietario data found or idPropietario missing.');
       }
