@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from "@/api/api";
-import { saveUser, isAuthenticated, getToken, logout } from "@/utils/auth";
+import { saveUser, isAuthenticated } from "@/utils/auth";
 import toast from "react-hot-toast";
 
 function Login() {
@@ -11,275 +12,108 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = "TOMWMSUX - Iniciar Sesión";
-
-    // Check once if already authenticated
     if (isAuthenticated()) {
-      const token = getToken();
-      if (token) {
-        console.log('User already authenticated, redirecting to existencias');
-        navigate("/existencias", { replace: true });
-      }
+      navigate("/existencias", { replace: true });
     }
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('🚀 === LOGIN FORM SUBMITTED ===');
-    console.log('Form submission time:', new Date().toISOString());
-    console.log('Current loading state:', loading);
-    
-    // Prevent multiple submissions
-    if (loading) {
-      console.log('❌ Login already in progress, ignoring duplicate submission');
-      toast.error("Login en progreso, por favor espere...");
-      return;
-    }
-
-    // Validate inputs
-    console.log('📝 Validating form inputs...');
-    console.log('Username provided:', !!username.trim(), 'Length:', username.trim().length);
-    console.log('Password provided:', !!password.trim(), 'Length:', password.trim().length);
+    if (loading) return;
     
     if (!username.trim() || !password.trim()) {
-      console.log('❌ Form validation failed - empty fields');
-      toast.error("Por favor complete todos los campos");
+      toast.error("Complete todos los campos");
       return;
     }
-    
-    console.log('✅ Form validation passed');
+
     setLoading(true);
-    console.log('🔐 === STARTING LOGIN PROCESS ===');
-    console.log('Target user:', username.trim());
-    console.log('Login attempt ID:', Date.now());
+    console.log('🚀 Starting login...');
 
     try {
-      console.log('📡 Calling authAPI.login...');
-      const user = await authAPI.login({ username: username.trim(), password });
+      const user = await authAPI.login({ 
+        username: username.trim(), 
+        password: password.trim() 
+      });
       
-      console.log('✅ === LOGIN FORM SUCCESS ===');
-      console.log('✅ API login returned successfully');
-      console.log('✅ User object received:', user);
-      console.log('✅ Token length:', user.token ? user.token.length : 'No token');
-      
-      console.log('💾 Saving user to localStorage...');
+      console.log('✅ Login successful');
       saveUser(user);
+      toast.success("¡Bienvenido!");
       
-      console.log('🎉 Showing success toast...');
-      toast.success("¡Bienvenido! Sesión iniciada correctamente");
-      
-      // Clear form
-      console.log('🧹 Clearing form fields...');
       setUsername("");
       setPassword("");
       
-      console.log('🚀 Navigating to existencias page...');
-      // Navigate with replace to prevent back button issues
       navigate("/existencias", { replace: true });
       
-      console.log('✅ === LOGIN FORM PROCESS COMPLETED ===');
     } catch (error) {
-      console.error("❌ === LOGIN FORM ERROR ===");
-      console.error("❌ Login attempt failed");
-      console.error("❌ Error type:", typeof error);
-      console.error("❌ Error instanceof Error:", error instanceof Error);
-      console.error("❌ Error message:", error instanceof Error ? error.message : "Unknown error");
-      console.error("❌ Full error object:", error);
-      
-      const errorMessage = error instanceof Error ? error.message : "Error de conexión";
-      console.error("❌ Displaying error to user:", errorMessage);
-      toast.error(errorMessage);
+      console.error("❌ Login error:", error);
+      const message = error instanceof Error ? error.message : "Error de login";
+      toast.error(message);
     } finally {
-      console.log('🏁 Setting loading to false...');
       setLoading(false);
-      console.log('🏁 Login form process finished');
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-700 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo and Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-2">
-            <img 
-              src="/tom_wms.png" 
-              alt="TOM WMS Logo" 
-              className="w-32 h-32 object-contain"
-            />
-          </div>
+          <img 
+            src="/tom_wms.png" 
+            alt="TOM WMS Logo" 
+            className="w-32 h-32 object-contain mx-auto mb-2"
+          />
           <p className="text-gray-400">Administración de Bodegas</p>
         </div>
 
-        {/* Login Card */}
         <div className="bg-gray-800/50 backdrop-blur-lg rounded-2xl shadow-xl border border-gray-700/50 p-8">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-white mb-2">Iniciar Sesión</h2>
-            <p className="text-gray-400">Ingresa a tu cuenta para continuar</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Username Field */}
             <div className="space-y-2">
-              <label htmlFor="username" className="block text-sm font-medium text-gray-300">
+              <label className="block text-sm font-medium text-gray-300">
                 Usuario
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  name="username"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  placeholder="Ingresa tu usuario"
-                  required
-                />
-              </div>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingresa tu usuario"
+                required
+              />
             </div>
 
-            {/* Password Field */}
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+              <label className="block text-sm font-medium text-gray-300">
                 Contraseña
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                  </svg>
-                </div>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                  placeholder="Ingresa tu contraseña"
-                  required
-                />
-              </div>
-            </div>
-
-            {/* Remember Me */}
-            <div className="flex items-center">
               <input
-                id="remember"
-                type="checkbox"
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 bg-gray-700 rounded"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full px-4 py-3 bg-gray-700/50 border border-gray-600 rounded-xl text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Ingresa tu contraseña"
+                required
               />
-              <label htmlFor="remember" className="ml-2 block text-sm text-gray-300">
-                Recordarme
-              </label>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-xl shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 transform hover:scale-[1.02]"
+              className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-medium rounded-xl hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Iniciando sesión...
-                </>
-              ) : (
-                "Iniciar Sesión"
-              )}
+              {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
             </button>
-
-            {/* API Test Buttons - Only for debugging */}
-            <div className="mt-4 space-y-2">
-              <button
-                type="button"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  console.log('🧪 Testing API connectivity...');
-                  try {
-                    // Test basic connectivity to the API server
-                    const baseUrl = window.location.hostname.includes('replit') ? '/api' : '/api';
-                    const response = await fetch(`${baseUrl}/health`, { 
-                      method: 'GET',
-                      headers: { 'Accept': 'application/json' }
-                    });
-                    console.log('API Health Response:', response.status, response.statusText);
-                    toast.success(`API server reachable: ${response.status}`);
-                  } catch (error) {
-                    console.error('❌ API connectivity test failed:', error);
-                    toast.error("API server not reachable: " + (error instanceof Error ? error.message : 'Unknown error'));
-                  }
-                }}
-                className="w-full py-2 px-4 text-sm text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors"
-              >
-                🔍 Test API Server
-              </button>
-              
-              <button
-                type="button"
-                onClick={async (e) => {
-                  e.preventDefault();
-                  console.log('🧪 Testing login with hardcoded credentials...');
-                  try {
-                    const testUser = await authAPI.login({ username: "nuevos_eticos", password: "Admin1965!*" });
-                    console.log('✅ Test login successful:', testUser);
-                    toast.success("Test login successful!");
-                  } catch (error) {
-                    console.error('❌ Test login failed:', error);
-                    toast.error("Test login failed: " + (error instanceof Error ? error.message : 'Unknown error'));
-                  }
-                }}
-                className="w-full py-2 px-4 text-sm text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors"
-              >
-                🧪 Test Login
-              </button>
-            </div>
           </form>
 
-          {/* Password Reset Link */}
-          <div className="mt-4 text-center">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                console.log('Password reset button clicked');
-                navigate('/cambiar-password');
-              }}
-              className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors"
-            >
-              ¿Olvidaste tu contraseña?
-            </button>
-          </div>
-
-          {/* Sign Up Link */}
-          <div className="mt-6 text-center">
+          <div className="mt-8 text-center">
             <p className="text-sm text-gray-400">
-              ¿No tienes una cuenta?{" "}
-              <a href="#" className="font-medium text-blue-400 hover:text-blue-300 transition-colors">
-                Regístrate aquí
-              </a>
+              Powered by DTSolutions, S.A.
             </p>
           </div>
-        </div>
-
-        {/* Footer */}
-        <div className="text-center mt-8 space-y-2">
-          <p className="text-sm text-gray-400">
-            Powered by DTSolutions, S.A.
-          </p>
-          <p className="text-xs text-gray-500">
-            Version EJC20250707
-          </p>
         </div>
       </div>
     </div>

@@ -46,49 +46,15 @@ const clearAuthAndRedirect = () => {
   }, 2000);
 };
 
-// Configure API base URL based on environment
-const getApiBaseUrl = () => {
-  const hostname = window.location.hostname;
-  const protocol = window.location.protocol;
-  const port = window.location.port;
+// Configuración simple de API
+const API_BASE = '/api';
 
-  console.log('=== API BASE URL CONFIGURATION ===');
-  console.log('Current hostname:', hostname);
-  console.log('Current protocol:', protocol);
-  console.log('Current port:', port);
-  console.log('Current URL:', window.location.href);
-  console.log('Navigator online:', navigator.onLine);
-
-  // Always use proxy for all Replit environments
-  const isReplit = hostname.includes('replit.app') || 
-                  hostname.includes('replit.dev') || 
-                  hostname.includes('riker.replit.dev') ||
-                  hostname.includes('replit.co');
-                  
-  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1';
-
-  if (isReplit) {
-    console.log('Environment type: REPLIT DEV');
-    console.log('✅ Using proxy: /api (universal proxy for mixed content protection)');
-    return '/api';
-  } else if (isLocal) {
-    console.log('Environment type: LOCAL DEV');
-    console.log('✅ Using proxy: /api');
-    return '/api';
-  } else {
-    // Fallback to proxy for unknown environments
-    console.log('Environment type: UNKNOWN - Using proxy');
-    console.log('✅ Using proxy: /api');
-    return '/api';
-  }
-};
-
-const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
-  const isLoginRequest = endpoint.includes('/Auth/login-propietario');
+// Función simple para hacer requests
+const apiCall = async (endpoint: string, options: RequestInit = {}) => {
+  const url = `${API_BASE}${endpoint}`;
 
   const config: RequestInit = {
     ...options,
-    credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -96,262 +62,135 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     },
   };
 
-  // Para login, no agregar token
-  if (!isLoginRequest) {
-    const user = getUser();
-    if (user.token) {
-      config.headers = {
-        ...config.headers,
-        'Authorization': `Bearer ${user.token}`,
-      };
+  console.log(`🌐 API Call: ${config.method || 'GET'} ${url}`);
+
+  const response = await fetch(url, config);
+
+  console.log(`📡 Response: ${response.status}`);
+
+  if (!response.ok) {
+    // Try to get error details from response
+    let errorDetails = '';
+    try {
+      const errorText = await response.text();
+      errorDetails = errorText ? ` - ${errorText}` : '';
+      console.error('Error response body:', errorText);
+    } catch (e) {
+      console.error('Could not read error response body');
     }
+
+    const errorMessage = `API Error: ${response.status} ${response.statusText}${errorDetails}`;
+    console.error(errorMessage);
+    throw new Error(errorMessage);
   }
 
-  try {
-    const baseUrl = getApiBaseUrl();
-    const cleanEndpoint = endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint;
-    const fullUrl = `${baseUrl}${cleanEndpoint}`;
-
-    console.log(`🌐 API Request: ${config.method || 'GET'} ${fullUrl}`);
-    console.log('Request headers:', config.headers);
-
-    const response = await fetch(fullUrl, config);
-
-    console.log(`📡 API Response: ${response.status} ${response.statusText}`);
-    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-
-    // Handle authentication errors
-    if (response.status === 401 || response.status === 403) {
-      console.error('Authentication error, clearing session');
-      clearAuthAndRedirect();
-      throw new Error(`Authentication failed: ${response.status}`);
-    }
-
-    if (!response.ok) {
-      // Try to get error details from response
-      let errorDetails = '';
-      try {
-        const errorText = await response.text();
-        errorDetails = errorText ? ` - ${errorText}` : '';
-        console.error('Error response body:', errorText);
-      } catch (e) {
-        console.error('Could not read error response body');
-      }
-
-      const errorMessage = `Request failed with status ${response.status}: ${response.statusText}${errorDetails}`;
-      throw new Error(errorMessage);
-    }
-
-    // Check if response has content
-    const contentLength = response.headers.get('content-length');
-    const contentType = response.headers.get('content-type');
-    
-    console.log('Response content-type:', contentType);
-    console.log('Response content-length:', contentLength);
-
-    if (contentLength === '0') {
-      return {};
-    }
-
-    if (!contentType || !contentType.includes('application/json')) {
-      const responseText = await response.text();
-      console.warn('Non-JSON response received:', responseText);
-      throw new Error('Invalid response format - expected JSON');
-    }
-
-    const responseData = await response.json();
-    console.log('✅ API Request successful');
-    return responseData;
-  } catch (error) {
-    console.error('❌ API Request failed:', error);
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Network error - check internet connection');
-    }
-    throw error;
+  // Handle authentication errors
+  if (response.status === 401 || response.status === 403) {
+    console.error('Authentication error, clearing session');
+    clearAuthAndRedirect();
+    throw new Error(`Authentication failed: ${response.status}`);
   }
+
+  // Check if response has content before parsing as JSON
+  const contentLength = response.headers.get('content-length');
+  if (contentLength === '0') {
+    return {};
+  }
+
+  const contentType = response.headers.get('content-type');
+  if (!contentType || !contentType.includes('application/json')) {
+    const responseText = await response.text();
+    console.warn('Non-JSON response received:', responseText);
+    throw new Error('Invalid response format - expected JSON');
+  }
+
+  return response.json();
 };
 
-// Auth API
+// API de autenticación simplificada
 export const authAPI = {
   login: async (credentials: LoginCredentials): Promise<User> => {
+    console.log('🔐 Login attempt for:', credentials.username);
+
     try {
-      console.log('🔐 === STARTING LOGIN ATTEMPT ===');
-      console.log('Username:', credentials.username);
-      console.log('Environment URL:', window.location.href);
-      console.log('Current time:', new Date().toISOString());
+      const response = await apiCall('/Auth/login-propietario', {
+        method: 'POST',
+        body: JSON.stringify(credentials),
+      });
 
-      const baseUrl = getApiBaseUrl();
-      console.log('API Base URL will be:', baseUrl);
+      console.log('✅ Login successful:', response);
 
-      // Clear any existing auth data before login attempt
-      localStorage.removeItem('wms_token');
-      localStorage.removeItem('wms_user');
-      localStorage.removeItem('wms_idPropietario');
-
-      const requestBody = JSON.stringify(credentials);
-      console.log('Request body:', requestBody);
-
-      // Validate credentials first
-      console.log('🔍 === CREDENTIAL VALIDATION ===');
-      if (!credentials.username || credentials.username.trim() === '') {
-        console.error('❌ Username is empty or invalid');
-        throw new Error('El nombre de usuario es requerido');
+      if (!response.token) {
+        console.error('❌ No token received from server:', response);
+        throw new Error('Token no recibido del servidor');
       }
-      if (!credentials.password || credentials.password.trim() === '') {
-        console.error('❌ Password is empty or invalid');
-        throw new Error('La contraseña es requerida');
+
+      const user: User = {
+        username: credentials.username,
+        token: response.token,
+        propietario: response.propietario
+      };
+
+      // Guardar ID del propietario si está disponible
+      if (response.propietario?.idPropietario) {
+        localStorage.setItem('wms_idPropietario', response.propietario.idPropietario.toString());
+        console.log('💾 Propietario ID stored:', response.propietario.idPropietario);
+      } else {
+        console.log('No propietario data found or idPropietario missing.');
       }
-      console.log('✅ Credentials format validation passed');
-      console.log('Username length:', credentials.username.length);
-      console.log('Password length:', credentials.password.length);
-      console.log('Username contains special chars:', /[^a-zA-Z0-9_.-]/.test(credentials.username));
 
-      // Use the working login endpoint directly
-      const endpoint = '/Auth/login-propietario';
-      
-      try {
-        console.log(`🔄 === USING LOGIN ENDPOINT: ${endpoint} ===`);
-        console.log('Full login URL:', `${baseUrl}${endpoint}`);
-        console.log('Attempt time:', new Date().toISOString());
-
-        const data = await apiRequest(endpoint, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: requestBody,
-        });
-
-      console.log('✅ === LOGIN SUCCESS ===');
-        console.log(`✅ Successful with endpoint: ${endpoint}`);
-        console.log('✅ Credentials are VALID and accepted by server');
-        console.log('✅ Server authentication: PASSED');
-        console.log('Login API Response received');
-        console.log('Response type:', typeof data);
-        console.log('Response keys:', data ? Object.keys(data) : 'No data');
-        console.log('Full response data:', JSON.stringify(data, null, 2));
-
-        // Validate response structure
-        if (!data) {
-          console.error('❌ Empty response from server after successful auth');
-          throw new Error('Respuesta vacía del servidor');
-        }
-
-        const token = data.token || data.accessToken;
-        if (!token) {
-          console.error('❌ No token found in response after successful auth:', data);
-          console.error('❌ Available fields in response:', Object.keys(data));
-          throw new Error('Token no recibido del servidor');
-        }
-
-        // Ensure we return the expected format with propietario data
-        const user = {
-          username: credentials.username,
-          token: token,
-          propietario: data.propietario
-        };
-
-        console.log('Token received:', token.substring(0, 20) + '...');
-        console.log('Propietario data available:', !!data.propietario);
-
-        // Store propietario info for later use
-        if (data.propietario?.idPropietario) {
-          localStorage.setItem('wms_idPropietario', data.propietario.idPropietario.toString());
-          console.log('💾 Propietario ID stored:', data.propietario.idPropietario);
-        }
-
-        console.log('=== LOGIN PROCESS COMPLETED SUCCESSFULLY ===');
-        return user;
-
-      } catch (loginError) {
-        console.log(`❌ === LOGIN ENDPOINT FAILED ===`);
-        console.log('❌ Error type:', typeof loginError);
-        console.log('❌ Error message:', loginError instanceof Error ? loginError.message : 'Unknown error');
-        console.log('❌ Full error object:', loginError);
-        
-        // Analyze the specific error
-        if (loginError instanceof Error) {
-          const errorMsg = loginError.message.toLowerCase();
-          
-          if (errorMsg.includes('404')) {
-            throw new Error('Endpoint de login no encontrado. Contacte al administrador.');
-          } else if (errorMsg.includes('401')) {
-            console.log('🔒 CREDENTIALS REJECTED (401) - Invalid username/password');
-            console.log('❌ The credentials provided are INCORRECT');
-            throw new Error('Credenciales incorrectas. Verifique usuario y contraseña.');
-          } else if (errorMsg.includes('403')) {
-            console.log('🚫 ACCESS FORBIDDEN (403) - Account may be disabled');
-            console.log('❌ The credentials may be correct but access is denied');
-            throw new Error('Acceso denegado. La cuenta puede estar deshabilitada.');
-          } else if (errorMsg.includes('400')) {
-            console.log('📝 BAD REQUEST (400) - Invalid request format');
-            console.log('❌ Request format issue, not credential issue');
-            throw new Error('Error en el formato de la solicitud.');
-          } else if (errorMsg.includes('500')) {
-            console.log('🔥 SERVER ERROR (500) - API internal error');
-            console.log('❌ Server-side issue, credentials cannot be validated');
-            throw new Error('Error interno del servidor. Intente nuevamente.');
-          } else if (errorMsg.includes('network') || errorMsg.includes('fetch')) {
-            console.log('🌐 NETWORK ERROR - Connection issue');
-            console.log('❌ Cannot reach server to validate credentials');
-            throw new Error('Error de conexión. No se puede conectar al servidor.');
-          }
-        }
-        
-        throw loginError;
-      }
+      console.log('=== LOGIN PROCESS COMPLETED SUCCESSFULLY ===');
+      return user;
     } catch (error) {
       console.error('❌ === LOGIN FAILED ===');
       console.error('Error type:', typeof error);
       console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
       console.error('Full error object:', error);
-      
+
       // Clear any partial auth data on failure
       localStorage.removeItem('wms_token');
       localStorage.removeItem('wms_user');
       localStorage.removeItem('wms_idPropietario');
 
-      // Provide more specific error messages
+      // Provide more specific error messages based on common issues
       if (error instanceof Error) {
-        console.error('Login error details:', {
-          message: error.message,
-          stack: error.stack,
-          name: error.name
-        });
-        
-        if (error.message.includes('500')) {
-          throw new Error('Error interno del servidor. Verifique que la API esté funcionando correctamente.');
-        } else if (error.message.includes('401') || error.message.includes('403')) {
+        const errorMessage = error.message.toLowerCase();
+        if (errorMessage.includes('401') || errorMessage.includes('403')) {
           throw new Error('Credenciales incorrectas. Verifique usuario y contraseña.');
-        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+        } else if (errorMessage.includes('network') || errorMessage.includes('fetch')) {
           throw new Error('Error de conexión. No se puede conectar al servidor API.');
-        } else if (error.message.includes('CORS')) {
-          throw new Error('Error de configuración del servidor. Contacte al administrador.');
-        } else if (error.message.includes('404')) {
+        } else if (errorMessage.includes('404')) {
           throw new Error('Servicio de autenticación no disponible.');
+        } else if (errorMessage.includes('500')) {
+          throw new Error('Error interno del servidor. Verifique que la API esté funcionando correctamente.');
         }
         throw new Error(`Error de login: ${error.message}`);
       }
-      
+
       throw new Error('Error desconocido durante el login');
     }
-  },
+  }
+};
+
+// Función para requests autenticados
+const authenticatedCall = async (endpoint: string, token: string, options: RequestInit = {}) => {
+  return apiCall(endpoint, {
+    ...options,
+    headers: {
+      ...options.headers,
+      'Authorization': `Bearer ${token}`,
+    },
+  });
 };
 
 // Ingresos API
 export const ingresosAPI = {
   listarDocumentos: async (filtro: DocumentoIngresoFiltro, token: string) => {
     try {
-      const data = await apiRequest(`/sync/ingresos/documentos-ingreso/listar`, {
+      const data = await authenticatedCall(`/sync/ingresos/documentos-ingreso/listar`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify(filtro),
       });
-
       return data;
     } catch (error) {
       console.error('Ingresos API Error:', error);
@@ -363,12 +202,7 @@ export const ingresosAPI = {
     try {
       const url = `/sync/ingresos/${idOrdenCompraEnc}/detalle-oc`;
       console.log('URL detalle OC:', url);
-      const data = await apiRequest(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
+      const data = await authenticatedCall(url, token);
       return data;
     } catch (error) {
       console.error('Detalle API Error:', error);
@@ -380,12 +214,7 @@ export const ingresosAPI = {
     try {
       const url = `/sync/ingresos/${idOrdenCompraEnc}/recepciones`;
       console.log('URL recepciones:', url);
-      const data = await apiRequest(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
+      const data = await authenticatedCall(url, token);
       return data;
     } catch (error) {
       console.error('Recepciones API Error:', error);
@@ -398,15 +227,10 @@ export const ingresosAPI = {
 export const salidasAPI = {
   listarDocumentos: async (filtro: DocumentoIngresoFiltro, token: string) => {
     try {
-      const data = await apiRequest(`/sync/salidas/documentos-salida/listar`, {
+      const data = await authenticatedCall(`/sync/salidas/documentos-salida/listar`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify(filtro),
       });
-
       return data;
     } catch (error) {
       console.error('Salidas API Error:', error);
@@ -418,12 +242,7 @@ export const salidasAPI = {
     try {
       const url = `/sync/salidas/${idPedidoEnc}/detalle-pe`;
       console.log('URL detalle PE:', url);
-      const data = await apiRequest(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
+      const data = await authenticatedCall(url, token);
       return data;
     } catch (error) {
       console.error('Detalle PE API Error:', error);
@@ -435,12 +254,7 @@ export const salidasAPI = {
     try {
       const url = `/sync/salidas/${idOrdenSalidaEnc}/despachos`;
       console.log('URL despachos:', url);
-      const data = await apiRequest(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
+      const data = await authenticatedCall(url, token);
       return data;
     } catch (error) {
       console.error('Despachos API Error:', error);
@@ -455,12 +269,7 @@ export const polizasAPI = {
     try {
       const url = `/sync/ingresos/${idOrdenCompraEnc}/poliza`;
       console.log('URL póliza:', url);
-      const data = await apiRequest(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
+      const data = await authenticatedCall(url, token);
       return data;
     } catch (error) {
       console.error('Póliza API Error:', error);
@@ -471,86 +280,24 @@ export const polizasAPI = {
 
 // Stock API (Existencias)
 export const existenciasAPI = {
-  resumen: async (filtro: { idBodega?: number; idPropietario: number }, token: string) => {
-    try {
-      // Build query parameters for GET request
-      const params = new URLSearchParams({
-        IdBodega: (filtro.idBodega || 0).toString(),
-        IdPropietario: filtro.idPropietario.toString()
-      });
-
-      const endpoint = `/Stock/resumen?${params.toString()}`;
-
-      console.log('=== RESUMEN EXISTENCIAS API REQUEST DEBUG ===');
-      console.log('Endpoint:', endpoint);
-      console.log('Full URL will be:', `/api${endpoint}`);
-      console.log('Query Parameters:');
-      console.log('  - IdBodega:', filtro.idBodega || 0);
-      console.log('  - IdPropietario:', filtro.idPropietario);
-      console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
-      console.log('Query String:', params.toString());
-      console.log('===============================================');
-
-      const data = await apiRequest(endpoint, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      console.log('=== RESUMEN EXISTENCIAS API RESPONSE DEBUG ===');
-      console.log('Response received:', data);
-      console.log('Response type:', typeof data);
-      console.log('Is array:', Array.isArray(data));
-      if (data) {
-        console.log('Response keys:', Object.keys(data));
-        if (data.resumenProducto && Array.isArray(data.resumenProducto)) {
-          console.log('ResumenProducto count:', data.resumenProducto.length);
-        }
-      }
-      console.log('===============================================');
-
-      // Return the resumenProducto array from the response
-      return data?.resumenProducto || [];
-    } catch (error) {
-      console.error('=== RESUMEN EXISTENCIAS API ERROR ===');
-      console.error('Error details:', error);
-      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
-      console.error('====================================');
-      throw new Error('Failed to fetch resumen data');
-    }
-  },
-
   listar: async (filtro: { idBodega?: number; idPropietario: number; pagina: number; tamanoPagina: number }, token: string) => {
+    const params = new URLSearchParams({
+      IdBodega: (filtro.idBodega || 0).toString(),
+      IdPropietario: filtro.idPropietario.toString(),
+      page: filtro.pagina.toString(),
+      pageSize: filtro.tamanoPagina.toString()
+    });
+
+    console.log('=== EXISTENCIAS API REQUEST DEBUG ===');
+    console.log('Query Parameters:');
+    console.log('  - IdBodega:', filtro.idBodega || 0);
+    console.log('  - IdPropietario:', filtro.idPropietario);
+    console.log('  - page:', filtro.pagina);
+    console.log('  - pageSize:', filtro.tamanoPagina);
+    console.log('=====================================');
+
     try {
-      // Build query parameters for GET request using the correct API parameter names
-      const params = new URLSearchParams({
-        IdBodega: (filtro.idBodega || 0).toString(),
-        IdPropietario: filtro.idPropietario.toString(),
-        page: filtro.pagina.toString(),
-        pageSize: filtro.tamanoPagina.toString()
-      });
-
-      const endpoint = `/Stock/listar?${params.toString()}`;
-
-      console.log('=== EXISTENCIAS API REQUEST DEBUG ===');
-      console.log('Endpoint:', endpoint);
-      console.log('Full URL will be:', `/api${endpoint}`);
-      console.log('Request Parameters:');
-      console.log('  - IdBodega:', filtro.idBodega || 0);
-      console.log('  - IdPropietario:', filtro.idPropietario);
-      console.log('  - page:', filtro.pagina);
-      console.log('  - pageSize:', filtro.tamanoPagina);
-      console.log('Token:', token ? `${token.substring(0, 20)}...` : 'NO TOKEN');
-      console.log('Query String:', params.toString());
-      console.log('=====================================');
-
-      const data = await apiRequest(endpoint, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const data = await authenticatedCall(`/Stock/listar?${params.toString()}`, token);
 
       console.log('=== EXISTENCIAS API RESPONSE DEBUG ===');
       console.log('Response received:', data);
@@ -576,18 +323,6 @@ export const existenciasAPI = {
         return response;
       }
 
-      // Handle the response format - wrap in expected structure if needed
-      if (Array.isArray(data)) {
-        const response = {
-          existencias: data,
-          totalRegistros: data.length,
-          totalPaginas: Math.ceil(data.length / filtro.tamanoPagina),
-          paginaActual: filtro.pagina
-        };
-        console.log('Wrapped array response:', response);
-        return response;
-      }
-
       // If no data found, return empty response
       return {
         existencias: [],
@@ -609,12 +344,13 @@ export const existenciasAPI = {
 export const bodegasAPI = {
   listar: async (token: string) => {
     try {
-      const data = await apiRequest(`/Bodegas/listar`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
+      console.log('=== BODEGAS API REQUEST DEBUG ===');
+      console.log('Endpoint: /Bodegas/listar');
+      console.log('=================================');
+      const data = await authenticatedCall('/Bodegas/listar', token);
+      console.log('=== BODEGAS API RESPONSE DEBUG ===');
+      console.log('Response received:', data);
+      console.log('==================================');
       return data;
     } catch (error) {
       console.error('Bodegas API Error:', error);
@@ -662,7 +398,7 @@ export const movimientosAPI = {
 
       console.log('=== MOVIMIENTOS API REQUEST DEBUG ===');
       console.log('Endpoint:', endpoint);
-      console.log('Full URL will be:', `/api${endpoint}`);
+      console.log('Full URL will be:', `${API_BASE}${endpoint}`);
       console.log('Query Parameters:');
       console.log('  - IdPropietario:', filtro.idPropietario);
       console.log('  - IdBodega:', filtro.idBodega || 'All');
@@ -673,7 +409,7 @@ export const movimientosAPI = {
       console.log('====================================');
 
       // Create the request promise and cache it
-      const requestPromise = apiRequest(endpoint, {
+      const requestPromise = apiCall(endpoint, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -714,12 +450,8 @@ export const movimientosAPI = {
 export const productosAPI = {
   sincronizar: async (productos: any[], token: string) => {
     try {
-      const data = await apiRequest(`/Productos/sincronizar`, {
+      const data = await authenticatedCall(`/Productos/sincronizar`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify(productos),
       });
 
@@ -736,11 +468,8 @@ export const passwordAPI = {
   resetPassword: async (email: string): Promise<{ success: boolean; message: string }> => {
     try {
       console.log('Attempting password reset for email:', email);
-      const data = await apiRequest(`/Auth/reset-password`, {
+      const data = await apiCall(`/Auth/reset-password`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify({ email }),
       });
 
@@ -759,11 +488,8 @@ export const passwordAPI = {
   validateResetToken: async (token: string): Promise<{ isValid: boolean; message?: string }> => {
     try {
       console.log('Validating reset token:', token);
-      const data = await apiRequest(`/Auth/validate-reset-token?token=${encodeURIComponent(token)}`, {
+      const data = await apiCall(`/Auth/validate-reset-token?token=${encodeURIComponent(token)}`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
       });
 
       console.log('Token validation response:', data);
@@ -789,11 +515,8 @@ export const passwordAPI = {
         NewPassword: newPassword
       };
 
-      const data = await apiRequest(`/Auth/update-password`, {
+      const data = await apiCall(`/Auth/update-password`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
         body: JSON.stringify(dto),
       });
 
@@ -810,4 +533,4 @@ export const passwordAPI = {
   }
 };
 
-export { apiRequest };
+export { apiCall as apiRequest };

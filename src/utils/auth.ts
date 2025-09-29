@@ -1,122 +1,42 @@
+interface User {
+  username: string;
+  token: string;
+  propietario?: any;
+}
+
 const TOKEN_KEY = 'wms_token';
 const USER_KEY = 'wms_user';
 
-export interface User {
-  username: string;
-  token: string;
-  propietario?: {
-    idPropietario: number;
-    nombre_comercial: string;
-    activo: boolean;
-  };
-}
-
 export const saveUser = (user: User) => {
-  try {
-    localStorage.setItem(TOKEN_KEY, user.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(user));
-    console.log('User saved successfully');
-  } catch (error) {
-    console.error('Error saving user:', error);
-  }
+  localStorage.setItem(TOKEN_KEY, user.token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
+  console.log('💾 User saved');
 };
 
 export const getUser = (): User => {
-  try {
-    const userStr = localStorage.getItem(USER_KEY);
-    const token = localStorage.getItem(TOKEN_KEY);
+  const userStr = localStorage.getItem(USER_KEY);
+  const token = localStorage.getItem(TOKEN_KEY);
 
-    if (userStr && token) {
-      return { ...JSON.parse(userStr), token };
-    }
-  } catch (error) {
-    console.error('Error getting user:', error);
+  if (userStr && token) {
+    return { ...JSON.parse(userStr), token };
   }
 
   return { username: '', token: '' };
 };
 
 export const getToken = (): string | null => {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch (error) {
-    console.error('Error getting token:', error);
-    return null;
-  }
+  return localStorage.getItem(TOKEN_KEY);
 };
 
 export const isAuthenticated = (): boolean => {
-  try {
-    const token = localStorage.getItem(TOKEN_KEY);
-    const user = localStorage.getItem(USER_KEY);
-    
-    if (!token || token === 'undefined' || token === 'null' || token.trim() === '') {
-      return false;
-    }
+  const token = localStorage.getItem(TOKEN_KEY);
+  const user = localStorage.getItem(USER_KEY);
 
-    if (!user || user === 'undefined' || user === 'null') {
-      return false;
-    }
-
-    // Basic token format check (JWT should have 3 parts)
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      return false;
-    }
-
-    // Check token expiration
-    try {
-      const payload = JSON.parse(atob(parts[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
-      
-      if (payload.exp && payload.exp < currentTime) {
-        // Token expired, clear it
-        logout();
-        return false;
-      }
-    } catch (e) {
-      // Invalid token format
-      logout();
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Auth check error:', error);
-    return false;
-  }
+  return !!(token && user && token !== 'null' && user !== 'null');
 };
 
 export const logout = () => {
-  localStorage.removeItem('wms_token');
-  localStorage.removeItem('wms_user');
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
   localStorage.removeItem('wms_idPropietario');
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
-};
-
-// Funciones utilitarias para formato de fecha
-export const formatDateToDisplay = (dateString: string): string => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const day = date.getDate().toString().padStart(2, '0');
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const year = date.getFullYear();
-  return `${day}/${month}/${year}`;
-};
-
-export const formatDateToInput = (dateString: string): string => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
-
-export const formatDateFromInput = (inputDate: string): string => {
-  // Convierte de YYYY-MM-DD a DD/MM/YYYY para mostrar
-  if (!inputDate) return '';
-  const [year, month, day] = inputDate.split('-');
-  return `${day}/${month}/${year}`;
 };
