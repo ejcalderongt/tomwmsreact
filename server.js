@@ -1,18 +1,26 @@
 
-const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const path = require('path');
+import express from 'express';
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 
 // API proxy middleware
-const apiProxy = createProxyMiddleware('/api', {
+const apiProxy = createProxyMiddleware({
   target: 'http://52.41.114.122:8097',
   changeOrigin: true,
   secure: false,
   timeout: 10000,
   proxyTimeout: 10000,
+  pathRewrite: {
+    '^/api': ''
+  },
   onProxyReq: (proxyReq, req, res) => {
     // Remove problematic headers
     proxyReq.removeHeader('referer');
@@ -35,8 +43,14 @@ app.use('/api', apiProxy);
 // Serve static files from dist directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Handle client-side routing
-app.get('*', (req, res) => {
+// Handle client-side routing - serve index.html for all non-API routes
+app.use((req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api')) {
+    return next();
+  }
+  
+  // For all other routes, serve the React app
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
