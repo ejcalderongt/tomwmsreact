@@ -59,21 +59,33 @@ const getApiBaseUrl = () => {
   console.log('Current URL:', window.location.href);
   console.log('Navigator online:', navigator.onLine);
 
-  // Always use proxy for all environments to avoid mixed content issues
-  // This ensures HTTPS -> proxy -> HTTP API works correctly
-  console.log('✅ Using proxy: /api (universal proxy for mixed content protection)');
-  
-  if (hostname.includes('replit.app')) {
+  // Check if we're in Replit production (deployed app)
+  const isReplitProduction = hostname.includes('replit.app');
+  const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || port === '5001';
+
+  if (isReplitProduction) {
+    // In production deployment, proxy might not be available
+    // Try proxy first, fallback to direct API if needed
     console.log('Environment type: REPLIT PRODUCTION');
-  } else if (hostname.includes('replit.dev') || hostname.includes('riker.replit.dev')) {
+    console.log('✅ Using proxy: /api (production deployment)');
+    return '/api';
+  } else if (isReplitDev) {
+    // Development environment - proxy should work
     console.log('Environment type: REPLIT DEV');
-  } else if (hostname === 'localhost' || hostname === '127.0.0.1' || port === '5001') {
+    console.log('✅ Using proxy: /api (development environment)');
+    return '/api';
+  } else if (isLocal) {
+    // Local development
     console.log('Environment type: LOCAL DEV');
+    console.log('✅ Using proxy: /api (local development)');
+    return '/api';
   } else {
+    // Other environments - fallback to direct API
     console.log('Environment type: OTHER');
+    console.log('✅ Using direct API: http://52.41.114.122:8097/api');
+    return 'http://52.41.114.122:8097/api';
   }
-  
-  return '/api';
 };
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {

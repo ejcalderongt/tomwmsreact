@@ -28,6 +28,8 @@ interface Existencia {
   nomEstado: string;
   marca: string;
   familia: string;
+  lic_plate: string; // Added for potential location
+  estadoUtilizable: boolean; // Added for filtering by usable status
 }
 
 interface Bodega {
@@ -60,7 +62,7 @@ function Existencias() {
     const saved = localStorage.getItem('existencias_bodegaSeleccionada');
     return saved ? parseInt(saved, 10) : 0;
   });
-  
+
   const [searchTerm, setSearchTerm] = useState<string>(() => {
     // Try to restore from localStorage first, fallback to empty string
     const saved = localStorage.getItem('existencias_searchTerm');
@@ -88,7 +90,7 @@ function Existencias() {
       const savedExistencias = localStorage.getItem('existencias_data');
       const savedTotalRegistros = localStorage.getItem('existencias_totalRegistros');
       const savedTotalPaginas = localStorage.getItem('existencias_totalPaginas');
-      
+
       if (savedExistencias && savedTotalRegistros && savedTotalPaginas) {
         try {
           const parsedExistencias = JSON.parse(savedExistencias);
@@ -109,7 +111,7 @@ function Existencias() {
   const cargarBodegas = async () => {
     // Prevent multiple simultaneous requests
     if (isLoadingBodegas) return;
-    
+
     setIsLoadingBodegas(true);
     setLoadingBodegas(true);
     try {
@@ -129,7 +131,7 @@ function Existencias() {
       setBodegas(data || []);
     } catch (error) {
       console.error('Error al cargar bodegas:', error);
-      
+
       // Check if it's an authentication error
       if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
         console.log('Authentication error, clearing session and redirecting to login');
@@ -137,7 +139,7 @@ function Existencias() {
         navigate('/login', { replace: true });
         return;
       }
-      
+
       toast.error('Error al cargar las bodegas');
       setBodegas([]);
     } finally {
@@ -152,16 +154,16 @@ function Existencias() {
       console.log('Request already in progress, skipping...');
       return;
     }
-    
+
     setIsLoadingExistencias(true);
     setLoading(true);
-    
+
     console.log('=== STARTING EXISTENCIAS LOAD ===');
     console.log('Current state:');
     console.log('  - bodegaSeleccionada:', bodegaSeleccionada);
     console.log('  - paginaActual:', paginaActual);
     console.log('  - tamanoPagina:', tamanoPagina);
-    
+
     try {
       const token = getToken();
       const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
@@ -186,9 +188,9 @@ function Existencias() {
 
       console.log('=== CALLING EXISTENCIAS API ===');
       console.log('Filter object:', filtro);
-      
+
       const data: ExistenciasResponse = await existenciasAPI.listar(filtro, token);
-      
+
       console.log('=== EXISTENCIAS API COMPLETED ===');
       console.log('Response data:', data);
 
@@ -220,7 +222,7 @@ function Existencias() {
       }
     } catch (error) {
       console.error('Error al cargar existencias:', error);
-      
+
       // Check if it's an authentication error
       if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
         console.log('Authentication error, clearing session and redirecting to login');
@@ -228,7 +230,7 @@ function Existencias() {
         navigate('/login', { replace: true });
         return;
       }
-      
+
       // Show more specific error message
       const errorMessage = error instanceof Error ? error.message : 'Error al cargar las existencias';
       toast.error(`Error: ${errorMessage}`);
@@ -247,13 +249,14 @@ function Existencias() {
     if (!term.trim()) {
       return existenciasToFilter;
     }
-    
+
     const searchLower = term.toLowerCase().trim();
     return existenciasToFilter.filter(existencia => 
       existencia.codigo?.toLowerCase().includes(searchLower) ||
       existencia.nombre?.toLowerCase().includes(searchLower) ||
       existencia.lote?.toLowerCase().includes(searchLower) ||
-      existencia.nombre_Completo?.toLowerCase().includes(searchLower)
+      existencia.nombre_Completo?.toLowerCase().includes(searchLower) ||
+      existencia.lic_plate?.toLowerCase().includes(searchLower) // Added for location search
     );
   };
 
@@ -294,16 +297,16 @@ function Existencias() {
       console.log('Request already in progress, skipping...');
       return;
     }
-    
+
     setIsLoadingExistencias(true);
     setLoading(true);
-    
+
     console.log('=== STARTING EXISTENCIAS LOAD ===');
     console.log('Current state:');
     console.log('  - bodegaSeleccionada:', bodegaSeleccionada);
     console.log('  - pagina:', pagina);
     console.log('  - tamanoPagina:', tamanoPagina);
-    
+
     try {
       const token = getToken();
       const idPropietario = parseInt(localStorage.getItem('wms_idPropietario') || '0');
@@ -328,9 +331,9 @@ function Existencias() {
 
       console.log('=== CALLING EXISTENCIAS API ===');
       console.log('Filter object:', filtro);
-      
+
       const data: ExistenciasResponse = await existenciasAPI.listar(filtro, token);
-      
+
       console.log('=== EXISTENCIAS API COMPLETED ===');
       console.log('Response data:', data);
 
@@ -362,7 +365,7 @@ function Existencias() {
       }
     } catch (error) {
       console.error('Error al cargar existencias:', error);
-      
+
       // Check if it's an authentication error
       if (error instanceof Error && (error.message.includes('401') || error.message.includes('403') || error.message.includes('Authentication failed'))) {
         console.log('Authentication error, clearing session and redirecting to login');
@@ -370,7 +373,7 @@ function Existencias() {
         navigate('/login', { replace: true });
         return;
       }
-      
+
       // Show more specific error message
       const errorMessage = error instanceof Error ? error.message : 'Error al cargar las existencias';
       toast.error(`Error: ${errorMessage}`);
@@ -393,7 +396,7 @@ function Existencias() {
     return `${day}/${month}/${year}`;
   };
 
-  const formatNumber = (value: number, precision: number = 2) => {
+  const formatNumber = (value: number | null | undefined, precision: number = 2) => {
     if (value === null || value === undefined) return '';
     return value.toLocaleString('es-ES', { 
       minimumFractionDigits: precision, 
@@ -535,7 +538,7 @@ function Existencias() {
                   id="search"
                   value={searchTerm}
                   onChange={(e) => handleSearchChange(e.target.value)}
-                  placeholder="Código, nombre, lote o ubicación..."
+                  placeholder="Código, nombre, lote, ubicación..."
                   className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
                 />
                 {searchTerm && (
@@ -621,82 +624,93 @@ function Existencias() {
           ) : (
             <>
               <div className="flex-1 overflow-y-auto overflow-x-auto" style={{ overflowX: 'auto', overflowY: 'auto' }}>
-                <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: '1200px' }}>
-                  <thead className="bg-gray-50 sticky top-0 z-10">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodega</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">UmBas</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cant. UMBas</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disp. UMBas</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reservada</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Presentación</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cant. Pres.</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ubicación</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vencimiento</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costo</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {existencias.map((existencia, index) => (
-                      <tr key={existencia.idStock || index} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                          {existencia.codigo}
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">
-                          {existencia.nombre}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.marca}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.bodega}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.unidadMedida}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStockStatus(existencia.cantidad_UMBas)}`}>
-                            {formatNumber(existencia.cantidad_UMBas, 2)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatNumber(existencia.disponible_UMBas, 2)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatNumber(existencia.cantidadReservadaUmBas, 2)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.presentacion}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatNumber(existencia.cantidad_Presentacion, 2)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.nombre_Completo}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {existencia.lote}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatDate(existencia.fecha_vence)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${existencia.nomEstado === 'Buen Estado' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                            {existencia.nomEstado}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          {formatNumber(existencia.costo, 2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                {/* Tabla de existencias */}
+                {existencias.length > 0 && (
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full min-w-[1400px] divide-y divide-gray-200">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Código</th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-64">Producto</th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">Marca</th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">Bodega</th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Lote</th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">UM/BAS</th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center w-20">
+                              CANT.<br />UMBAS
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center w-20">
+                              DISP.<br />UMBAS
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center w-24">
+                              RESERVADA
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center w-32">
+                              PRESENTACIÓN
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider text-center w-20">
+                              CANT.<br />PRES.
+                            </th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">UBICACIÓN</th>
+                            <th className="px-3 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">ESTADO</th>
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                          {existencias.map((item, index) => (
+                            <tr key={`${item.idStock}-${index}`} className="hover:bg-gray-50">
+                              <td className="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
+                                {item.codigo}
+                              </td>
+                              <td className="px-3 py-3 text-sm text-gray-900 max-w-64" title={item.nombre}>
+                                <div className="truncate">{item.nombre}</div>
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+                                {item.marca || '-'}
+                              </td>
+                              <td className="px-3 py-3 text-sm text-gray-500">
+                                <div className="truncate">{item.bodega}</div>
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+                                {item.lote || '-'}
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+                                {item.unidadMedida}
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">
+                                {formatNumber(item.cantidad_UMBas)}
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">
+                                {formatNumber(item.disponible_UMBas)}
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">
+                                {formatNumber(item.cantidadReservadaUmBas)}
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">
+                                {item.presentacion || '-'}
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500 text-center">
+                                {formatNumber(item.cantidad_Presentacion)}
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+                                {item.lic_plate || '-'}
+                              </td>
+                              <td className="px-3 py-3 whitespace-nowrap text-sm text-gray-500">
+                                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                  item.estadoUtilizable 
+                                    ? 'bg-green-100 text-green-800' 
+                                    : 'bg-red-100 text-red-800'
+                                }`}>
+                                  {item.nomEstado || 'N/A'}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Paginación */}
