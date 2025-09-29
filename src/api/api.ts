@@ -50,48 +50,30 @@ const clearAuthAndRedirect = () => {
 const getApiBaseUrl = () => {
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
+  const port = window.location.port;
 
   console.log('=== API BASE URL CONFIGURATION ===');
   console.log('Current hostname:', hostname);
   console.log('Current protocol:', protocol);
-  console.log('Current port:', window.location.port);
+  console.log('Current port:', port);
   console.log('Current URL:', window.location.href);
   console.log('Navigator online:', navigator.onLine);
-  console.log('User agent:', navigator.userAgent);
 
-  // Check if we're in development environment (local or Replit dev)
-  const isLocalDev = hostname === 'localhost' || 
-                    hostname === '127.0.0.1' ||
-                    window.location.port === '5001';
-                    
-  const isReplitDev = hostname.includes('replit.dev') || hostname.includes('riker.replit.dev');
-  const isReplitProd = hostname.includes('replit.app');
-  const isReplit = isReplitDev || isReplitProd;
-
-  console.log('Is Replit DEV environment:', isReplitDev);
-  console.log('Is Replit PROD environment:', isReplitProd);
-  console.log('Is Replit environment (any):', isReplit);
-  console.log('Is local development:', isLocalDev);
-  console.log('Protocol is HTTPS:', protocol === 'https:');
-
-  // In all Replit environments (dev and prod), use proxy to avoid mixed content
-  if (isReplit) {
-    console.log('✅ Using proxy: /api (to avoid mixed content issues)');
-    console.log('Environment type:', isReplitDev ? 'REPLIT DEV' : 'REPLIT PRODUCTION');
-    return '/api';
-  }
-
-  // Only in local development, use proxy
-  if (isLocalDev) {
-    console.log('✅ Using proxy: /api (local development)');
+  // Always use proxy for all environments to avoid mixed content issues
+  // This ensures HTTPS -> proxy -> HTTP API works correctly
+  console.log('✅ Using proxy: /api (universal proxy for mixed content protection)');
+  
+  if (hostname.includes('replit.app')) {
+    console.log('Environment type: REPLIT PRODUCTION');
+  } else if (hostname.includes('replit.dev') || hostname.includes('riker.replit.dev')) {
+    console.log('Environment type: REPLIT DEV');
+  } else if (hostname === 'localhost' || hostname === '127.0.0.1' || port === '5001') {
     console.log('Environment type: LOCAL DEV');
-    return '/api';
+  } else {
+    console.log('Environment type: OTHER');
   }
-
-  // Only for external production deployments (non-Replit), use direct HTTP API
-  console.log('✅ Using HTTP API: http://52.41.114.122:8097/api (external environment)');
-  console.log('Environment type: EXTERNAL');
-  return 'http://52.41.114.122:8097/api';
+  
+  return '/api';
 };
 
 const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
@@ -102,6 +84,7 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     credentials: 'omit',
     headers: {
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
       ...options.headers,
     },
   };
@@ -122,21 +105,61 @@ const apiRequest = async (endpoint: string, options: RequestInit = {}): Promise<
     const cleanEndpoint = endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint;
     const fullUrl = `${baseUrl}${cleanEndpoint}`;
 
+    console.log(`🌐 API Request: ${config.method || 'GET'} ${fullUrl}`);
+    console.log('Request headers:', config.headers);
+
     const response = await fetch(fullUrl, config);
+
+    console.log(`📡 API Response: ${response.status} ${response.statusText}`);
+    console.log('Response headers:', Object.fromEntries(response.headers.entries()));
 
     // Handle authentication errors
     if (response.status === 401 || response.status === 403) {
+      console.error('Authentication error, clearing session');
       clearAuthAndRedirect();
       throw new Error(`Authentication failed: ${response.status}`);
     }
 
     if (!response.ok) {
-      const errorMessage = `Request failed with status ${response.status}: ${response.statusText}`;
+      // Try to get error details from response
+      let errorDetails = '';
+      try {
+        const errorText = await response.text();
+        errorDetails = errorText ? ` - ${errorText}` : '';
+        console.error('Error response body:', errorText);
+      } catch (e) {
+        console.error('Could not read error response body');
+      }
+
+      const errorMessage = `Request failed with status ${response.status}: ${response.statusText}${errorDetails}`;
       throw new Error(errorMessage);
     }
 
-    return await response.json();
+    // Check if response has content
+    const contentLength = response.headers.get('content-length');
+    const contentType = response.headers.get('content-type');
+    
+    console.log('Response content-type:', contentType);
+    console.log('Response content-length:', contentLength);
+
+    if (contentLength === '0') {
+      return {};
+    }
+
+    if (!contentType || !contentType.includes('application/json')) {
+      const responseText = await response.text();
+      console.warn('Non-JSON response received:', responseText);
+      throw new Error('Invalid response format - expected JSON');
+    }
+
+    const responseData = await response.json();
+    console.log('✅ API Request successful');
+    return responseData;
   } catch (error) {
+    console.error('❌ API Request failed:', error);
+    if (error instanceof TypeError && error.message.includes('fetch')) {
+      throw new Error('Network error - check internet connection');
+    }
     throw error;
   }
 };
@@ -148,32 +171,54 @@ export const authAPI = {
       console.log('🔐 === STARTING LOGIN ATTEMPT ===');
       console.log('Username:', credentials.username);
       console.log('Environment URL:', window.location.href);
+      console.log('Current time:', new Date().toISOString());
 
       const baseUrl = getApiBaseUrl();
       console.log('API Base URL will be:', baseUrl);
-      console.log('Timestamp:', new Date().toISOString());
-      console.log('API Request URL:', `${baseUrl}/Auth/login-propietario`);
+      console.log('Full login URL:', `${baseUrl}/Auth/login-propietario`);
+
+      // Clear any existing auth data before login attempt
+      localStorage.removeItem('wms_token');
+      localStorage.removeItem('wms_user');
+      localStorage.removeItem('wms_idPropietario');
+
+      const requestBody = JSON.stringify(credentials);
+      console.log('Request body:', requestBody);
 
       const data = await apiRequest(`/Auth/login-propietario`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json'
         },
-        body: JSON.stringify(credentials),
+        body: requestBody,
       });
 
       console.log('✅ === LOGIN SUCCESS ===');
-      console.log('Login API Response:', data);
+      console.log('Login API Response received');
+      console.log('Response type:', typeof data);
+      console.log('Response keys:', data ? Object.keys(data) : 'No data');
+
+      // Validate response structure
+      if (!data) {
+        throw new Error('Respuesta vacía del servidor');
+      }
+
+      const token = data.token || data.accessToken;
+      if (!token) {
+        console.error('No token found in response:', data);
+        throw new Error('Token no recibido del servidor');
+      }
 
       // Ensure we return the expected format with propietario data
       const user = {
         username: credentials.username,
-        token: data.token || data.accessToken || data,
+        token: token,
         propietario: data.propietario
       };
 
-      console.log('Token received:', data.token ? `${data.token.substring(0, 50)}...` : 'No token');
-      console.log('Propietario data:', data.propietario);
+      console.log('Token received:', token.substring(0, 20) + '...');
+      console.log('Propietario data available:', !!data.propietario);
 
       // Store propietario info for later use
       if (data.propietario?.idPropietario) {
@@ -181,12 +226,32 @@ export const authAPI = {
         console.log('💾 Propietario ID stored:', data.propietario.idPropietario);
       }
 
-      console.log('=== LOGIN PROCESS COMPLETED ===');
+      console.log('=== LOGIN PROCESS COMPLETED SUCCESSFULLY ===');
       return user;
     } catch (error) {
       console.error('❌ === LOGIN FAILED ===');
-      console.error('Login error details:', error);
-      throw new Error('Usuario o contraseña incorrectos');
+      console.error('Error type:', typeof error);
+      console.error('Error message:', error instanceof Error ? error.message : 'Unknown error');
+      console.error('Full error object:', error);
+      
+      // Clear any partial auth data on failure
+      localStorage.removeItem('wms_token');
+      localStorage.removeItem('wms_user');
+      localStorage.removeItem('wms_idPropietario');
+
+      // Provide more specific error messages
+      if (error instanceof Error) {
+        if (error.message.includes('500')) {
+          throw new Error('Error interno del servidor. Intente nuevamente.');
+        } else if (error.message.includes('401') || error.message.includes('403')) {
+          throw new Error('Usuario o contraseña incorrectos');
+        } else if (error.message.includes('Network')) {
+          throw new Error('Error de conexión. Verifique su conexión a internet.');
+        }
+        throw new Error(error.message);
+      }
+      
+      throw new Error('Error desconocido durante el login');
     }
   },
 };
