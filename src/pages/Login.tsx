@@ -12,7 +12,7 @@ function Login() {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate("/inventario-en-linea", { replace: true });
+      navigate("/dashboard", { replace: true });
     }
   }, [navigate]);
 
@@ -42,7 +42,7 @@ function Login() {
       setUsername("");
       setPassword("");
 
-      navigate("/inventario-en-linea", { replace: true });
+      navigate("/dashboard", { replace: true });
 
     } catch (error) {
       console.error("❌ Login error:", error);

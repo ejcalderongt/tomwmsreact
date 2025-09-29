@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from '@/pages/Login';
+import Dashboard from '@/pages/Dashboard';
 import Existencias from '@/pages/Existencias';
 import ResumenExistencias from '@/pages/ResumenExistencias';
 import Ingresos from '@/pages/Ingresos';
@@ -25,6 +26,9 @@ function App() {
         <Route path="/session-expired" element={<SessionExpired />} />
         <Route path="/cambiar-password" element={<CambiarPassword />} />
         <Route path="/new-password" element={<NewPassword />} />
+        <Route path="/dashboard" element={<PrivateRoute />}>
+          <Route index element={<Dashboard />} />
+        </Route>
         <Route path="/existencias" element={<PrivateRoute />}>
           <Route index element={<Existencias />} />
         </Route>
