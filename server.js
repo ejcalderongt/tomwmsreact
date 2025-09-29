@@ -14,6 +14,21 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Add CORS middleware for all routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+
+  next();
+});
+
 // API proxy middleware
 const apiProxy = createProxyMiddleware({
   target: 'http://52.41.114.122:8097',
@@ -28,15 +43,14 @@ const apiProxy = createProxyMiddleware({
     // Remove problematic headers
     proxyReq.removeHeader('referer');
     proxyReq.removeHeader('origin');
-    proxyReq.removeHeader('host');
-    
+
     // Set proper headers for the target server
     proxyReq.setHeader('Host', '52.41.114.122:8097');
     proxyReq.setHeader('User-Agent', 'TomWMSReact/1.0');
-    
+
     console.log(`🟡 Proxy Request: ${req.method} ${req.url}`);
     console.log('🟡 Request Headers:', req.headers);
-    
+
     // Log request body for POST requests
     if (req.method === 'POST' && req.body) {
       console.log('🟡 Request Body:', req.body);
@@ -45,12 +59,12 @@ const apiProxy = createProxyMiddleware({
   onProxyRes: (proxyRes, req, res) => {
     const statusColor = proxyRes.statusCode >= 400 ? '🔴' : '🟢';
     console.log(`${statusColor} Proxy Response: ${proxyRes.statusCode} ${req.url}`);
-    
+
     // Add CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    
+
     if (proxyRes.statusCode >= 400) {
       console.log('🔴 Response Headers:', proxyRes.headers);
     }
@@ -59,7 +73,7 @@ const apiProxy = createProxyMiddleware({
     console.error('🔴 Proxy Error:', err.message);
     console.error('🔴 Request URL:', req.url);
     console.error('🔴 Request Method:', req.method);
-    
+
     if (!res.headersSent) {
       res.status(500).json({ 
         error: 'Proxy error', 
