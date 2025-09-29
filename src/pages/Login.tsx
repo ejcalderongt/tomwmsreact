@@ -14,7 +14,12 @@ function Login() {
     document.title = "TOMWMSUX - Iniciar Sesión";
 
     // Solo verificar una vez al montar si ya está autenticado
+    let hasChecked = false;
+    
     const checkAuth = () => {
+      if (hasChecked) return false;
+      hasChecked = true;
+      
       if (isAuthenticated()) {
         const token = getToken();
         if (token) {
@@ -27,8 +32,12 @@ function Login() {
     };
 
     // Only check once on mount
-    checkAuth();
-  }, [navigate]);
+    const timer = setTimeout(() => {
+      checkAuth();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -154,6 +163,26 @@ function Login() {
               ) : (
                 "Iniciar Sesión"
               )}
+            </button>
+
+            {/* Test API Button - Only for debugging */}
+            <button
+              type="button"
+              onClick={async (e) => {
+                e.preventDefault();
+                console.log('🧪 Testing API directly...');
+                try {
+                  const testUser = await authAPI.login({ username: "nuevos_eticos", password: "Admin1965!*" });
+                  console.log('✅ Test login successful:', testUser);
+                  toast.success("Test login successful!");
+                } catch (error) {
+                  console.error('❌ Test login failed:', error);
+                  toast.error("Test login failed: " + (error instanceof Error ? error.message : 'Unknown error'));
+                }
+              }}
+              className="w-full mt-2 py-2 px-4 text-sm text-gray-400 border border-gray-600 rounded-lg hover:bg-gray-700/50 transition-colors"
+            >
+              🧪 Test API Connection
             </button>
           </form>
 

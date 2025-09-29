@@ -50,19 +50,17 @@ export const isAuthenticated = (): boolean => {
     const token = localStorage.getItem(TOKEN_KEY);
     const user = localStorage.getItem(USER_KEY);
     
-    console.log('=== AUTH CHECK DEBUG ===');
-    console.log('Token exists:', !!token);
-    console.log('User exists:', !!user);
-    
-    if (!token || token === 'undefined' || token === 'null') {
-      console.log('❌ No valid token found');
+    if (!token || token === 'undefined' || token === 'null' || token.trim() === '') {
+      return false;
+    }
+
+    if (!user || user === 'undefined' || user === 'null') {
       return false;
     }
 
     // Basic token format check (JWT should have 3 parts)
     const parts = token.split('.');
     if (parts.length !== 3) {
-      console.log('❌ Invalid token format');
       return false;
     }
 
@@ -71,19 +69,17 @@ export const isAuthenticated = (): boolean => {
       const payload = JSON.parse(atob(parts[1]));
       const currentTime = Math.floor(Date.now() / 1000);
       
-      console.log('Token exp:', payload.exp);
-      console.log('Current time:', currentTime);
-      
       if (payload.exp && payload.exp < currentTime) {
-        console.log('❌ Token expired');
+        // Token expired, clear it
+        logout();
         return false;
       }
     } catch (e) {
-      console.log('❌ Could not parse token payload');
+      // Invalid token format
+      logout();
       return false;
     }
 
-    console.log('✅ Token is valid');
     return true;
   } catch (error) {
     console.error('Auth check error:', error);
