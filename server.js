@@ -13,13 +13,13 @@ const PORT = process.env.PORT || 5000;
 
 // API proxy middleware
 const apiProxy = createProxyMiddleware({
-  target: 'http://52.41.114.122:8097',
+  target: 'http://52.41.114.122:8091',
   changeOrigin: true,
   secure: false,
   timeout: 10000,
   proxyTimeout: 10000,
   pathRewrite: {
-    '^/api': ''
+    '^/': '/api/'  // Add /api prefix back since Express strips it
   },
   onProxyReq: (proxyReq, req, res) => {
     // Remove problematic headers
@@ -51,5 +51,5 @@ app.use((req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Production server running on http://0.0.0.0:${PORT}`);
   console.log(`📁 Serving static files from: ${path.join(__dirname, 'dist')}`);
-  console.log(`🔄 API proxy configured for: http://52.41.114.122:8097`);
+  console.log(`🔄 API proxy configured for: http://52.41.114.122:8091`);
 });
