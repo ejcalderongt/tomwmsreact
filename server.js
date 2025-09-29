@@ -18,7 +18,7 @@ const apiProxy = createProxyMiddleware({
   timeout: 10000,
   proxyTimeout: 10000,
   pathRewrite: {
-    '^/api': ''  // Remove /api prefix since target already has it
+    '^/api': '/api'  // Keep /api prefix for new endpoint
   },
   onProxyReq: (proxyReq, req, res) => {
     // Remove problematic headers

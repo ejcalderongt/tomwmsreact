@@ -22,6 +22,9 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: false,
+        pathRewrite: {
+          '^/api': '/api'  // Keep /api prefix for new endpoint
+        },
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
             console.error('🔴 Proxy error:', err.message);
@@ -59,6 +62,9 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: false,
+        pathRewrite: {
+          '^/api': '/api'  // Keep /api prefix for new endpoint
+        },
         configure: (proxy, options) => {
           proxy.on('error', (err, req, res) => {
             console.error('🔴 Preview Proxy error:', err.message);
