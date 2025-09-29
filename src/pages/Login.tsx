@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from "@/api/api";
@@ -13,15 +12,15 @@ function Login() {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate("/existencias", { replace: true });
+      navigate("/inventario-en-linea", { replace: true });
     }
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (loading) return;
-    
+
     if (!username.trim() || !password.trim()) {
       toast.error("Complete todos los campos");
       return;
@@ -35,16 +34,16 @@ function Login() {
         username: username.trim(), 
         password: password.trim() 
       });
-      
+
       console.log('✅ Login successful');
       saveUser(user);
       toast.success("¡Bienvenido!");
-      
+
       setUsername("");
       setPassword("");
-      
-      navigate("/existencias", { replace: true });
-      
+
+      navigate("/inventario-en-linea", { replace: true });
+
     } catch (error) {
       console.error("❌ Login error:", error);
       const message = error instanceof Error ? error.message : "Error de login";
