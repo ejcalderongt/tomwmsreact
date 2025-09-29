@@ -34,6 +34,7 @@ const apiProxy = createProxyMiddleware({
   target: 'http://52.41.114.122:8097',
   changeOrigin: true,
   secure: false,
+  followRedirects: true,
   timeout: 10000,
   proxyTimeout: 10000,
   pathRewrite: {
@@ -47,6 +48,10 @@ const apiProxy = createProxyMiddleware({
     // Set proper headers for the target server
     proxyReq.setHeader('Host', '52.41.114.122:8097');
     proxyReq.setHeader('User-Agent', 'TomWMSReact/1.0');
+    
+    // Force HTTP protocol
+    proxyReq.setHeader('X-Forwarded-Proto', 'http');
+    proxyReq.setHeader('X-Forwarded-Port', '8097');
 
     console.log(`🟡 Proxy Request: ${req.method} ${req.url}`);
     console.log('🟡 Request Headers:', req.headers);

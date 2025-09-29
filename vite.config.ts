@@ -22,6 +22,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: false,
+        followRedirects: true,
         pathRewrite: {
           '^/api': '/api'  // Keep /api prefix for new endpoint
         },
@@ -62,6 +63,7 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
         ws: false,
+        followRedirects: true,
         pathRewrite: {
           '^/api': '/api'  // Keep /api prefix for new endpoint
         },
