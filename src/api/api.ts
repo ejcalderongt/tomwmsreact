@@ -65,8 +65,7 @@ const getApiBaseUrl = () => {
   const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || port === '5001';
 
   if (isReplitProduction) {
-    // In production deployment, proxy might not be available
-    // Try proxy first, fallback to direct API if needed
+    // In production deployment, use proxy to avoid CORS issues
     console.log('Environment type: REPLIT PRODUCTION');
     console.log('✅ Using proxy: /api (production deployment)');
     return '/api';

@@ -37,20 +37,14 @@ const apiProxy = createProxyMiddleware({
   }
 });
 
-// Apply proxy middleware
+// Apply proxy middleware FIRST
 app.use('/api', apiProxy);
 
 // Serve static files from dist directory
 app.use(express.static(path.join(__dirname, 'dist')));
 
-// Handle client-side routing - serve index.html for all non-API routes
-app.use((req, res, next) => {
-  // Skip API routes
-  if (req.path.startsWith('/api')) {
-    return next();
-  }
-  
-  // For all other routes, serve the React app
+// Handle client-side routing - serve index.html for all other routes
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
