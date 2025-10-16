@@ -44,7 +44,9 @@ function Layout({ children, pageTitle }: LayoutProps) {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
-            <h1 className="text-xl font-bold text-gray-900">TOMWMSUX</h1>
+            <Link to="/" className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer">
+              TOMWMSUX
+            </Link>
             <button onClick={() => setSidebarOpen(false)} className="text-gray-500 hover:text-gray-700">
               <XMarkIcon className="h-6 w-6" />
             </button>
@@ -137,9 +139,9 @@ function Layout({ children, pageTitle }: LayoutProps) {
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex min-h-0 flex-1 flex-col bg-white border-r border-gray-200">
-          <div className="flex h-16 items-center justify-center border-b border-gray-200 bg-blue-600">
+          <Link to="/" className="flex h-16 items-center justify-center border-b border-gray-200 bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer">
             <h1 className="text-xl font-bold text-white">TOMWMSUX</h1>
-          </div>
+          </Link>
           <nav className="flex-1 space-y-1 px-2 py-4">
             {/* Reportes de Existencias */}
             <div className="space-y-1">
