@@ -427,7 +427,7 @@ function InventarioEnLinea() {
       });
 
       // Preparar los datos para el Excel
-      const datosExcel = todosLosDatos.map(item => ({
+      const datosExcel = todosLosDatos.map((item: InventarioItem) => ({
         'Código': item.codigo,
         'Producto': item.nombre,
         'Marca': item.marca,
@@ -447,11 +447,11 @@ function InventarioEnLinea() {
       }));
 
       // Calcular totales
-      const totalCantidadUMBase = todosLosDatos.reduce((sum, item) => sum + (item.cantidad_UMBas || 0), 0);
-      const totalDisponibleUMBase = todosLosDatos.reduce((sum, item) => sum + (item.disponible_UMBas || 0), 0);
-      const totalReservada = todosLosDatos.reduce((sum, item) => sum + (item.cantidadReservadaUmBas || 0), 0);
-      const totalCantidadPresentacion = todosLosDatos.reduce((sum, item) => sum + (item.cantidad_Presentacion || 0), 0);
-      const totalCosto = todosLosDatos.reduce((sum, item) => sum + (item.costo || 0), 0);
+      const totalCantidadUMBase = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.cantidad_UMBas || 0), 0);
+      const totalDisponibleUMBase = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.disponible_UMBas || 0), 0);
+      const totalReservada = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.cantidadReservadaUmBas || 0), 0);
+      const totalCantidadPresentacion = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.cantidad_Presentacion || 0), 0);
+      const totalCosto = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.costo || 0), 0);
 
       // Crear el libro de trabajo
       const wb = XLSX.utils.book_new();
