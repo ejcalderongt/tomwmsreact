@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 
 interface LayoutProps {
   children: React.ReactNode;
+  pageTitle?: string;
 }
 
 const navigation = [
@@ -25,7 +26,7 @@ const navigation = [
   { name: 'Salidas', href: '/salidas', icon: ArrowLeftOnRectangleIcon },
 ];
 
-function Layout({ children }: LayoutProps) {
+function Layout({ children, pageTitle }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -238,7 +239,7 @@ function Layout({ children }: LayoutProps) {
           <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
             <div className="flex flex-1 items-center">
               <h2 className="text-lg font-semibold text-gray-900">
-                Sistema de Gestión de Inventarios
+                Sistema de Gestión de Inventarios{pageTitle ? ` - ${pageTitle}` : ''}
               </h2>
             </div>
           </div>
