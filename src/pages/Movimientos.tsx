@@ -88,6 +88,26 @@ function Movimientos() {
   });
   const [busqueda, setBusqueda] = useState('');
   
+  const navigate = useNavigate();
+
+  // Filter movements based on search term (moved before use)
+  const movimientosFiltrados = movimientos.filter(movimiento => {
+    if (!busqueda) return true;
+    const searchTerm = busqueda.toLowerCase();
+    return (
+      movimiento.idMovimiento?.toString().includes(searchTerm) ||
+      movimiento.producto?.toLowerCase().includes(searchTerm) ||
+      movimiento.operador?.toLowerCase().includes(searchTerm) ||
+      movimiento.licencia?.toLowerCase().includes(searchTerm) ||
+      movimiento.idTicketTMS?.toLowerCase().includes(searchTerm) ||
+      movimiento.poliza?.toLowerCase().includes(searchTerm) ||
+      movimiento.codigo?.toLowerCase().includes(searchTerm) ||
+      movimiento.lote?.toLowerCase().includes(searchTerm) ||
+      movimiento.nombre_Bodega_Origen?.toLowerCase().includes(searchTerm) ||
+      movimiento.nombre_Bodega_Destino?.toLowerCase().includes(searchTerm)
+    );
+  });
+  
   // Paginación básica
   const [paginaActual, setPaginaActual] = useState(1);
   const itemsPorPagina = 100;
@@ -97,8 +117,6 @@ function Movimientos() {
   const indexFin = indexInicio + itemsPorPagina;
   const totalPaginas = Math.ceil(movimientosFiltrados.length / itemsPorPagina);
   const movimientosPaginados = movimientosFiltrados.slice(indexInicio, indexFin);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = 'TOMWMSUX - Movimientos';
@@ -271,24 +289,6 @@ function Movimientos() {
   const getEstadoProducto = (estado: string | undefined): string => {
     return estado || '-';
   };
-
-  // Filter movements based on search term
-  const movimientosFiltrados = movimientos.filter(movimiento => {
-    if (!busqueda) return true;
-    const searchTerm = busqueda.toLowerCase();
-    return (
-      movimiento.idMovimiento?.toString().includes(searchTerm) ||
-      movimiento.producto?.toLowerCase().includes(searchTerm) ||
-      movimiento.operador?.toLowerCase().includes(searchTerm) ||
-      movimiento.licencia?.toLowerCase().includes(searchTerm) ||
-      movimiento.idTicketTMS?.toLowerCase().includes(searchTerm) ||
-      movimiento.poliza?.toLowerCase().includes(searchTerm) ||
-      movimiento.codigo?.toLowerCase().includes(searchTerm) ||
-      movimiento.lote?.toLowerCase().includes(searchTerm) ||
-      movimiento.nombre_Bodega_Origen?.toLowerCase().includes(searchTerm) ||
-      movimiento.nombre_Bodega_Destino?.toLowerCase().includes(searchTerm)
-    );
-  });
 
   return (
     <Layout pageTitle="Movimientos">
