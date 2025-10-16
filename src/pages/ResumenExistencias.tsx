@@ -139,26 +139,59 @@ function ResumenExistencias() {
 
       const filtro = {
         idBodega: bodegaSeleccionada,
-        idPropietario
+        idPropietario,
+        pagina: 1,
+        tamanoPagina: 999999  // Get all records for summary
       };
 
-      // Use the dedicated resumen endpoint for a single request
-      const resumenData: ResumenProducto[] = await existenciasAPI.resumen(filtro, token);
-      console.log('Datos de resumen recibidos:', resumenData);
+      // Use listar to get all existencias and process them for resumen
+      const data = await existenciasAPI.listar(filtro, token);
+      console.log('Datos de existencias recibidos:', data);
 
-      if (Array.isArray(resumenData) && resumenData.length > 0) {
+      // Process existencias to create resumen (group by product)
+      const existencias = data.existencias || [];
+      
+      if (existencias.length > 0) {
+        // Store detail data
+        setExistenciasDetalle(existencias);
+        
+        // Group by product to create summary
+        const productoMap = new Map<string, ResumenProducto>();
+        
+        existencias.forEach((item: Existencia) => {
+          // Create a key based on product code and bodega to group similar products
+          const key = `${item.codigo}_${item.idBodega}`;
+          
+          if (productoMap.has(key)) {
+            const existing = productoMap.get(key)!;
+            existing.cantidadUMBas += item.cantidad_UMBas || 0;
+            existing.cantidadPresentacion += item.cantidad_Presentacion || 0;
+          } else {
+            productoMap.set(key, {
+              id: item.idStock,
+              cod: item.codigo,
+              prop: '', // Propietario not available in Existencia interface
+              nom: item.nombre,
+              pres: item.presentacion,
+              barra: item.codigo,
+              um: item.unidadMedida,
+              bodega: item.bodega,
+              cantidadUMBas: item.cantidad_UMBas || 0,
+              cantidadPresentacion: item.cantidad_Presentacion || 0
+            });
+          }
+        });
+        
+        const resumenData = Array.from(productoMap.values());
         setResumenProductos(resumenData);
         setFilteredResumen(resumenData);
-        
-        // Clear existencias detalle since we're using resumen data directly
-        setExistenciasDetalle([]);
         
         toast.success(`Se cargaron ${resumenData.length} productos en el resumen`);
       } else {
         setResumenProductos([]);
         setFilteredResumen([]);
         setExistenciasDetalle([]);
-        toast.info('No se encontraron productos con los filtros seleccionados');
+        toast('No se encontraron productos con los filtros seleccionados', { icon: 'ℹ️' });
       }
     } catch (error: any) {
       console.error('Error al cargar resumen:', error);
