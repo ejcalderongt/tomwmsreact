@@ -48,10 +48,12 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
 ## Mejoras Recientes
 
 ### Octubre 17, 2025
-1. ✅ **Navegación Simplificada - Menús Visibles**
-   - Ocultado acceso a: Detalle, Resumen y Movimientos
-   - Menús visibles ahora: Inventario en Línea, Ingresos, Salidas, Cerrar Sesión
+1. ✅ **Navegación Simplificada - Sistema Completo**
+   - **Sidebar:** Ocultado acceso a Detalle, Resumen y Movimientos
+   - **Dashboard:** Ocultado acceso a Existencias, Resumen de Existencias y Movimientos
+   - **Menús visibles:** Inventario en Línea, Ingresos, Salidas, Cerrar Sesión
    - Navegación simplificada tanto en sidebar móvil como desktop
+   - Dashboard ahora muestra solo 3 opciones principales en grid y accesos rápidos
 
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**

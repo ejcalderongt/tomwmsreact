@@ -24,25 +24,11 @@ function Dashboard() {
 
   const menuItems: MenuItem[] = [
     {
-      title: 'Existencias',
-      description: 'Consultar inventario y existencias por bodega',
-      icon: CubeIcon,
-      route: '/existencias',
-      color: 'bg-blue-100 text-blue-600'
-    },
-    {
       title: 'Inventario en Línea',
       description: 'Consulta de inventario en tiempo real',
       icon: BuildingStorefrontIcon,
       route: '/inventario-en-linea',
       color: 'bg-green-100 text-green-600'
-    },
-    {
-      title: 'Resumen de Existencias',
-      description: 'Vista consolidada de inventarios',
-      icon: ClipboardDocumentListIcon,
-      route: '/resumen-existencias',
-      color: 'bg-purple-100 text-purple-600'
     },
     {
       title: 'Ingresos',
@@ -57,13 +43,6 @@ function Dashboard() {
       icon: ArrowLeftStartOnRectangleIcon,
       route: '/salidas',
       color: 'bg-red-100 text-red-600'
-    },
-    {
-      title: 'Movimientos',
-      description: 'Reporte de movimientos de inventario',
-      icon: ArrowsRightLeftIcon,
-      route: '/movimientos',
-      color: 'bg-orange-100 text-orange-600'
     }
   ];
 
@@ -123,25 +102,25 @@ function Dashboard() {
           <h3 className="text-lg font-semibold text-gray-900 mb-4">Accesos Rápidos</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <button
-              onClick={() => handleMenuClick('/existencias')}
-              className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-left"
-            >
-              <div className="text-sm text-blue-600 font-medium">Consulta Rápida</div>
-              <div className="text-lg font-semibold text-blue-900">Existencias</div>
-            </button>
-            <button
               onClick={() => handleMenuClick('/inventario-en-linea')}
               className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-left"
             >
               <div className="text-sm text-green-600 font-medium">Tiempo Real</div>
-              <div className="text-lg font-semibold text-green-900">Inventario</div>
+              <div className="text-lg font-semibold text-green-900">Inventario en Línea</div>
             </button>
             <button
-              onClick={() => handleMenuClick('/movimientos')}
-              className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors text-left"
+              onClick={() => handleMenuClick('/ingresos')}
+              className="p-4 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition-colors text-left"
             >
-              <div className="text-sm text-purple-600 font-medium">Últimos</div>
-              <div className="text-lg font-semibold text-purple-900">Movimientos</div>
+              <div className="text-sm text-emerald-600 font-medium">Documentos de</div>
+              <div className="text-lg font-semibold text-emerald-900">Ingresos</div>
+            </button>
+            <button
+              onClick={() => handleMenuClick('/salidas')}
+              className="p-4 bg-red-50 rounded-lg hover:bg-red-100 transition-colors text-left"
+            >
+              <div className="text-sm text-red-600 font-medium">Documentos de</div>
+              <div className="text-lg font-semibold text-red-900">Salidas</div>
             </button>
           </div>
         </div>
