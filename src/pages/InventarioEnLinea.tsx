@@ -479,13 +479,17 @@ function InventarioEnLinea() {
       const dia = fechaHoy.getDate().toString().padStart(2, '0');
       const mes = (fechaHoy.getMonth() + 1).toString().padStart(2, '0');
       const año = fechaHoy.getFullYear().toString();
+      const horas = fechaHoy.getHours().toString().padStart(2, '0');
+      const minutos = fechaHoy.getMinutes().toString().padStart(2, '0');
+      const segundos = fechaHoy.getSeconds().toString().padStart(2, '0');
       const fechaFormateada = `${dia}${mes}${año}`;
+      const horaFormateada = `${horas}${minutos}${segundos}`;
 
       const bodegaCodigo = bodegaSeleccionada === 0 
         ? 'TodasBodegas' 
         : bodegas.find(b => b.idBodega === bodegaSeleccionada)?.codigo?.replace(/\s+/g, '') || 'Bodega';
 
-      const nombreArchivo = `InventarioCompleto_${bodegaCodigo}_${fechaFormateada}.xlsx`;
+      const nombreArchivo = `InventarioCompleto_${bodegaCodigo}_${fechaFormateada}_${horaFormateada}.xlsx`;
       
       // Descargar archivo
       XLSX.writeFile(wb, nombreArchivo);

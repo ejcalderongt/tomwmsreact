@@ -55,6 +55,11 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Navegación simplificada tanto en sidebar móvil como desktop
    - Dashboard ahora muestra solo 3 opciones principales en grid y accesos rápidos
 
+2. ✅ **Mejora en Descarga de Inventario en Línea**
+   - Agregada la hora (HH:MM:SS) al nombre del archivo descargado
+   - Formato del nombre: `InventarioCompleto_[Bodega]_[Fecha]_[Hora].xlsx`
+   - Ejemplo: `InventarioCompleto_TodasBodegas_17102025_143052.xlsx`
+
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**
    - El título "TOMWMSUX" ahora es clickeable y redirecciona al menú principal (Dashboard)
