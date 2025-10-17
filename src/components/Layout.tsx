@@ -52,67 +52,27 @@ function Layout({ children, pageTitle }: LayoutProps) {
             </button>
           </div>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {/* Reportes de Existencias */}
-            <div className="space-y-1">
-              <div className="px-4 py-2">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Reportes de Existencias
-                </p>
-              </div>
-              <a
-                href="/inventario-en-linea"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/inventario-en-linea'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <WifiIcon className="mr-3 h-6 w-6" />
-                Inventario en Línea
-              </a>
-              <a
-                href="/existencias"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/existencias'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <CubeIcon className="mr-3 h-6 w-6" />
-                Detalle
-              </a>
-              <a
-                href="/resumen-existencias"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/resumen-existencias'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <CubeIcon className="mr-3 h-6 w-6" />
-                Resumen
-              </a>
-              <a
-                href="/movimientos"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/movimientos'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <CubeIcon className="mr-3 h-6 w-6" />
-                Movimientos
-              </a>
-            </div>
+            {/* Inventario en Línea */}
+            <Link
+              to="/inventario-en-linea"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/inventario-en-linea'
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <WifiIcon className="mr-3 h-6 w-6" />
+              Inventario en Línea
+            </Link>
 
-            {/* Other Navigation Items - excluding Existencias since it's already in the reports section */}
+            {/* Ingresos y Salidas */}
             {navigation.filter(item => item.name !== 'Existencias').map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                  className={`group flex items-center px-4 py-2 text-sm font-medium rounded-md ${
                     isActive
                       ? 'bg-blue-100 text-blue-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -143,67 +103,27 @@ function Layout({ children, pageTitle }: LayoutProps) {
             <h1 className="text-xl font-bold text-white">TOMWMSUX</h1>
           </Link>
           <nav className="flex-1 space-y-1 px-2 py-4">
-            {/* Reportes de Existencias */}
-            <div className="space-y-1">
-              <div className="px-4 py-2">
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Reportes de Existencias
-                </p>
-              </div>
-              <a
-                href="/inventario-en-linea"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/inventario-en-linea'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <WifiIcon className="mr-3 h-6 w-6" />
-                Inventario en Línea
-              </a>
-              <a
-                href="/existencias"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/existencias'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <CubeIcon className="mr-3 h-6 w-6" />
-                Detalle
-              </a>
-              <a
-                href="/resumen-existencias"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/resumen-existencias'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <CubeIcon className="mr-3 h-6 w-6" />
-                Resumen
-              </a>
-              <a
-                href="/movimientos"
-                className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                  location.pathname === '/movimientos'
-                    ? 'bg-blue-100 text-blue-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`}
-              >
-                <CubeIcon className="mr-3 h-6 w-6" />
-                Movimientos
-              </a>
-            </div>
+            {/* Inventario en Línea */}
+            <Link
+              to="/inventario-en-linea"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/inventario-en-linea'
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <WifiIcon className="mr-3 h-6 w-6" />
+              Inventario en Línea
+            </Link>
 
-            {/* Other Navigation Items - excluding Existencias since it's already in the reports section */}
+            {/* Ingresos y Salidas */}
             {navigation.filter(item => item.name !== 'Existencias').map((item) => {
               const isActive = location.pathname === item.href;
               return (
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`group flex items-center px-2 py-2 text-sm font-medium rounded-md ${
+                  className={`group flex items-center px-4 py-2 text-sm font-medium rounded-md ${
                     isActive
                       ? 'bg-blue-100 text-blue-900'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'

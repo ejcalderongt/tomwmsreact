@@ -47,6 +47,12 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
 
 ## Mejoras Recientes
 
+### Octubre 17, 2025
+1. ✅ **Navegación Simplificada - Menús Visibles**
+   - Ocultado acceso a: Detalle, Resumen y Movimientos
+   - Menús visibles ahora: Inventario en Línea, Ingresos, Salidas, Cerrar Sesión
+   - Navegación simplificada tanto en sidebar móvil como desktop
+
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**
    - El título "TOMWMSUX" ahora es clickeable y redirecciona al menú principal (Dashboard)
