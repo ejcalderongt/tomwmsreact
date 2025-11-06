@@ -30,6 +30,9 @@ interface InventarioItem {
   nomEstado: string;
   marca: string;
   familia: string;
+  licencia?: string;
+  referencia?: string;
+  fecha_ingreso?: string;
 }
 
 interface Bodega {
@@ -426,51 +429,21 @@ function InventarioEnLinea() {
         duration: Infinity
       });
 
-      // Preparar los datos para el Excel
+      // Preparar los datos para el Excel (solo campos solicitados)
       const datosExcel = todosLosDatos.map((item: InventarioItem) => ({
-        'Código': item.codigo,
-        'Producto': item.nombre,
-        'Marca': item.marca,
-        'Bodega': item.bodega,
-        'Unidad Medida': item.unidadMedida,
-        'Cantidad UM Base': item.cantidad_UMBas,
-        'Disponible UM Base': item.disponible_UMBas,
-        'Cantidad Reservada': item.cantidadReservadaUmBas,
-        'Presentación': item.presentacion,
-        'Cantidad Presentación': item.cantidad_Presentacion,
-        'Ubicación': item.nombre_Completo,
-        'Lote': item.lote,
-        'Fecha Vencimiento': item.fecha_vence ? formatDate(item.fecha_vence) : '',
-        'Estado': item.nomEstado,
-        'Costo': item.costo,
-        'Familia': item.familia
+        'Código': item.codigo || '',
+        'Producto': item.nombre || '',
+        'Disponible U.M. Bas': item.disponible_UMBas || 0,
+        'Lote': item.lote || '',
+        'Licencia': item.licencia || '',
+        'Referencia': item.referencia || '',
+        'Fecha Vence': item.fecha_vence ? formatDate(item.fecha_vence) : '',
+        'Fecha Ingreso': item.fecha_ingreso ? formatDate(item.fecha_ingreso) : ''
       }));
-
-      // Calcular totales
-      const totalCantidadUMBase = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.cantidad_UMBas || 0), 0);
-      const totalDisponibleUMBase = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.disponible_UMBas || 0), 0);
-      const totalReservada = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.cantidadReservadaUmBas || 0), 0);
-      const totalCantidadPresentacion = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.cantidad_Presentacion || 0), 0);
-      const totalCosto = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.costo || 0), 0);
 
       // Crear el libro de trabajo
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(datosExcel);
-
-      // Agregar totales
-      const filaInicial = datosExcel.length + 2;
-      XLSX.utils.sheet_add_aoa(ws, [
-        [''],
-        ['TOTALES:', '', '', '', '', 
-         formatNumber(totalCantidadUMBase, 2), 
-         formatNumber(totalDisponibleUMBase, 2), 
-         formatNumber(totalReservada, 2), 
-         '', 
-         formatNumber(totalCantidadPresentacion, 2), 
-         '', '', '', '', 
-         formatNumber(totalCosto, 2), 
-         '']
-      ], { origin: `A${filaInicial}` });
 
       XLSX.utils.book_append_sheet(wb, ws, 'Inventario Completo');
 

@@ -60,6 +60,19 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Formato del nombre: `InventarioCompleto_[Bodega]_[Fecha]_[Hora].xlsx`
    - Ejemplo: `InventarioCompleto_TodasBodegas_17102025_143052.xlsx`
 
+3. ✅ **Campos Simplificados en Excel - Inventario en Línea**
+   - Reducido el archivo Excel a solo 8 campos esenciales:
+     1. Código
+     2. Producto
+     3. Disponible U.M. Bas
+     4. Lote
+     5. Licencia
+     6. Referencia
+     7. Fecha Vence
+     8. Fecha Ingreso
+   - Eliminados campos adicionales para simplificar la exportación
+   - Eliminada sección de totales del archivo Excel
+
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**
    - El título "TOMWMSUX" ahora es clickeable y redirecciona al menú principal (Dashboard)
