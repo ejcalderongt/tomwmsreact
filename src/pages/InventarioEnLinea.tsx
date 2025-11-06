@@ -450,11 +450,11 @@ function InventarioEnLinea() {
 
       // Crear encabezado del Excel
       const encabezado = [
-        ['EMPRESA', propietario, '', '', '', ''],
-        ['FECHA DE GENERACIÓN:', fechaGeneracion, '', 'TIPO DE CARGA:', '', ''],
-        ['HORA DE GENERACIÓN:', horaGeneracion, '', 'TOTAL DE INVENTARIO:', '', ''],
-        ['USUARIO:', usuario, '', '', '', ''],
-        ['', '', '', '', '', ''], // Fila vacía
+        ['EMPRESA', propietario, '', '', '', '', '', ''],
+        ['FECHA DE GENERACIÓN:', fechaGeneracion, '', 'TIPO DE CARGA:', '', '', '', ''],
+        ['HORA DE GENERACIÓN:', horaGeneracion, '', 'TOTAL DE INVENTARIO:', '', '', '', ''],
+        ['USUARIO:', usuario, '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', ''], // Fila vacía
         ['Código', 'Producto', 'Disponible U.M. Bas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso']
       ];
 
@@ -476,6 +476,24 @@ function InventarioEnLinea() {
       // Crear el libro de trabajo
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(datosCompletos);
+
+      // Combinar celdas en el encabezado para mantener el diseño
+      // Formato: { s: { r: fila, c: columna }, e: { r: fila_final, c: columna_final } }
+      ws['!merges'] = [
+        // Fila 1: EMPRESA - propietario combinado de B1 a H1
+        { s: { r: 0, c: 1 }, e: { r: 0, c: 7 } },
+        
+        // Fila 2: FECHA DE GENERACIÓN: + fecha combinadas (A2:B2), TIPO DE CARGA: combinado (D2:H2)
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
+        { s: { r: 1, c: 3 }, e: { r: 1, c: 7 } },
+        
+        // Fila 3: HORA DE GENERACIÓN: + hora combinadas (A3:B3), TOTAL DE INVENTARIO: combinado (D3:H3)
+        { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },
+        { s: { r: 2, c: 3 }, e: { r: 2, c: 7 } },
+        
+        // Fila 4: USUARIO: + usuario combinado de B4 a H4
+        { s: { r: 3, c: 1 }, e: { r: 3, c: 7 } }
+      ];
 
       XLSX.utils.book_append_sheet(wb, ws, 'Inventario Completo');
       const fechaFormateada = `${dia}${mes}${año}`;

@@ -87,6 +87,11 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Encabezado se muestra antes de los datos de inventario
    - Fila vacía separa el encabezado de los datos
    - El campo propietario se obtiene de los datos del API (campo oculto en el grid)
+   - Celdas combinadas (merged) en el encabezado para mantener diseño independiente de las columnas del detalle:
+     - Fila EMPRESA: propietario combinado de B1 a H1
+     - Fila FECHA: etiqueta y fecha combinadas (A2:B2), TIPO DE CARGA combinado (D2:H2)
+     - Fila HORA: etiqueta y hora combinadas (A3:B3), TOTAL DE INVENTARIO combinado (D3:H3)
+     - Fila USUARIO: usuario combinado de B4 a H4
 
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**
