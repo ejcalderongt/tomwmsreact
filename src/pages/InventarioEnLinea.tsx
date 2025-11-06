@@ -450,10 +450,10 @@ function InventarioEnLinea() {
 
       // Crear encabezado del Excel
       const encabezado = [
-        ['EMPRESA', propietario, '', '', '', '', '', ''],
-        ['FECHA DE GENERACIÓN:', fechaGeneracion, '', 'TIPO DE CARGA:', '', '', '', ''],
-        ['HORA DE GENERACIÓN:', horaGeneracion, '', 'TOTAL DE INVENTARIO:', '', '', '', ''],
-        ['USUARIO:', usuario, '', '', '', '', '', ''],
+        ['EMPRESA', '', propietario, '', '', '', '', ''],
+        ['FECHA DE GENERACIÓN:', '', fechaGeneracion, '', 'TIPO DE CARGA:', '', '', ''],
+        ['HORA DE GENERACIÓN:', '', horaGeneracion, '', 'TOTAL DE INVENTARIO:', '', '', ''],
+        ['USUARIO:', '', usuario, '', '', '', '', ''],
         ['', '', '', '', '', '', '', ''], // Fila vacía
         ['Código', 'Producto', 'Disponible U.M. Bas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso']
       ];
@@ -480,19 +480,21 @@ function InventarioEnLinea() {
       // Combinar celdas en el encabezado para mantener el diseño
       // Formato: { s: { r: fila, c: columna }, e: { r: fila_final, c: columna_final } }
       ws['!merges'] = [
-        // Fila 1: EMPRESA - propietario combinado de B1 a H1
-        { s: { r: 0, c: 1 }, e: { r: 0, c: 7 } },
+        // Fila 1: EMPRESA (A1:B1 combinadas) | propietario (C1:D1 combinadas)
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
+        { s: { r: 0, c: 2 }, e: { r: 0, c: 3 } },
         
-        // Fila 2: FECHA DE GENERACIÓN: + fecha combinadas (A2:B2), TIPO DE CARGA: combinado (D2:H2)
+        // Fila 2: FECHA DE GENERACIÓN: (A2:B2) | fecha en C2 | vacío D2 | TIPO DE CARGA: (E2:G2)
         { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
-        { s: { r: 1, c: 3 }, e: { r: 1, c: 7 } },
+        { s: { r: 1, c: 4 }, e: { r: 1, c: 6 } },
         
-        // Fila 3: HORA DE GENERACIÓN: + hora combinadas (A3:B3), TOTAL DE INVENTARIO: combinado (D3:H3)
+        // Fila 3: HORA DE GENERACIÓN: (A3:B3) | hora en C3 | vacío D3 | TOTAL DE INVENTARIO: (E3:G3)
         { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },
-        { s: { r: 2, c: 3 }, e: { r: 2, c: 7 } },
+        { s: { r: 2, c: 4 }, e: { r: 2, c: 6 } },
         
-        // Fila 4: USUARIO: + usuario combinado de B4 a H4
-        { s: { r: 3, c: 1 }, e: { r: 3, c: 7 } }
+        // Fila 4: USUARIO: (A4:B4) | usuario (C4:D4)
+        { s: { r: 3, c: 0 }, e: { r: 3, c: 1 } },
+        { s: { r: 3, c: 2 }, e: { r: 3, c: 3 } }
       ];
 
       XLSX.utils.book_append_sheet(wb, ws, 'Inventario Completo');

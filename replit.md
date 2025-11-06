@@ -88,10 +88,12 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Fila vacía separa el encabezado de los datos
    - El campo propietario se obtiene de los datos del API (campo oculto en el grid)
    - Celdas combinadas (merged) en el encabezado para mantener diseño independiente de las columnas del detalle:
-     - Fila EMPRESA: propietario combinado de B1 a H1
-     - Fila FECHA: etiqueta y fecha combinadas (A2:B2), TIPO DE CARGA combinado (D2:H2)
-     - Fila HORA: etiqueta y hora combinadas (A3:B3), TOTAL DE INVENTARIO combinado (D3:H3)
-     - Fila USUARIO: usuario combinado de B4 a H4
+     - Fila 1: EMPRESA (A1:B1) | Propietario (C1:D1)
+     - Fila 2: FECHA DE GENERACIÓN: (A2:B2) | Fecha visible en C2 | TIPO DE CARGA: (E2:G2)
+     - Fila 3: HORA DE GENERACIÓN: (A3:B3) | Hora visible en C3 | TOTAL DE INVENTARIO: (E3:G3)
+     - Fila 4: USUARIO: (A4:B4) | Usuario (C4:D4)
+   - Los valores de fecha y hora son visibles en celdas separadas (no combinadas con etiquetas)
+   - TIPO DE CARGA y TOTAL DE INVENTARIO se alinean con el espacio de las columnas de datos
 
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**
