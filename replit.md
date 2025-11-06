@@ -73,6 +73,9 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Eliminados campos adicionales para simplificar la exportación
    - Eliminada sección de totales del archivo Excel
 
+4. ✅ **Renombrar Columna en Grid de Inventario en Línea**
+   - Columna "Bodega" renombrada a "Regimen(Bodega)" en la vista de grid
+
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**
    - El título "TOMWMSUX" ahora es clickeable y redirecciona al menú principal (Dashboard)
