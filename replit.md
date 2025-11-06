@@ -76,6 +76,13 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
 4. ✅ **Renombrar Columna en Grid de Inventario en Línea**
    - Columna "Bodega" renombrada a "Regimen(Bodega)" en la vista de grid
 
+6. ✅ **Limpieza de Grid al Filtrar por Bodega - Inventario en Línea**
+   - Cuando se filtra por bodega y no se encuentran datos, el grid ahora se limpia correctamente
+   - Se vacían los arrays de inventario (allInventario e inventario)
+   - Se resetean los contadores (totalRegistros, totalPaginas, paginaActual)
+   - Se actualiza el localStorage con estado vacío
+   - Solución al problema donde se mostraban los datos de la carga previa
+
 5. ✅ **Encabezado Mejorado en Archivo Excel - Inventario en Línea**
    - Agregado encabezado informativo al archivo Excel con los siguientes campos:
      - EMPRESA: Nombre del propietario (obtenido desde los datos del grid)

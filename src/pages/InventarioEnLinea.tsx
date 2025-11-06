@@ -198,22 +198,22 @@ function InventarioEnLinea() {
 
       const data: InventarioResponse = await existenciasAPI.listar(filtro, token);
 
-      const inventarioData = data.existencias || [];
-      setAllInventario(inventarioData);
-      setInventario(inventarioData);
-      setTotalRegistros(data.totalRegistros || 0);
-      setTotalPaginas(data.totalPaginas || 1);
-      setPaginaActual(data.paginaActual || 1);
-
-      // Save data and filter state to localStorage
-      localStorage.setItem('inventario_online_bodegaSeleccionada', bodegaSeleccionada.toString());
-      localStorage.setItem('inventario_online_paginaActual', (data.paginaActual || 1).toString());
-      localStorage.setItem('inventario_online_data', JSON.stringify(data.existencias || []));
-      localStorage.setItem('inventario_online_totalRegistros', (data.totalRegistros || 0).toString());
-      localStorage.setItem('inventario_online_totalPaginas', (data.totalPaginas || 1).toString());
-      localStorage.setItem('inventario_online_searchTerm', searchTerm);
-
+      // Limpiar el grid si no hay datos
       if (!data.existencias || data.existencias.length === 0) {
+        setAllInventario([]);
+        setInventario([]);
+        setTotalRegistros(0);
+        setTotalPaginas(1);
+        setPaginaActual(1);
+        
+        // Save empty state to localStorage
+        localStorage.setItem('inventario_online_bodegaSeleccionada', bodegaSeleccionada.toString());
+        localStorage.setItem('inventario_online_paginaActual', '1');
+        localStorage.setItem('inventario_online_data', JSON.stringify([]));
+        localStorage.setItem('inventario_online_totalRegistros', '0');
+        localStorage.setItem('inventario_online_totalPaginas', '1');
+        localStorage.setItem('inventario_online_searchTerm', searchTerm);
+        
         toast('No se encontraron items de inventario con los filtros seleccionados', {
           icon: 'ℹ️',
           style: {
@@ -222,6 +222,22 @@ function InventarioEnLinea() {
           }
         });
       } else {
+        // Cargar datos cuando existen
+        const inventarioData = data.existencias;
+        setAllInventario(inventarioData);
+        setInventario(inventarioData);
+        setTotalRegistros(data.totalRegistros || 0);
+        setTotalPaginas(data.totalPaginas || 1);
+        setPaginaActual(data.paginaActual || 1);
+
+        // Save data and filter state to localStorage
+        localStorage.setItem('inventario_online_bodegaSeleccionada', bodegaSeleccionada.toString());
+        localStorage.setItem('inventario_online_paginaActual', (data.paginaActual || 1).toString());
+        localStorage.setItem('inventario_online_data', JSON.stringify(data.existencias));
+        localStorage.setItem('inventario_online_totalRegistros', (data.totalRegistros || 0).toString());
+        localStorage.setItem('inventario_online_totalPaginas', (data.totalPaginas || 1).toString());
+        localStorage.setItem('inventario_online_searchTerm', searchTerm);
+        
         toast.success(`Se cargaron ${data.existencias.length} items de inventario`);
       }
     } catch (error) {
