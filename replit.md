@@ -78,7 +78,7 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
 
 5. ✅ **Encabezado Mejorado en Archivo Excel - Inventario en Línea**
    - Agregado encabezado informativo al archivo Excel con los siguientes campos:
-     - EMPRESA: Nombre del propietario
+     - EMPRESA: Nombre del propietario (obtenido desde los datos del grid)
      - FECHA DE GENERACIÓN: Fecha cuando se genera la descarga (DD/MM/AAAA)
      - HORA DE GENERACIÓN: Hora cuando se genera la descarga (HH:MM:SS)
      - TIPO DE CARGA: Campo vacío para uso futuro
@@ -86,6 +86,7 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
      - USUARIO: Usuario que genera la descarga
    - Encabezado se muestra antes de los datos de inventario
    - Fila vacía separa el encabezado de los datos
+   - El campo propietario se obtiene de los datos del API (campo oculto en el grid)
 
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**

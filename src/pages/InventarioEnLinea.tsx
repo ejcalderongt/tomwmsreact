@@ -33,6 +33,7 @@ interface InventarioItem {
   licencia?: string;
   referencia?: string;
   fecha_ingreso?: string;
+  propietario?: string;
 }
 
 interface Bodega {
@@ -438,9 +439,9 @@ function InventarioEnLinea() {
       const minutos = fechaHoy.getMinutes().toString().padStart(2, '0');
       const segundos = fechaHoy.getSeconds().toString().padStart(2, '0');
 
-      // Obtener información del usuario y propietario
+      // Obtener información del usuario y propietario desde los datos del grid
       const user = getUser();
-      const propietario = user.propietario?.nombre || 'Propietario';
+      const propietario = todosLosDatos.length > 0 ? (todosLosDatos[0].propietario || 'Propietario') : 'Propietario';
       const usuario = user.username || '';
       
       // Formatear fecha y hora de generación
