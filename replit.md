@@ -76,6 +76,17 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
 4. ✅ **Renombrar Columna en Grid de Inventario en Línea**
    - Columna "Bodega" renombrada a "Regimen(Bodega)" en la vista de grid
 
+5. ✅ **Encabezado Mejorado en Archivo Excel - Inventario en Línea**
+   - Agregado encabezado informativo al archivo Excel con los siguientes campos:
+     - EMPRESA: Nombre del propietario
+     - FECHA DE GENERACIÓN: Fecha cuando se genera la descarga (DD/MM/AAAA)
+     - HORA DE GENERACIÓN: Hora cuando se genera la descarga (HH:MM:SS)
+     - TIPO DE CARGA: Campo vacío para uso futuro
+     - TOTAL DE INVENTARIO: Campo vacío para uso futuro
+     - USUARIO: Usuario que genera la descarga
+   - Encabezado se muestra antes de los datos de inventario
+   - Fila vacía separa el encabezado de los datos
+
 ### Octubre 16, 2025
 1. ✅ **Sidebar Clickeable al Menú Principal**
    - El título "TOMWMSUX" ahora es clickeable y redirecciona al menú principal (Dashboard)

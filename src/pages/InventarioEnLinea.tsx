@@ -5,7 +5,7 @@ import Layout from '@/components/Layout';
 import { CubeIcon, BuildingStorefrontIcon, MagnifyingGlassIcon, WifiIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { existenciasAPI, bodegasAPI } from '@/api/api';
-import { getToken, logout } from '@/utils/auth';
+import { getToken, logout, getUser } from '@/utils/auth';
 import * as XLSX from 'xlsx';
 
 interface InventarioItem {
@@ -429,25 +429,7 @@ function InventarioEnLinea() {
         duration: Infinity
       });
 
-      // Preparar los datos para el Excel (solo campos solicitados)
-      const datosExcel = todosLosDatos.map((item: InventarioItem) => ({
-        'Código': item.codigo || '',
-        'Producto': item.nombre || '',
-        'Disponible U.M. Bas': item.disponible_UMBas || 0,
-        'Lote': item.lote || '',
-        'Licencia': item.licencia || '',
-        'Referencia': item.referencia || '',
-        'Fecha Vence': item.fecha_vence ? formatDate(item.fecha_vence) : '',
-        'Fecha Ingreso': item.fecha_ingreso ? formatDate(item.fecha_ingreso) : ''
-      }));
-
-      // Crear el libro de trabajo
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.json_to_sheet(datosExcel);
-
-      XLSX.utils.book_append_sheet(wb, ws, 'Inventario Completo');
-
-      // Generar nombre del archivo
+      // Generar fecha y hora para el archivo y encabezado
       const fechaHoy = new Date();
       const dia = fechaHoy.getDate().toString().padStart(2, '0');
       const mes = (fechaHoy.getMonth() + 1).toString().padStart(2, '0');
@@ -455,6 +437,46 @@ function InventarioEnLinea() {
       const horas = fechaHoy.getHours().toString().padStart(2, '0');
       const minutos = fechaHoy.getMinutes().toString().padStart(2, '0');
       const segundos = fechaHoy.getSeconds().toString().padStart(2, '0');
+
+      // Obtener información del usuario y propietario
+      const user = getUser();
+      const propietario = user.propietario?.nombre || 'Propietario';
+      const usuario = user.username || '';
+      
+      // Formatear fecha y hora de generación
+      const fechaGeneracion = `${dia}/${mes}/${año}`;
+      const horaGeneracion = `${horas}:${minutos}:${segundos}`;
+
+      // Crear encabezado del Excel
+      const encabezado = [
+        ['EMPRESA', propietario, '', '', '', ''],
+        ['FECHA DE GENERACIÓN:', fechaGeneracion, '', 'TIPO DE CARGA:', '', ''],
+        ['HORA DE GENERACIÓN:', horaGeneracion, '', 'TOTAL DE INVENTARIO:', '', ''],
+        ['USUARIO:', usuario, '', '', '', ''],
+        ['', '', '', '', '', ''], // Fila vacía
+        ['Código', 'Producto', 'Disponible U.M. Bas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso']
+      ];
+
+      // Preparar los datos para el Excel (solo campos solicitados)
+      const datosExcel = todosLosDatos.map((item: InventarioItem) => [
+        item.codigo || '',
+        item.nombre || '',
+        item.disponible_UMBas || 0,
+        item.lote || '',
+        item.licencia || '',
+        item.referencia || '',
+        item.fecha_vence ? formatDate(item.fecha_vence) : '',
+        item.fecha_ingreso ? formatDate(item.fecha_ingreso) : ''
+      ]);
+
+      // Combinar encabezado con datos
+      const datosCompletos = [...encabezado, ...datosExcel];
+
+      // Crear el libro de trabajo
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(datosCompletos);
+
+      XLSX.utils.book_append_sheet(wb, ws, 'Inventario Completo');
       const fechaFormateada = `${dia}${mes}${año}`;
       const horaFormateada = `${horas}${minutos}${segundos}`;
 
