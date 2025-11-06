@@ -83,6 +83,13 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Se actualiza el localStorage con estado vacío
    - Solución al problema donde se mostraban los datos de la carga previa
 
+7. ✅ **Corrección del Filtro de Bodega - Inventario en Línea**
+   - Corregido comportamiento del cambio de bodega para que cargue datos basados en la nueva selección
+   - Modificada función cargarInventario para aceptar parámetros opcionales (idBodegaParam, paginaParam)
+   - handleBodegaChange ahora pasa directamente el idBodega seleccionado a cargarInventario
+   - Solución al problema donde mostraba registros de la bodega previamente cargada
+   - El comportamiento ahora es consistente con el botón "Consultar"
+
 5. ✅ **Encabezado Mejorado en Archivo Excel - Inventario en Línea**
    - Agregado encabezado informativo al archivo Excel con los siguientes campos:
      - EMPRESA: Nombre del propietario (obtenido desde los datos del grid)

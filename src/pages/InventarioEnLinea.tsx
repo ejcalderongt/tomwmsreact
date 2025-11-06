@@ -171,7 +171,7 @@ function InventarioEnLinea() {
     }
   };
 
-  const cargarInventario = async () => {
+  const cargarInventario = async (idBodegaParam?: number, paginaParam?: number) => {
     if (!isOnline) {
       toast.error('Sin conexión a internet. Mostrando datos en caché.');
       return;
@@ -189,10 +189,14 @@ function InventarioEnLinea() {
         return;
       }
 
+      // Usar parámetros si se proveen, sino usar el estado actual
+      const idBodegaToUse = idBodegaParam !== undefined ? idBodegaParam : bodegaSeleccionada;
+      const paginaToUse = paginaParam !== undefined ? paginaParam : paginaActual;
+
       const filtro = {
-        idBodega: bodegaSeleccionada,
+        idBodega: idBodegaToUse,
         idPropietario,
-        pagina: paginaActual,
+        pagina: paginaToUse,
         tamanoPagina
       };
 
@@ -207,7 +211,7 @@ function InventarioEnLinea() {
         setPaginaActual(1);
         
         // Save empty state to localStorage
-        localStorage.setItem('inventario_online_bodegaSeleccionada', bodegaSeleccionada.toString());
+        localStorage.setItem('inventario_online_bodegaSeleccionada', idBodegaToUse.toString());
         localStorage.setItem('inventario_online_paginaActual', '1');
         localStorage.setItem('inventario_online_data', JSON.stringify([]));
         localStorage.setItem('inventario_online_totalRegistros', '0');
@@ -231,7 +235,7 @@ function InventarioEnLinea() {
         setPaginaActual(data.paginaActual || 1);
 
         // Save data and filter state to localStorage
-        localStorage.setItem('inventario_online_bodegaSeleccionada', bodegaSeleccionada.toString());
+        localStorage.setItem('inventario_online_bodegaSeleccionada', idBodegaToUse.toString());
         localStorage.setItem('inventario_online_paginaActual', (data.paginaActual || 1).toString());
         localStorage.setItem('inventario_online_data', JSON.stringify(data.existencias));
         localStorage.setItem('inventario_online_totalRegistros', (data.totalRegistros || 0).toString());
@@ -284,7 +288,8 @@ function InventarioEnLinea() {
   const handleBodegaChange = (idBodega: number) => {
     setBodegaSeleccionada(idBodega);
     setPaginaActual(1);
-    setTimeout(() => cargarInventario(), 0);
+    // Pasar el idBodega directamente para evitar usar el estado antiguo
+    cargarInventario(idBodega, 1);
   };
 
   const handleSearchChange = (value: string) => {
