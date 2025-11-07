@@ -475,10 +475,10 @@ function InventarioEnLinea() {
       // Crear encabezado del Excel según imagen encabezado.png
       // Estructura:
       // Fila 1: Espacio vacío
-      // Fila 2: EMPRESA (col C) | valor (col D-E) | Logo (col J-K)
-      // Fila 3: FECHA DE GENERACIÓN (col C) | valor (col D) | TIPO DE CARGA (col F) | valor (col G-H) | Logo
-      // Fila 4: HORA DE GENERACIÓN (col C) | valor (col D) | TOTAL DE INVENTARIO (col F) | valor (col G) | Logo
-      // Fila 5: USUARIO (col C) | valor (col D) | Logo
+      // Fila 2: EMPRESA (col B) | valor (col C-D) | Logo (col J-K)
+      // Fila 3: FECHA DE GENERACIÓN (col B) | valor (col C) | TIPO DE CARGA (col E) | valor (col F-G) | Logo
+      // Fila 4: HORA DE GENERACIÓN (col B) | valor (col C) | TOTAL DE INVENTARIO (col E) | valor (col F) | Logo
+      // Fila 5: USUARIO (col B) | valor (col C-D) | Logo
       // Filas 6-8: Vacías
       // Fila 9: "INVENTARIO" centrado
       // Fila 10: Cabeceras de columnas
@@ -489,16 +489,16 @@ function InventarioEnLinea() {
         ['', '', '', '', '', '', '', '', '', '', ''],
         
         // Fila 2 (índice 1): EMPRESA
-        ['', '', 'EMPRESA', '', '', '', '', '', '', '', ''],
+        ['', 'EMPRESA', '', '', '', '', '', '', '', '', ''],
         
         // Fila 3 (índice 2): FECHA DE GENERACIÓN | TIPO DE CARGA
-        ['', '', 'FECHA DE GENERACIÓN:', '', '', 'TIPO DE CARGA:', '', '', '', '', ''],
+        ['', 'FECHA DE GENERACIÓN:', '', '', 'TIPO DE CARGA:', '', '', '', '', '', ''],
         
         // Fila 4 (índice 3): HORA DE GENERACIÓN | TOTAL DE INVENTARIO
-        ['', '', 'HORA DE GENERACIÓN:', '', '', 'TOTAL DE INVENTARIO:', '', '', '', '', ''],
+        ['', 'HORA DE GENERACIÓN:', '', '', 'TOTAL DE INVENTARIO:', '', '', '', '', '', ''],
         
         // Fila 5 (índice 4): USUARIO
-        ['', '', 'USUARIO:', '', '', '', '', '', '', '', ''],
+        ['', 'USUARIO:', '', '', '', '', '', '', '', '', ''],
         
         // Filas 6-8 (índices 5-7): Vacías
         ['', '', '', '', '', '', '', '', '', '', ''],
@@ -533,19 +533,19 @@ function InventarioEnLinea() {
       const ws = XLSX.utils.aoa_to_sheet(datosCompletos);
 
       // Agregar los valores del encabezado en las celdas apropiadas
-      // Fila 2: Valor de EMPRESA (propietario) en D2-E2
-      ws['D2'] = { v: propietario, t: 's' };
+      // Fila 2: Valor de EMPRESA (propietario) en C2-D2
+      ws['C2'] = { v: propietario, t: 's' };
       
-      // Fila 3: Valor de FECHA en D3, TIPO DE CARGA valor en G3-H3
-      ws['D3'] = { v: fechaGeneracion, t: 's' };
-      ws['G3'] = { v: 'SECA/REFRIGERADA/CONGELADA', t: 's' };
+      // Fila 3: Valor de FECHA en C3, TIPO DE CARGA valor en F3-G3
+      ws['C3'] = { v: fechaGeneracion, t: 's' };
+      ws['F3'] = { v: 'SECA/REFRIGERADA/CONGELADA', t: 's' };
       
-      // Fila 4: Valor de HORA en D4, TOTAL en G4
-      ws['D4'] = { v: horaGeneracion, t: 's' };
-      ws['G4'] = { v: totalInventario, t: 'n' };
+      // Fila 4: Valor de HORA en C4, TOTAL en F4
+      ws['C4'] = { v: horaGeneracion, t: 's' };
+      ws['F4'] = { v: totalInventario, t: 'n' };
       
-      // Fila 5: Valor de USUARIO en D5
-      ws['D5'] = { v: usuario, t: 's' };
+      // Fila 5: Valor de USUARIO en C5-D5
+      ws['C5'] = { v: usuario, t: 's' };
       
       // Fila 9: Título "INVENTARIO" en celda A9
       ws['A9'] = { v: 'INVENTARIO', t: 's' };
@@ -553,64 +553,92 @@ function InventarioEnLinea() {
       // Combinar celdas en el encabezado para mantener el diseño según imagen
       // Formato: { s: { r: fila, c: columna }, e: { r: fila_final, c: columna_final } }
       ws['!merges'] = [
-        // Fila 2: EMPRESA (C2) solo, valor D2-E2 combinado, Logo espacio J2-K2 (y J2-K5 vertical)
-        { s: { r: 1, c: 3 }, e: { r: 1, c: 4 } }, // D2:E2 - Valor propietario
+        // Fila 2: EMPRESA (B2) solo, valor C2-D2 combinado, Logo espacio J2-K5 vertical
+        { s: { r: 1, c: 2 }, e: { r: 1, c: 3 } }, // C2:D2 - Valor propietario
         { s: { r: 1, c: 9 }, e: { r: 4, c: 10 } }, // J2:K5 - Espacio para logo
         
-        // Fila 3: FECHA DE GENERACIÓN (C3), TIPO DE CARGA (F3), valor G3-H3
-        { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } }, // G3:H3 - Valor tipo de carga
+        // Fila 3: FECHA DE GENERACIÓN (B3), TIPO DE CARGA (E3), valor F3-G3
+        { s: { r: 2, c: 5 }, e: { r: 2, c: 6 } }, // F3:G3 - Valor tipo de carga
         
-        // Fila 4: HORA DE GENERACIÓN (C4), TOTAL DE INVENTARIO (F4)
+        // Fila 4: HORA DE GENERACIÓN (B4), TOTAL DE INVENTARIO (E4)
         // (No merges necesarios, valores individuales)
         
-        // Fila 5: USUARIO (C5), valor D5-E5
-        { s: { r: 4, c: 3 }, e: { r: 4, c: 4 } }, // D5:E5 - Valor usuario
+        // Fila 5: USUARIO (B5), valor C5-D5
+        { s: { r: 4, c: 2 }, e: { r: 4, c: 3 } }, // C5:D5 - Valor usuario
         
-        // Fila 9: Título "INVENTARIO" centrado A9-H9 (o hasta donde llegue la tabla)
+        // Fila 9: Título "INVENTARIO" centrado A9-H9 (sobre las columnas de la tabla)
         { s: { r: 8, c: 0 }, e: { r: 8, c: 7 } } // A9:H9 - Título INVENTARIO centrado
       ];
 
       // Aplicar estilos a las celdas del encabezado
-      // Estilo para etiquetas (negrita)
+      // Estilo para etiquetas (negrita con fondo blanco)
       const estiloEtiqueta = {
         font: { bold: true, sz: 10 },
-        alignment: { horizontal: 'left', vertical: 'center' }
+        alignment: { horizontal: 'left', vertical: 'center' },
+        fill: { fgColor: { rgb: 'FFFFFF' } }
       };
       
-      // Estilo para valores
+      // Estilo para valores (con fondo blanco)
       const estiloValor = {
         font: { sz: 10 },
-        alignment: { horizontal: 'left', vertical: 'center' }
+        alignment: { horizontal: 'left', vertical: 'center' },
+        fill: { fgColor: { rgb: 'FFFFFF' } }
       };
       
-      // Estilo para título "INVENTARIO"
+      // Estilo para título "INVENTARIO" (con fondo blanco)
       const estiloTitulo = {
         font: { bold: true, sz: 14 },
-        alignment: { horizontal: 'center', vertical: 'center' }
+        alignment: { horizontal: 'center', vertical: 'center' },
+        fill: { fgColor: { rgb: 'FFFFFF' } }
       };
       
-      // Estilo para cabeceras de columnas
+      // Estilo para cabeceras de columnas (con bordes)
       const estiloCabecera = {
         font: { bold: true, sz: 10 },
         alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: 'D3D3D3' } }
+        fill: { fgColor: { rgb: 'D3D3D3' } },
+        border: {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '000000' } },
+          right: { style: 'thin', color: { rgb: '000000' } }
+        }
+      };
+      
+      // Estilo para celdas de datos (con bordes)
+      const estiloDatos = {
+        border: {
+          top: { style: 'thin', color: { rgb: '000000' } },
+          bottom: { style: 'thin', color: { rgb: '000000' } },
+          left: { style: 'thin', color: { rgb: '000000' } },
+          right: { style: 'thin', color: { rgb: '000000' } }
+        }
       };
 
-      // Aplicar estilos a etiquetas
-      if (ws['C2']) ws['C2'].s = estiloEtiqueta;
-      if (ws['C3']) ws['C3'].s = estiloEtiqueta;
-      if (ws['C4']) ws['C4'].s = estiloEtiqueta;
-      if (ws['C5']) ws['C5'].s = estiloEtiqueta;
-      if (ws['F3']) ws['F3'].s = estiloEtiqueta;
-      if (ws['F4']) ws['F4'].s = estiloEtiqueta;
+      // Aplicar fondo blanco a todas las celdas del encabezado (filas 1-9)
+      for (let r = 0; r < 9; r++) {
+        for (let c = 0; c < 11; c++) {
+          const cellAddress = XLSX.utils.encode_cell({ r, c });
+          if (!ws[cellAddress]) ws[cellAddress] = { v: '', t: 's' };
+          ws[cellAddress].s = { fill: { fgColor: { rgb: 'FFFFFF' } } };
+        }
+      }
+
+      // Aplicar estilos a etiquetas (columna B)
+      if (ws['B2']) ws['B2'].s = estiloEtiqueta;
+      if (ws['B3']) ws['B3'].s = estiloEtiqueta;
+      if (ws['B4']) ws['B4'].s = estiloEtiqueta;
+      if (ws['B5']) ws['B5'].s = estiloEtiqueta;
+      if (ws['E3']) ws['E3'].s = estiloEtiqueta;
+      if (ws['E4']) ws['E4'].s = estiloEtiqueta;
       
       // Aplicar estilos a valores
-      if (ws['D2']) ws['D2'].s = estiloValor;
-      if (ws['D3']) ws['D3'].s = estiloValor;
-      if (ws['D4']) ws['D4'].s = estiloValor;
-      if (ws['D5']) ws['D5'].s = estiloValor;
-      if (ws['G3']) ws['G3'].s = estiloValor;
-      if (ws['G4']) ws['G4'].s = estiloValor;
+      if (ws['C2']) ws['C2'].s = estiloValor;
+      if (ws['C3']) ws['C3'].s = estiloValor;
+      if (ws['C4']) ws['C4'].s = estiloValor;
+      if (ws['C5']) ws['C5'].s = estiloValor;
+      if (ws['F3']) ws['F3'].s = estiloValor;
+      if (ws['F4']) ws['F4'].s = estiloValor;
       
       // Aplicar estilo al título INVENTARIO
       if (ws['A9']) ws['A9'].s = estiloTitulo;
@@ -619,6 +647,17 @@ function InventarioEnLinea() {
       ['A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10'].forEach(cell => {
         if (ws[cell]) ws[cell].s = estiloCabecera;
       });
+
+      // Aplicar bordes a todas las celdas de datos (desde fila 11 en adelante)
+      const numFilasDatos = todosLosDatos.length;
+      for (let r = 10; r < 10 + numFilasDatos; r++) {
+        for (let c = 0; c < 8; c++) {
+          const cellAddress = XLSX.utils.encode_cell({ r, c });
+          if (ws[cellAddress]) {
+            ws[cellAddress].s = { ...ws[cellAddress].s, ...estiloDatos };
+          }
+        }
+      }
 
       // Configurar anchos de columnas
       ws['!cols'] = [
