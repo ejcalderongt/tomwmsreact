@@ -9,6 +9,7 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "@tailwindcss/postcss": "^4.1.11",
+    "exceljs": "^4.4.0",
     "express": "^5.1.0",
     "http-proxy-middleware": "^3.0.5",
     "react": "^19.1.0",

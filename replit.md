@@ -90,7 +90,10 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Solución al problema donde mostraba registros de la bodega previamente cargada
    - El comportamiento ahora es consistente con el botón "Consultar"
 
-8. ✅ **Rediseño Completo del Encabezado Excel - Inventario en Línea**
+8. ✅ **Rediseño Completo del Encabezado Excel con ExcelJS - Inventario en Línea**
+   - **Migración de xlsx a ExcelJS:** Cambio de librería para soportar estilos completos en archivos Excel
+   - La librería `xlsx` gratuita NO soporta estilos (solo versión Pro de pago)
+   - Implementación completa con `exceljs` que soporta todos los estilos de forma gratuita
    - Encabezado completamente rediseñado según especificación de imagen encabezado.png
    - **Estructura del encabezado:**
      - Columna B: Etiquetas (EMPRESA, FECHA DE GENERACIÓN, HORA DE GENERACIÓN, USUARIO)
@@ -105,7 +108,7 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
      - **Borde exterior grueso:** Borde perimetral grueso aplicado a toda la tabla de datos (desde fila 9 hasta la última fila con datos)
      - Etiquetas en negrita, alineación izquierda
      - Valores en fuente normal, alineación izquierda
-     - Cabeceras de columnas en negrita, centradas, con fondo gris
+     - Cabeceras de columnas en negrita, centradas, con fondo gris (D3D3D3)
      - Contenido de la fila 9 completamente centrado
    - **Funcionalidades:**
      - Cálculo automático del total de inventario (suma de disponible_UMBas)
@@ -113,6 +116,7 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
      - Anchos de columnas configurados para mejor visualización
      - Espacio para logo puede ser ocupado posteriormente con imagen
      - Formato de tabla profesional con bordes internos y externos diferenciados
+     - **TODOS LOS ESTILOS SE APLICAN CORRECTAMENTE** gracias a ExcelJS
    - Datos comienzan en fila 11 después del encabezado completo
    - Excel generado con aspecto limpio y profesional sin líneas de grid visibles
 

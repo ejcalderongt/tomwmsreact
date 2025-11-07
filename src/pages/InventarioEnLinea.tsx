@@ -6,7 +6,7 @@ import { CubeIcon, BuildingStorefrontIcon, MagnifyingGlassIcon, WifiIcon, ArrowD
 import toast from 'react-hot-toast';
 import { existenciasAPI, bodegasAPI } from '@/api/api';
 import { getToken, logout, getUser } from '@/utils/auth';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 interface InventarioItem {
   idStock: number;
@@ -431,7 +431,7 @@ function InventarioEnLinea() {
         idBodega: bodegaSeleccionada,
         idPropietario,
         pagina: 1,
-        tamanoPagina: 999999 // Número muy grande para obtener todos los registros
+        tamanoPagina: 999999
       };
 
       const data = await existenciasAPI.listar(filtro, token);
@@ -472,282 +472,203 @@ function InventarioEnLinea() {
       // Calcular el total de inventario
       const totalInventario = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.disponible_UMBas || 0), 0);
 
-      // Crear encabezado del Excel según imagen encabezado.png
-      // Estructura:
-      // Fila 1: Espacio vacío
-      // Fila 2: EMPRESA (col B) | valor (col C-D) | Logo (col J-K)
-      // Fila 3: FECHA DE GENERACIÓN (col B) | valor (col C) | TIPO DE CARGA (col E) | valor (col F-G) | Logo
-      // Fila 4: HORA DE GENERACIÓN (col B) | valor (col C) | TOTAL DE INVENTARIO (col E) | valor (col F) | Logo
-      // Fila 5: USUARIO (col B) | valor (col C-D) | Logo
-      // Filas 6-8: Vacías
-      // Fila 9: "INVENTARIO" centrado
+      // Crear workbook con ExcelJS
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Inventario Completo');
+
+      // Configurar anchos de columnas
+      worksheet.columns = [
+        { width: 12 },  // A - Código
+        { width: 30 },  // B - Producto
+        { width: 18 },  // C - Disponible U.M. Bas
+        { width: 15 },  // D - Lote
+        { width: 15 },  // E - Licencia
+        { width: 15 },  // F - Referencia
+        { width: 12 },  // G - Fecha Vence
+        { width: 12 },  // H - Fecha Ingreso
+        { width: 8 },   // I - Vacía
+        { width: 10 },  // J - Logo
+        { width: 10 },  // K - Logo
+        { width: 10 },  // L
+        { width: 10 },  // M
+        { width: 10 }   // N
+      ];
+
+      // Aplicar fondo blanco a todas las celdas desde A1 hasta N1000
+      for (let r = 1; r <= 1000; r++) {
+        for (let c = 1; c <= 14; c++) {
+          const cell = worksheet.getCell(r, c);
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: 'FFFFFFFF' }
+          };
+        }
+      }
+
+      // Fila 2: EMPRESA
+      worksheet.getCell('B2').value = 'EMPRESA';
+      worksheet.getCell('B2').font = { bold: true };
+      worksheet.getCell('C2').value = propietario;
+      worksheet.mergeCells('C2:D2');
+
+      // Fila 3: FECHA DE GENERACIÓN | TIPO DE CARGA
+      worksheet.getCell('B3').value = 'FECHA DE GENERACIÓN:';
+      worksheet.getCell('B3').font = { bold: true };
+      worksheet.getCell('C3').value = fechaGeneracion;
+      
+      worksheet.getCell('E3').value = 'TIPO DE CARGA:';
+      worksheet.getCell('E3').font = { bold: true };
+      worksheet.getCell('F3').value = 'SECA/REFRIGERADA/CONGELADA';
+      worksheet.mergeCells('F3:G3');
+
+      // Fila 4: HORA DE GENERACIÓN | TOTAL DE INVENTARIO
+      worksheet.getCell('B4').value = 'HORA DE GENERACIÓN:';
+      worksheet.getCell('B4').font = { bold: true };
+      worksheet.getCell('C4').value = horaGeneracion;
+      
+      worksheet.getCell('E4').value = 'TOTAL DE INVENTARIO:';
+      worksheet.getCell('E4').font = { bold: true };
+      worksheet.getCell('F4').value = totalInventario;
+
+      // Fila 5: USUARIO
+      worksheet.getCell('B5').value = 'USUARIO:';
+      worksheet.getCell('B5').font = { bold: true };
+      worksheet.getCell('C5').value = usuario;
+      worksheet.mergeCells('C5:D5');
+
+      // Espacio para logo (J2:K5)
+      worksheet.mergeCells('J2:K5');
+
+      // Fila 9: Título "INVENTARIO" centrado
+      worksheet.mergeCells('A9:H9');
+      const cellInventario = worksheet.getCell('A9');
+      cellInventario.value = 'INVENTARIO';
+      cellInventario.font = { bold: true, size: 14 };
+      cellInventario.alignment = { horizontal: 'center', vertical: 'middle' };
+      cellInventario.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFFFFFFF' }
+      };
+
       // Fila 10: Cabeceras de columnas
-      // Fila 11+: Datos
-      
-      const encabezado = [
-        // Fila 1 (índice 0): Vacía
-        ['', '', '', '', '', '', '', '', '', '', ''],
-        
-        // Fila 2 (índice 1): EMPRESA
-        ['', 'EMPRESA', '', '', '', '', '', '', '', '', ''],
-        
-        // Fila 3 (índice 2): FECHA DE GENERACIÓN | TIPO DE CARGA
-        ['', 'FECHA DE GENERACIÓN:', '', '', 'TIPO DE CARGA:', '', '', '', '', '', ''],
-        
-        // Fila 4 (índice 3): HORA DE GENERACIÓN | TOTAL DE INVENTARIO
-        ['', 'HORA DE GENERACIÓN:', '', '', 'TOTAL DE INVENTARIO:', '', '', '', '', '', ''],
-        
-        // Fila 5 (índice 4): USUARIO
-        ['', 'USUARIO:', '', '', '', '', '', '', '', '', ''],
-        
-        // Filas 6-8 (índices 5-7): Vacías
-        ['', '', '', '', '', '', '', '', '', '', ''],
-        ['', '', '', '', '', '', '', '', '', '', ''],
-        ['', '', '', '', '', '', '', '', '', '', ''],
-        
-        // Fila 9 (índice 8): Título "INVENTARIO"
-        ['', '', '', '', '', '', '', '', '', '', ''],
-        
-        // Fila 10 (índice 9): Cabeceras de columnas
-        ['Código', 'Producto', 'Disponible U.M. Bas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso', '', '', '']
-      ];
-
-      // Preparar los datos para el Excel (solo campos solicitados)
-      const datosExcel = todosLosDatos.map((item: InventarioItem) => [
-        item.codigo || '',
-        item.nombre || '',
-        item.disponible_UMBas || 0,
-        item.lote || '',
-        item.licencia || '',
-        item.referencia || '',
-        item.fecha_vence ? formatDate(item.fecha_vence) : '',
-        item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '',
-        '', '', '' // Columnas extras para mantener ancho consistente
-      ]);
-
-      // Combinar encabezado con datos
-      const datosCompletos = [...encabezado, ...datosExcel];
-
-      // Crear el libro de trabajo
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.aoa_to_sheet(datosCompletos);
-
-      // Agregar los valores del encabezado en las celdas apropiadas
-      // Fila 2: Valor de EMPRESA (propietario) en C2-D2
-      ws['C2'] = { v: propietario, t: 's' };
-      
-      // Fila 3: Valor de FECHA en C3, TIPO DE CARGA valor en F3-G3
-      ws['C3'] = { v: fechaGeneracion, t: 's' };
-      ws['F3'] = { v: 'SECA/REFRIGERADA/CONGELADA', t: 's' };
-      
-      // Fila 4: Valor de HORA en C4, TOTAL en F4
-      ws['C4'] = { v: horaGeneracion, t: 's' };
-      ws['F4'] = { v: totalInventario, t: 'n' };
-      
-      // Fila 5: Valor de USUARIO en C5-D5
-      ws['C5'] = { v: usuario, t: 's' };
-      
-      // Fila 9: Título "INVENTARIO" en celda A9
-      ws['A9'] = { v: 'INVENTARIO', t: 's' };
-
-      // Combinar celdas en el encabezado para mantener el diseño según imagen
-      // Formato: { s: { r: fila, c: columna }, e: { r: fila_final, c: columna_final } }
-      ws['!merges'] = [
-        // Fila 2: EMPRESA (B2) solo, valor C2-D2 combinado, Logo espacio J2-K5 vertical
-        { s: { r: 1, c: 2 }, e: { r: 1, c: 3 } }, // C2:D2 - Valor propietario
-        { s: { r: 1, c: 9 }, e: { r: 4, c: 10 } }, // J2:K5 - Espacio para logo
-        
-        // Fila 3: FECHA DE GENERACIÓN (B3), TIPO DE CARGA (E3), valor F3-G3
-        { s: { r: 2, c: 5 }, e: { r: 2, c: 6 } }, // F3:G3 - Valor tipo de carga
-        
-        // Fila 4: HORA DE GENERACIÓN (B4), TOTAL DE INVENTARIO (E4)
-        // (No merges necesarios, valores individuales)
-        
-        // Fila 5: USUARIO (B5), valor C5-D5
-        { s: { r: 4, c: 2 }, e: { r: 4, c: 3 } }, // C5:D5 - Valor usuario
-        
-        // Fila 9: Título "INVENTARIO" centrado A9-H9 (sobre las columnas de la tabla)
-        { s: { r: 8, c: 0 }, e: { r: 8, c: 7 } } // A9:H9 - Título INVENTARIO centrado
-      ];
-
-      // Aplicar estilos a las celdas del encabezado
-      // Estilo para etiquetas (negrita con fondo blanco)
-      const estiloEtiqueta = {
-        font: { bold: true, sz: 10 },
-        alignment: { horizontal: 'left', vertical: 'center' },
-        fill: { fgColor: { rgb: 'FFFFFF' } }
-      };
-      
-      // Estilo para valores (con fondo blanco)
-      const estiloValor = {
-        font: { sz: 10 },
-        alignment: { horizontal: 'left', vertical: 'center' },
-        fill: { fgColor: { rgb: 'FFFFFF' } }
-      };
-      
-      // Estilo para título "INVENTARIO" (con fondo blanco)
-      const estiloTitulo = {
-        font: { bold: true, sz: 14 },
-        alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: 'FFFFFF' } }
-      };
-      
-      // Estilo para cabeceras de columnas (con bordes)
-      const estiloCabecera = {
-        font: { bold: true, sz: 10 },
-        alignment: { horizontal: 'center', vertical: 'center' },
-        fill: { fgColor: { rgb: 'D3D3D3' } },
-        border: {
-          top: { style: 'thin', color: { rgb: '000000' } },
-          bottom: { style: 'thin', color: { rgb: '000000' } },
-          left: { style: 'thin', color: { rgb: '000000' } },
-          right: { style: 'thin', color: { rgb: '000000' } }
-        }
-      };
-      
-      // Estilo para celdas de datos (con bordes)
-      const estiloDatos = {
-        border: {
-          top: { style: 'thin', color: { rgb: '000000' } },
-          bottom: { style: 'thin', color: { rgb: '000000' } },
-          left: { style: 'thin', color: { rgb: '000000' } },
-          right: { style: 'thin', color: { rgb: '000000' } }
-        }
-      };
-
-      // Aplicar fondo blanco desde columna A hasta N (14 columnas) y desde fila 1 hasta 1000
-      for (let r = 0; r < 1000; r++) {
-        for (let c = 0; c < 14; c++) {
-          const cellAddress = XLSX.utils.encode_cell({ r, c });
-          if (!ws[cellAddress]) ws[cellAddress] = { v: '', t: 's' };
-          if (!ws[cellAddress].s) ws[cellAddress].s = {};
-          ws[cellAddress].s.fill = { fgColor: { rgb: 'FFFFFF' } };
-        }
-      }
-
-      // Aplicar estilos a etiquetas (columna B)
-      if (ws['B2']) ws['B2'].s = estiloEtiqueta;
-      if (ws['B3']) ws['B3'].s = estiloEtiqueta;
-      if (ws['B4']) ws['B4'].s = estiloEtiqueta;
-      if (ws['B5']) ws['B5'].s = estiloEtiqueta;
-      if (ws['E3']) ws['E3'].s = estiloEtiqueta;
-      if (ws['E4']) ws['E4'].s = estiloEtiqueta;
-      
-      // Aplicar estilos a valores
-      if (ws['C2']) ws['C2'].s = estiloValor;
-      if (ws['C3']) ws['C3'].s = estiloValor;
-      if (ws['C4']) ws['C4'].s = estiloValor;
-      if (ws['C5']) ws['C5'].s = estiloValor;
-      if (ws['F3']) ws['F3'].s = estiloValor;
-      if (ws['F4']) ws['F4'].s = estiloValor;
-      
-      // Aplicar estilo al título INVENTARIO centrado en toda la fila 9 (A9:H9)
-      for (let c = 0; c < 8; c++) {
-        const cellAddress = XLSX.utils.encode_cell({ r: 8, c });
-        if (!ws[cellAddress]) ws[cellAddress] = { v: '', t: 's' };
-        ws[cellAddress].s = estiloTitulo;
-      }
-      
-      // Aplicar estilo a cabeceras de columnas (fila 10)
-      ['A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10'].forEach(cell => {
-        if (ws[cell]) ws[cell].s = estiloCabecera;
+      const headers = ['Código', 'Producto', 'Disponible U.M. Bas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso'];
+      const row10 = worksheet.getRow(10);
+      headers.forEach((header, index) => {
+        const cell = row10.getCell(index + 1);
+        cell.value = header;
+        cell.font = { bold: true };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFD3D3D3' }
+        };
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
       });
 
-      // Aplicar bordes a todas las celdas desde fila 9 hasta fila 1000 (columnas A-H)
-      for (let r = 8; r < 1000; r++) {
-        for (let c = 0; c < 8; c++) {
-          const cellAddress = XLSX.utils.encode_cell({ r, c });
-          if (!ws[cellAddress]) ws[cellAddress] = { v: '', t: 's' };
-          if (!ws[cellAddress].s) ws[cellAddress].s = {};
-          
-          // Preservar estilos existentes y agregar bordes
-          const currentStyle = ws[cellAddress].s || {};
-          ws[cellAddress].s = {
-            ...currentStyle,
-            border: {
-              top: { style: 'thin', color: { rgb: '000000' } },
-              bottom: { style: 'thin', color: { rgb: '000000' } },
-              left: { style: 'thin', color: { rgb: '000000' } },
-              right: { style: 'thin', color: { rgb: '000000' } }
-            }
+      // Agregar datos a partir de la fila 11
+      todosLosDatos.forEach((item: InventarioItem, index: number) => {
+        const rowNum = 11 + index;
+        const row = worksheet.getRow(rowNum);
+        
+        row.getCell(1).value = item.codigo || '';
+        row.getCell(2).value = item.nombre || '';
+        row.getCell(3).value = item.disponible_UMBas || 0;
+        row.getCell(4).value = item.lote || '';
+        row.getCell(5).value = item.licencia || '';
+        row.getCell(6).value = item.referencia || '';
+        row.getCell(7).value = item.fecha_vence ? formatDate(item.fecha_vence) : '';
+        row.getCell(8).value = item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '';
+        
+        // Aplicar bordes a todas las celdas de datos
+        for (let c = 1; c <= 8; c++) {
+          row.getCell(c).border = {
+            top: { style: 'thin' },
+            left: { style: 'thin' },
+            bottom: { style: 'thin' },
+            right: { style: 'thin' }
           };
+        }
+      });
+
+      // Aplicar bordes desde fila 9 hasta fila 1000
+      for (let r = 9; r <= 1000; r++) {
+        for (let c = 1; c <= 8; c++) {
+          const cell = worksheet.getCell(r, c);
+          if (!cell.border) {
+            cell.border = {
+              top: { style: 'thin' },
+              left: { style: 'thin' },
+              bottom: { style: 'thin' },
+              right: { style: 'thin' }
+            };
+          }
         }
       }
 
-      // Aplicar borde exterior grueso al rango de la tabla (A9:H + última fila con datos)
+      // Aplicar borde exterior grueso a la tabla de datos
       const ultimaFilaDatos = 10 + todosLosDatos.length;
       
-      // Borde superior grueso (fila 9, columnas A-H)
-      for (let c = 0; c < 8; c++) {
-        const cellAddress = XLSX.utils.encode_cell({ r: 8, c });
-        if (ws[cellAddress] && ws[cellAddress].s) {
-          ws[cellAddress].s.border = {
-            ...ws[cellAddress].s.border,
-            top: { style: 'medium', color: { rgb: '000000' } }
-          };
-        }
+      // Borde superior grueso (fila 9)
+      for (let c = 1; c <= 8; c++) {
+        const cell = worksheet.getCell(9, c);
+        cell.border = {
+          ...cell.border,
+          top: { style: 'medium' }
+        };
       }
       
       // Borde inferior grueso (última fila con datos)
-      for (let c = 0; c < 8; c++) {
-        const cellAddress = XLSX.utils.encode_cell({ r: ultimaFilaDatos - 1, c });
-        if (ws[cellAddress] && ws[cellAddress].s) {
-          ws[cellAddress].s.border = {
-            ...ws[cellAddress].s.border,
-            bottom: { style: 'medium', color: { rgb: '000000' } }
-          };
-        }
+      for (let c = 1; c <= 8; c++) {
+        const cell = worksheet.getCell(ultimaFilaDatos, c);
+        cell.border = {
+          ...cell.border,
+          bottom: { style: 'medium' }
+        };
       }
       
-      // Borde izquierdo grueso (columna A, desde fila 9 hasta última fila con datos)
-      for (let r = 8; r < ultimaFilaDatos; r++) {
-        const cellAddress = XLSX.utils.encode_cell({ r, c: 0 });
-        if (ws[cellAddress] && ws[cellAddress].s) {
-          ws[cellAddress].s.border = {
-            ...ws[cellAddress].s.border,
-            left: { style: 'medium', color: { rgb: '000000' } }
-          };
-        }
+      // Borde izquierdo grueso (columna A)
+      for (let r = 9; r <= ultimaFilaDatos; r++) {
+        const cell = worksheet.getCell(r, 1);
+        cell.border = {
+          ...cell.border,
+          left: { style: 'medium' }
+        };
       }
       
-      // Borde derecho grueso (columna H, desde fila 9 hasta última fila con datos)
-      for (let r = 8; r < ultimaFilaDatos; r++) {
-        const cellAddress = XLSX.utils.encode_cell({ r, c: 7 });
-        if (ws[cellAddress] && ws[cellAddress].s) {
-          ws[cellAddress].s.border = {
-            ...ws[cellAddress].s.border,
-            right: { style: 'medium', color: { rgb: '000000' } }
-          };
-        }
+      // Borde derecho grueso (columna H)
+      for (let r = 9; r <= ultimaFilaDatos; r++) {
+        const cell = worksheet.getCell(r, 8);
+        cell.border = {
+          ...cell.border,
+          right: { style: 'medium' }
+        };
       }
 
-      // Configurar anchos de columnas
-      ws['!cols'] = [
-        { wch: 12 },  // A - Código
-        { wch: 30 },  // B - Producto
-        { wch: 18 },  // C - Disponible U.M. Bas
-        { wch: 15 },  // D - Lote
-        { wch: 15 },  // E - Licencia
-        { wch: 15 },  // F - Referencia
-        { wch: 12 },  // G - Fecha Vence
-        { wch: 12 },  // H - Fecha Ingreso
-        { wch: 8 },   // I - Vacía
-        { wch: 10 },  // J - Logo
-        { wch: 10 }   // K - Logo
-      ];
-
-      XLSX.utils.book_append_sheet(wb, ws, 'Inventario Completo');
+      // Generar nombre del archivo
       const fechaFormateada = `${dia}${mes}${año}`;
       const horaFormateada = `${horas}${minutos}${segundos}`;
-
       const bodegaCodigo = bodegaSeleccionada === 0 
         ? 'TodasBodegas' 
         : bodegas.find(b => b.idBodega === bodegaSeleccionada)?.codigo?.replace(/\s+/g, '') || 'Bodega';
-
       const nombreArchivo = `InventarioCompleto_${bodegaCodigo}_${fechaFormateada}_${horaFormateada}.xlsx`;
       
-      // Descargar archivo
-      XLSX.writeFile(wb, nombreArchivo);
+      // Generar y descargar archivo
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = nombreArchivo;
+      link.click();
+      window.URL.revokeObjectURL(url);
       
       toast.dismiss(processToast);
       toast.success(`✅ Descarga completada en ${elapsedTime}s\n📁 ${nombreArchivo}\n📊 ${todosLosDatos.length} registros`, {
