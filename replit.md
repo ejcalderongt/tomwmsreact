@@ -90,7 +90,7 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Solución al problema donde mostraba registros de la bodega previamente cargada
    - El comportamiento ahora es consistente con el botón "Consultar"
 
-8. ✅ **Rediseño Completo del Encabezado Excel con ExcelJS - Inventario en Línea**
+8. ✅ **Rediseño Completo del Encabezado Excel con ExcelJS + Logotipo - Inventario en Línea**
    - **Migración de xlsx a ExcelJS:** Cambio de librería para soportar estilos completos en archivos Excel
    - La librería `xlsx` gratuita NO soporta estilos (solo versión Pro de pago)
    - Implementación completa con `exceljs` que soporta todos los estilos de forma gratuita
@@ -98,9 +98,14 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - **Estructura del encabezado:**
      - Columna B: Etiquetas (EMPRESA, FECHA DE GENERACIÓN, HORA DE GENERACIÓN, USUARIO)
      - Columna C-D: Valores correspondientes (propietario, fecha, hora, usuario) con celdas combinadas
-     - Columna E: Etiquetas adicionales (TIPO DE CARGA, TOTAL DE INVENTARIO)
-     - Columna F-G: Valores (SECA/REFRIGERADA/CONGELADA, total calculado)
-     - Columnas J-K: Espacio reservado para logotipo (celdas J2:K5 combinadas)
+     - Columna E: Etiqueta TOTAL DE INVENTARIO
+     - Columna F: Valor total calculado
+     - **Columnas H-I: Logotipo CEALSA insertado (celdas H2:I5 combinadas, imagen PNG 150x60px)**
+   - **Logotipo corporativo:**
+     - Imagen `logotipo.png` insertada automáticamente en el Excel
+     - Posicionada en celdas H2:I5 (columnas H-I, filas 2-5)
+     - Tamaño optimizado: 150x60 píxeles
+     - Carga dinámica desde `/public/logotipo.png`
    - **Título "INVENTARIO":** Fila 9, centrado en toda la fila (A9:H9) en negrita con tamaño 14pt
    - **Formato profesional aplicado:**
      - **Fondo blanco:** Aplicado desde columna A hasta N (14 columnas) y desde fila 1 hasta fila 1000
@@ -114,11 +119,12 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
      - Cálculo automático del total de inventario (suma de disponible_UMBas)
      - Fusión de celdas para mantener diseño profesional
      - Anchos de columnas configurados para mejor visualización
-     - Espacio para logo puede ser ocupado posteriormente con imagen
+     - **Inserción automática de imagen del logotipo corporativo**
      - Formato de tabla profesional con bordes internos y externos diferenciados
      - **TODOS LOS ESTILOS SE APLICAN CORRECTAMENTE** gracias a ExcelJS
    - Datos comienzan en fila 11 después del encabezado completo
    - Excel generado con aspecto limpio y profesional sin líneas de grid visibles
+   - **Texto TIPO DE CARGA removido** según especificación
 
 5. ✅ **Encabezado Mejorado en Archivo Excel - Inventario en Línea**
    - Agregado encabezado informativo al archivo Excel con los siguientes campos:

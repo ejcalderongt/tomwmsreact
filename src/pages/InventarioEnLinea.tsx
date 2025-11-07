@@ -512,15 +512,10 @@ function InventarioEnLinea() {
       worksheet.getCell('C2').value = propietario;
       worksheet.mergeCells('C2:D2');
 
-      // Fila 3: FECHA DE GENERACIÓN | TIPO DE CARGA
+      // Fila 3: FECHA DE GENERACIÓN
       worksheet.getCell('B3').value = 'FECHA DE GENERACIÓN:';
       worksheet.getCell('B3').font = { bold: true };
       worksheet.getCell('C3').value = fechaGeneracion;
-      
-      worksheet.getCell('E3').value = 'TIPO DE CARGA:';
-      worksheet.getCell('E3').font = { bold: true };
-      worksheet.getCell('F3').value = 'SECA/REFRIGERADA/CONGELADA';
-      worksheet.mergeCells('F3:G3');
 
       // Fila 4: HORA DE GENERACIÓN | TOTAL DE INVENTARIO
       worksheet.getCell('B4').value = 'HORA DE GENERACIÓN:';
@@ -537,8 +532,27 @@ function InventarioEnLinea() {
       worksheet.getCell('C5').value = usuario;
       worksheet.mergeCells('C5:D5');
 
-      // Espacio para logo (J2:K5)
-      worksheet.mergeCells('J2:K5');
+      // Insertar logotipo en H2:I5
+      worksheet.mergeCells('H2:I5');
+      
+      // Cargar y agregar la imagen del logotipo
+      try {
+        const logoResponse = await fetch('/logotipo.png');
+        const logoBlob = await logoResponse.blob();
+        const logoBuffer = await logoBlob.arrayBuffer();
+        
+        const imageId = workbook.addImage({
+          buffer: logoBuffer,
+          extension: 'png',
+        });
+        
+        worksheet.addImage(imageId, {
+          tl: { col: 7, row: 1 },
+          ext: { width: 150, height: 60 }
+        });
+      } catch (error) {
+        console.log('No se pudo cargar el logotipo, continuando sin él');
+      }
 
       // Fila 9: Título "INVENTARIO" centrado
       worksheet.mergeCells('A9:H9');
