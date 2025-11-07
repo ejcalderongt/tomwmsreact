@@ -90,6 +90,26 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
    - Solución al problema donde mostraba registros de la bodega previamente cargada
    - El comportamiento ahora es consistente con el botón "Consultar"
 
+8. ✅ **Rediseño Completo del Encabezado Excel - Inventario en Línea**
+   - Encabezado completamente rediseñado según especificación de imagen encabezado.png
+   - **Estructura del encabezado:**
+     - Columna C: Etiquetas (EMPRESA, FECHA DE GENERACIÓN, HORA DE GENERACIÓN, USUARIO)
+     - Columna D-E: Valores correspondientes (propietario, fecha, hora, usuario) con celdas combinadas
+     - Columna F: Etiquetas adicionales (TIPO DE CARGA, TOTAL DE INVENTARIO)
+     - Columna G-H: Valores (SECA/REFRIGERADA/CONGELADA, total calculado)
+     - Columnas J-K: Espacio reservado para logotipo (celdas J2:K5 combinadas)
+   - **Título "INVENTARIO":** Fila 9, centrado en negrita con tamaño 14pt
+   - **Estilos aplicados:**
+     - Etiquetas en negrita, alineación izquierda
+     - Valores en fuente normal, alineación izquierda
+     - Cabeceras de columnas en negrita, centradas, con fondo gris
+   - **Funcionalidades:**
+     - Cálculo automático del total de inventario (suma de disponible_UMBas)
+     - Fusión de celdas para mantener diseño profesional
+     - Anchos de columnas configurados para mejor visualización
+     - Espacio para logo puede ser ocupado posteriormente con imagen
+   - Datos comienzan en fila 11 después del encabezado completo
+
 5. ✅ **Encabezado Mejorado en Archivo Excel - Inventario en Línea**
    - Agregado encabezado informativo al archivo Excel con los siguientes campos:
      - EMPRESA: Nombre del propietario (obtenido desde los datos del grid)

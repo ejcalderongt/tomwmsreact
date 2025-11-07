@@ -469,14 +469,47 @@ function InventarioEnLinea() {
       const fechaGeneracion = `${dia}/${mes}/${año}`;
       const horaGeneracion = `${horas}:${minutos}:${segundos}`;
 
-      // Crear encabezado del Excel
+      // Calcular el total de inventario
+      const totalInventario = todosLosDatos.reduce((sum: number, item: InventarioItem) => sum + (item.disponible_UMBas || 0), 0);
+
+      // Crear encabezado del Excel según imagen encabezado.png
+      // Estructura:
+      // Fila 1: Espacio vacío
+      // Fila 2: EMPRESA (col C) | valor (col D-E) | Logo (col J-K)
+      // Fila 3: FECHA DE GENERACIÓN (col C) | valor (col D) | TIPO DE CARGA (col F) | valor (col G-H) | Logo
+      // Fila 4: HORA DE GENERACIÓN (col C) | valor (col D) | TOTAL DE INVENTARIO (col F) | valor (col G) | Logo
+      // Fila 5: USUARIO (col C) | valor (col D) | Logo
+      // Filas 6-8: Vacías
+      // Fila 9: "INVENTARIO" centrado
+      // Fila 10: Cabeceras de columnas
+      // Fila 11+: Datos
+      
       const encabezado = [
-        ['EMPRESA', '', propietario, '', '', '', '', ''],
-        ['FECHA DE GENERACIÓN:', '', fechaGeneracion, '', 'TIPO DE CARGA:', '', '', ''],
-        ['HORA DE GENERACIÓN:', '', horaGeneracion, '', 'TOTAL DE INVENTARIO:', '', '', ''],
-        ['USUARIO:', '', usuario, '', '', '', '', ''],
-        ['', '', '', '', '', '', '', ''], // Fila vacía
-        ['Código', 'Producto', 'Disponible U.M. Bas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso']
+        // Fila 1 (índice 0): Vacía
+        ['', '', '', '', '', '', '', '', '', '', ''],
+        
+        // Fila 2 (índice 1): EMPRESA
+        ['', '', 'EMPRESA', '', '', '', '', '', '', '', ''],
+        
+        // Fila 3 (índice 2): FECHA DE GENERACIÓN | TIPO DE CARGA
+        ['', '', 'FECHA DE GENERACIÓN:', '', '', 'TIPO DE CARGA:', '', '', '', '', ''],
+        
+        // Fila 4 (índice 3): HORA DE GENERACIÓN | TOTAL DE INVENTARIO
+        ['', '', 'HORA DE GENERACIÓN:', '', '', 'TOTAL DE INVENTARIO:', '', '', '', '', ''],
+        
+        // Fila 5 (índice 4): USUARIO
+        ['', '', 'USUARIO:', '', '', '', '', '', '', '', ''],
+        
+        // Filas 6-8 (índices 5-7): Vacías
+        ['', '', '', '', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', '', '', '', ''],
+        ['', '', '', '', '', '', '', '', '', '', ''],
+        
+        // Fila 9 (índice 8): Título "INVENTARIO"
+        ['', '', '', '', '', '', '', '', '', '', ''],
+        
+        // Fila 10 (índice 9): Cabeceras de columnas
+        ['Código', 'Producto', 'Disponible U.M. Bas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso', '', '', '']
       ];
 
       // Preparar los datos para el Excel (solo campos solicitados)
@@ -488,7 +521,8 @@ function InventarioEnLinea() {
         item.licencia || '',
         item.referencia || '',
         item.fecha_vence ? formatDate(item.fecha_vence) : '',
-        item.fecha_ingreso ? formatDate(item.fecha_ingreso) : ''
+        item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '',
+        '', '', '' // Columnas extras para mantener ancho consistente
       ]);
 
       // Combinar encabezado con datos
@@ -498,24 +532,107 @@ function InventarioEnLinea() {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(datosCompletos);
 
-      // Combinar celdas en el encabezado para mantener el diseño
+      // Agregar los valores del encabezado en las celdas apropiadas
+      // Fila 2: Valor de EMPRESA (propietario) en D2-E2
+      ws['D2'] = { v: propietario, t: 's' };
+      
+      // Fila 3: Valor de FECHA en D3, TIPO DE CARGA valor en G3-H3
+      ws['D3'] = { v: fechaGeneracion, t: 's' };
+      ws['G3'] = { v: 'SECA/REFRIGERADA/CONGELADA', t: 's' };
+      
+      // Fila 4: Valor de HORA en D4, TOTAL en G4
+      ws['D4'] = { v: horaGeneracion, t: 's' };
+      ws['G4'] = { v: totalInventario, t: 'n' };
+      
+      // Fila 5: Valor de USUARIO en D5
+      ws['D5'] = { v: usuario, t: 's' };
+      
+      // Fila 9: Título "INVENTARIO" en celda A9
+      ws['A9'] = { v: 'INVENTARIO', t: 's' };
+
+      // Combinar celdas en el encabezado para mantener el diseño según imagen
       // Formato: { s: { r: fila, c: columna }, e: { r: fila_final, c: columna_final } }
       ws['!merges'] = [
-        // Fila 1: EMPRESA (A1:B1 combinadas) | propietario (C1:D1 combinadas)
-        { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
-        { s: { r: 0, c: 2 }, e: { r: 0, c: 3 } },
+        // Fila 2: EMPRESA (C2) solo, valor D2-E2 combinado, Logo espacio J2-K2 (y J2-K5 vertical)
+        { s: { r: 1, c: 3 }, e: { r: 1, c: 4 } }, // D2:E2 - Valor propietario
+        { s: { r: 1, c: 9 }, e: { r: 4, c: 10 } }, // J2:K5 - Espacio para logo
         
-        // Fila 2: FECHA DE GENERACIÓN: (A2:B2) | fecha en C2 | vacío D2 | TIPO DE CARGA: (E2:G2)
-        { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } },
-        { s: { r: 1, c: 4 }, e: { r: 1, c: 6 } },
+        // Fila 3: FECHA DE GENERACIÓN (C3), TIPO DE CARGA (F3), valor G3-H3
+        { s: { r: 2, c: 6 }, e: { r: 2, c: 7 } }, // G3:H3 - Valor tipo de carga
         
-        // Fila 3: HORA DE GENERACIÓN: (A3:B3) | hora en C3 | vacío D3 | TOTAL DE INVENTARIO: (E3:G3)
-        { s: { r: 2, c: 0 }, e: { r: 2, c: 1 } },
-        { s: { r: 2, c: 4 }, e: { r: 2, c: 6 } },
+        // Fila 4: HORA DE GENERACIÓN (C4), TOTAL DE INVENTARIO (F4)
+        // (No merges necesarios, valores individuales)
         
-        // Fila 4: USUARIO: (A4:B4) | usuario (C4:D4)
-        { s: { r: 3, c: 0 }, e: { r: 3, c: 1 } },
-        { s: { r: 3, c: 2 }, e: { r: 3, c: 3 } }
+        // Fila 5: USUARIO (C5), valor D5-E5
+        { s: { r: 4, c: 3 }, e: { r: 4, c: 4 } }, // D5:E5 - Valor usuario
+        
+        // Fila 9: Título "INVENTARIO" centrado A9-H9 (o hasta donde llegue la tabla)
+        { s: { r: 8, c: 0 }, e: { r: 8, c: 7 } } // A9:H9 - Título INVENTARIO centrado
+      ];
+
+      // Aplicar estilos a las celdas del encabezado
+      // Estilo para etiquetas (negrita)
+      const estiloEtiqueta = {
+        font: { bold: true, sz: 10 },
+        alignment: { horizontal: 'left', vertical: 'center' }
+      };
+      
+      // Estilo para valores
+      const estiloValor = {
+        font: { sz: 10 },
+        alignment: { horizontal: 'left', vertical: 'center' }
+      };
+      
+      // Estilo para título "INVENTARIO"
+      const estiloTitulo = {
+        font: { bold: true, sz: 14 },
+        alignment: { horizontal: 'center', vertical: 'center' }
+      };
+      
+      // Estilo para cabeceras de columnas
+      const estiloCabecera = {
+        font: { bold: true, sz: 10 },
+        alignment: { horizontal: 'center', vertical: 'center' },
+        fill: { fgColor: { rgb: 'D3D3D3' } }
+      };
+
+      // Aplicar estilos a etiquetas
+      if (ws['C2']) ws['C2'].s = estiloEtiqueta;
+      if (ws['C3']) ws['C3'].s = estiloEtiqueta;
+      if (ws['C4']) ws['C4'].s = estiloEtiqueta;
+      if (ws['C5']) ws['C5'].s = estiloEtiqueta;
+      if (ws['F3']) ws['F3'].s = estiloEtiqueta;
+      if (ws['F4']) ws['F4'].s = estiloEtiqueta;
+      
+      // Aplicar estilos a valores
+      if (ws['D2']) ws['D2'].s = estiloValor;
+      if (ws['D3']) ws['D3'].s = estiloValor;
+      if (ws['D4']) ws['D4'].s = estiloValor;
+      if (ws['D5']) ws['D5'].s = estiloValor;
+      if (ws['G3']) ws['G3'].s = estiloValor;
+      if (ws['G4']) ws['G4'].s = estiloValor;
+      
+      // Aplicar estilo al título INVENTARIO
+      if (ws['A9']) ws['A9'].s = estiloTitulo;
+      
+      // Aplicar estilo a cabeceras de columnas (fila 10)
+      ['A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10'].forEach(cell => {
+        if (ws[cell]) ws[cell].s = estiloCabecera;
+      });
+
+      // Configurar anchos de columnas
+      ws['!cols'] = [
+        { wch: 12 },  // A - Código
+        { wch: 30 },  // B - Producto
+        { wch: 18 },  // C - Disponible U.M. Bas
+        { wch: 15 },  // D - Lote
+        { wch: 15 },  // E - Licencia
+        { wch: 15 },  // F - Referencia
+        { wch: 12 },  // G - Fecha Vence
+        { wch: 12 },  // H - Fecha Ingreso
+        { wch: 8 },   // I - Vacía
+        { wch: 10 },  // J - Logo
+        { wch: 10 }   // K - Logo
       ];
 
       XLSX.utils.book_append_sheet(wb, ws, 'Inventario Completo');
