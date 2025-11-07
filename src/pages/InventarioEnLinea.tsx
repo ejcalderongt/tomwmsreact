@@ -512,10 +512,13 @@ function InventarioEnLinea() {
       worksheet.getCell('C2').value = propietario;
       worksheet.mergeCells('C2:D2');
 
-      // Fila 3: FECHA DE GENERACIÓN
+      // Fila 3: FECHA DE GENERACIÓN | TIPO DE CARGA
       worksheet.getCell('B3').value = 'FECHA DE GENERACIÓN:';
       worksheet.getCell('B3').font = { bold: true };
       worksheet.getCell('C3').value = fechaGeneracion;
+      
+      worksheet.getCell('E3').value = 'TIPO DE CARGA:';
+      worksheet.getCell('E3').font = { bold: true };
 
       // Fila 4: HORA DE GENERACIÓN | TOTAL DE INVENTARIO
       worksheet.getCell('B4').value = 'HORA DE GENERACIÓN:';
@@ -532,8 +535,8 @@ function InventarioEnLinea() {
       worksheet.getCell('C5').value = usuario;
       worksheet.mergeCells('C5:D5');
 
-      // Insertar logotipo en H2:I5
-      worksheet.mergeCells('H2:I5');
+      // Insertar logotipo en H2:J7 (3 columnas x 6 filas)
+      worksheet.mergeCells('H2:J7');
       
       // Cargar y agregar la imagen del logotipo
       try {
@@ -548,7 +551,7 @@ function InventarioEnLinea() {
         
         worksheet.addImage(imageId, {
           tl: { col: 7, row: 1 },
-          ext: { width: 150, height: 60 }
+          ext: { width: 200, height: 90 }
         });
       } catch (error) {
         console.log('No se pudo cargar el logotipo, continuando sin él');
