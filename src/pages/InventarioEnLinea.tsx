@@ -615,12 +615,13 @@ function InventarioEnLinea() {
         }
       };
 
-      // Aplicar fondo blanco a todas las celdas del encabezado (filas 1-9)
-      for (let r = 0; r < 9; r++) {
-        for (let c = 0; c < 11; c++) {
+      // Aplicar fondo blanco desde columna A hasta N (14 columnas) y desde fila 1 hasta 1000
+      for (let r = 0; r < 1000; r++) {
+        for (let c = 0; c < 14; c++) {
           const cellAddress = XLSX.utils.encode_cell({ r, c });
           if (!ws[cellAddress]) ws[cellAddress] = { v: '', t: 's' };
-          ws[cellAddress].s = { fill: { fgColor: { rgb: 'FFFFFF' } } };
+          if (!ws[cellAddress].s) ws[cellAddress].s = {};
+          ws[cellAddress].s.fill = { fgColor: { rgb: 'FFFFFF' } };
         }
       }
 
@@ -640,22 +641,83 @@ function InventarioEnLinea() {
       if (ws['F3']) ws['F3'].s = estiloValor;
       if (ws['F4']) ws['F4'].s = estiloValor;
       
-      // Aplicar estilo al título INVENTARIO
-      if (ws['A9']) ws['A9'].s = estiloTitulo;
+      // Aplicar estilo al título INVENTARIO centrado en toda la fila 9 (A9:H9)
+      for (let c = 0; c < 8; c++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 8, c });
+        if (!ws[cellAddress]) ws[cellAddress] = { v: '', t: 's' };
+        ws[cellAddress].s = estiloTitulo;
+      }
       
       // Aplicar estilo a cabeceras de columnas (fila 10)
       ['A10', 'B10', 'C10', 'D10', 'E10', 'F10', 'G10', 'H10'].forEach(cell => {
         if (ws[cell]) ws[cell].s = estiloCabecera;
       });
 
-      // Aplicar bordes a todas las celdas de datos (desde fila 11 en adelante)
-      const numFilasDatos = todosLosDatos.length;
-      for (let r = 10; r < 10 + numFilasDatos; r++) {
+      // Aplicar bordes a todas las celdas desde fila 9 hasta fila 1000 (columnas A-H)
+      for (let r = 8; r < 1000; r++) {
         for (let c = 0; c < 8; c++) {
           const cellAddress = XLSX.utils.encode_cell({ r, c });
-          if (ws[cellAddress]) {
-            ws[cellAddress].s = { ...ws[cellAddress].s, ...estiloDatos };
-          }
+          if (!ws[cellAddress]) ws[cellAddress] = { v: '', t: 's' };
+          if (!ws[cellAddress].s) ws[cellAddress].s = {};
+          
+          // Preservar estilos existentes y agregar bordes
+          const currentStyle = ws[cellAddress].s || {};
+          ws[cellAddress].s = {
+            ...currentStyle,
+            border: {
+              top: { style: 'thin', color: { rgb: '000000' } },
+              bottom: { style: 'thin', color: { rgb: '000000' } },
+              left: { style: 'thin', color: { rgb: '000000' } },
+              right: { style: 'thin', color: { rgb: '000000' } }
+            }
+          };
+        }
+      }
+
+      // Aplicar borde exterior grueso al rango de la tabla (A9:H + última fila con datos)
+      const ultimaFilaDatos = 10 + todosLosDatos.length;
+      
+      // Borde superior grueso (fila 9, columnas A-H)
+      for (let c = 0; c < 8; c++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: 8, c });
+        if (ws[cellAddress] && ws[cellAddress].s) {
+          ws[cellAddress].s.border = {
+            ...ws[cellAddress].s.border,
+            top: { style: 'medium', color: { rgb: '000000' } }
+          };
+        }
+      }
+      
+      // Borde inferior grueso (última fila con datos)
+      for (let c = 0; c < 8; c++) {
+        const cellAddress = XLSX.utils.encode_cell({ r: ultimaFilaDatos - 1, c });
+        if (ws[cellAddress] && ws[cellAddress].s) {
+          ws[cellAddress].s.border = {
+            ...ws[cellAddress].s.border,
+            bottom: { style: 'medium', color: { rgb: '000000' } }
+          };
+        }
+      }
+      
+      // Borde izquierdo grueso (columna A, desde fila 9 hasta última fila con datos)
+      for (let r = 8; r < ultimaFilaDatos; r++) {
+        const cellAddress = XLSX.utils.encode_cell({ r, c: 0 });
+        if (ws[cellAddress] && ws[cellAddress].s) {
+          ws[cellAddress].s.border = {
+            ...ws[cellAddress].s.border,
+            left: { style: 'medium', color: { rgb: '000000' } }
+          };
+        }
+      }
+      
+      // Borde derecho grueso (columna H, desde fila 9 hasta última fila con datos)
+      for (let r = 8; r < ultimaFilaDatos; r++) {
+        const cellAddress = XLSX.utils.encode_cell({ r, c: 7 });
+        if (ws[cellAddress] && ws[cellAddress].s) {
+          ws[cellAddress].s.border = {
+            ...ws[cellAddress].s.border,
+            right: { style: 'medium', color: { rgb: '000000' } }
+          };
         }
       }
 

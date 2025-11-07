@@ -98,20 +98,23 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
      - Columna E: Etiquetas adicionales (TIPO DE CARGA, TOTAL DE INVENTARIO)
      - Columna F-G: Valores (SECA/REFRIGERADA/CONGELADA, total calculado)
      - Columnas J-K: Espacio reservado para logotipo (celdas J2:K5 combinadas)
-   - **Título "INVENTARIO":** Fila 9, centrado sobre las columnas de la tabla (A9:H9) en negrita con tamaño 14pt
-   - **Estilos aplicados:**
-     - Etiquetas en negrita, alineación izquierda, fondo blanco
-     - Valores en fuente normal, alineación izquierda, fondo blanco
-     - Cabeceras de columnas en negrita, centradas, con fondo gris y bordes
-     - Todas las celdas del encabezado (filas 1-9) con fondo blanco para ocultar líneas del grid
-     - Bordes negros aplicados a todas las celdas de datos (tabla)
+   - **Título "INVENTARIO":** Fila 9, centrado en toda la fila (A9:H9) en negrita con tamaño 14pt
+   - **Formato profesional aplicado:**
+     - **Fondo blanco:** Aplicado desde columna A hasta N (14 columnas) y desde fila 1 hasta fila 1000
+     - **Bordes internos:** Bordes delgados negros en todas las celdas desde fila 9 hasta fila 1000 (columnas A-H)
+     - **Borde exterior grueso:** Borde perimetral grueso aplicado a toda la tabla de datos (desde fila 9 hasta la última fila con datos)
+     - Etiquetas en negrita, alineación izquierda
+     - Valores en fuente normal, alineación izquierda
+     - Cabeceras de columnas en negrita, centradas, con fondo gris
+     - Contenido de la fila 9 completamente centrado
    - **Funcionalidades:**
      - Cálculo automático del total de inventario (suma de disponible_UMBas)
      - Fusión de celdas para mantener diseño profesional
      - Anchos de columnas configurados para mejor visualización
      - Espacio para logo puede ser ocupado posteriormente con imagen
-     - Bordes en todas las celdas de datos para mejor presentación visual
+     - Formato de tabla profesional con bordes internos y externos diferenciados
    - Datos comienzan en fila 11 después del encabezado completo
+   - Excel generado con aspecto limpio y profesional sin líneas de grid visibles
 
 5. ✅ **Encabezado Mejorado en Archivo Excel - Inventario en Línea**
    - Agregado encabezado informativo al archivo Excel con los siguientes campos:
