@@ -65,6 +65,11 @@ const apiProxy = createProxyMiddleware({
     console.log(`${statusColor} [${new Date().toISOString()}] Proxy Response: ${proxyRes.statusCode} for ${req.url}`);
     console.log(`   Response Headers:`, JSON.stringify(proxyRes.headers, null, 2));
 
+    // CRITICAL: Remove WWW-Authenticate header to prevent browser's native auth dialog
+    // This header from IIS causes the browser to show its native credentials popup on 401 errors
+    delete proxyRes.headers['www-authenticate'];
+    delete proxyRes.headers['WWW-Authenticate'];
+
     // Force CORS headers on response
     proxyRes.headers['access-control-allow-origin'] = '*';
     proxyRes.headers['access-control-allow-methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
