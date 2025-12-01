@@ -476,22 +476,22 @@ function InventarioEnLinea() {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Inventario Completo');
 
-      // Configurar anchos de columnas
+      // Configurar anchos de columnas (10 columnas de datos + espacio para logo)
       worksheet.columns = [
-        { width: 12 },  // A - Código
-        { width: 30 },  // B - Producto
-        { width: 18 },  // C - Disponible U.M. Bas
-        { width: 15 },  // D - Lote
-        { width: 15 },  // E - Licencia
-        { width: 15 },  // F - Referencia
-        { width: 12 },  // G - Fecha Vence
-        { width: 12 },  // H - Fecha Ingreso
-        { width: 8 },   // I - Vacía
-        { width: 10 },  // J - Logo
-        { width: 10 },  // K - Logo
-        { width: 10 },  // L
-        { width: 10 },  // M
-        { width: 10 }   // N
+        { width: 28 },  // A - Propietario
+        { width: 14 },  // B - Código
+        { width: 32 },  // C - Producto
+        { width: 18 },  // D - Disponible Umbas
+        { width: 14 },  // E - Lote
+        { width: 14 },  // F - Licencia
+        { width: 14 },  // G - Referencia
+        { width: 14 },  // H - Fecha Vence
+        { width: 14 },  // I - Fecha Ingreso
+        { width: 18 },  // J - Bodega
+        { width: 2 },   // K - Espacio
+        { width: 10 },  // L - Logo
+        { width: 10 },  // M - Logo
+        { width: 10 }   // N - Logo
       ];
 
       // Aplicar fondo blanco a todas las celdas desde A1 hasta N1000
@@ -535,8 +535,8 @@ function InventarioEnLinea() {
       worksheet.getCell('C5').value = usuario;
       worksheet.mergeCells('C5:D5');
 
-      // Insertar logotipo en H2:J7 (3 columnas x 6 filas)
-      worksheet.mergeCells('H2:J7');
+      // Insertar logotipo en L2:N7 (3 columnas x 6 filas)
+      worksheet.mergeCells('L2:N7');
       
       // Cargar y agregar la imagen del logotipo
       try {
@@ -550,15 +550,15 @@ function InventarioEnLinea() {
         });
         
         worksheet.addImage(imageId, {
-          tl: { col: 7, row: 1 },
+          tl: { col: 11, row: 1 },
           ext: { width: 200, height: 90 }
         });
       } catch (error) {
         console.log('No se pudo cargar el logotipo, continuando sin él');
       }
 
-      // Fila 9: Título "INVENTARIO" centrado
-      worksheet.mergeCells('A9:H9');
+      // Fila 9: Título "INVENTARIO" centrado (10 columnas: A-J)
+      worksheet.mergeCells('A9:J9');
       const cellInventario = worksheet.getCell('A9');
       cellInventario.value = 'INVENTARIO';
       cellInventario.font = { bold: true, size: 14 };
@@ -569,8 +569,8 @@ function InventarioEnLinea() {
         fgColor: { argb: 'FFFFFFFF' }
       };
 
-      // Fila 10: Cabeceras de columnas
-      const headers = ['Código', 'Producto', 'Disponible U.M. Bas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso'];
+      // Fila 10: Cabeceras de columnas (10 columnas)
+      const headers = ['Propietario', 'Código', 'Producto', 'Disponible Umbas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso', 'Bodega'];
       const row10 = worksheet.getRow(10);
       headers.forEach((header, index) => {
         const cell = row10.getCell(index + 1);
@@ -590,22 +590,24 @@ function InventarioEnLinea() {
         };
       });
 
-      // Agregar datos a partir de la fila 11
+      // Agregar datos a partir de la fila 11 (10 columnas)
       todosLosDatos.forEach((item: InventarioItem, index: number) => {
         const rowNum = 11 + index;
         const row = worksheet.getRow(rowNum);
         
-        row.getCell(1).value = item.codigo || '';
-        row.getCell(2).value = item.nombre || '';
-        row.getCell(3).value = item.disponible_UMBas || 0;
-        row.getCell(4).value = item.lote || '';
-        row.getCell(5).value = item.licencia || '';
-        row.getCell(6).value = item.referencia || '';
-        row.getCell(7).value = item.fecha_vence ? formatDate(item.fecha_vence) : '';
-        row.getCell(8).value = item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '';
+        row.getCell(1).value = item.propietario || '';
+        row.getCell(2).value = item.codigo || '';
+        row.getCell(3).value = item.nombre || '';
+        row.getCell(4).value = item.disponible_UMBas || 0;
+        row.getCell(5).value = item.lote || '';
+        row.getCell(6).value = item.licencia || '';
+        row.getCell(7).value = item.referencia || '';
+        row.getCell(8).value = item.fecha_vence ? formatDate(item.fecha_vence) : '';
+        row.getCell(9).value = item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '';
+        row.getCell(10).value = item.bodega || '';
         
-        // Aplicar bordes a todas las celdas de datos
-        for (let c = 1; c <= 8; c++) {
+        // Aplicar bordes a todas las celdas de datos (10 columnas)
+        for (let c = 1; c <= 10; c++) {
           row.getCell(c).border = {
             top: { style: 'thin' },
             left: { style: 'thin' },
@@ -615,9 +617,9 @@ function InventarioEnLinea() {
         }
       });
 
-      // Aplicar bordes desde fila 9 hasta fila 1000
+      // Aplicar bordes desde fila 9 hasta fila 1000 (10 columnas)
       for (let r = 9; r <= 1000; r++) {
-        for (let c = 1; c <= 8; c++) {
+        for (let c = 1; c <= 10; c++) {
           const cell = worksheet.getCell(r, c);
           if (!cell.border) {
             cell.border = {
@@ -634,7 +636,7 @@ function InventarioEnLinea() {
       const ultimaFilaDatos = 10 + todosLosDatos.length;
       
       // Borde superior grueso (fila 9)
-      for (let c = 1; c <= 8; c++) {
+      for (let c = 1; c <= 10; c++) {
         const cell = worksheet.getCell(9, c);
         cell.border = {
           ...cell.border,
@@ -643,7 +645,7 @@ function InventarioEnLinea() {
       }
       
       // Borde inferior grueso (última fila con datos)
-      for (let c = 1; c <= 8; c++) {
+      for (let c = 1; c <= 10; c++) {
         const cell = worksheet.getCell(ultimaFilaDatos, c);
         cell.border = {
           ...cell.border,
@@ -660,9 +662,9 @@ function InventarioEnLinea() {
         };
       }
       
-      // Borde derecho grueso (columna H)
+      // Borde derecho grueso (columna J)
       for (let r = 9; r <= ultimaFilaDatos; r++) {
-        const cell = worksheet.getCell(r, 8);
+        const cell = worksheet.getCell(r, 10);
         cell.border = {
           ...cell.border,
           right: { style: 'medium' }
