@@ -478,8 +478,8 @@ function InventarioEnLinea() {
 
       // Configurar anchos de columnas (10 columnas de datos + espacio para logo)
       worksheet.columns = [
-        { width: 28 },  // A - Propietario
-        { width: 14 },  // B - Código
+        { width: 14 },  // A - Propietario (reducido 50%)
+        { width: 24 },  // B - Código (aumentado para encabezados)
         { width: 32 },  // C - Producto
         { width: 18 },  // D - Disponible Umbas
         { width: 14 },  // E - Lote
@@ -488,10 +488,9 @@ function InventarioEnLinea() {
         { width: 14 },  // H - Fecha Vence
         { width: 14 },  // I - Fecha Ingreso
         { width: 18 },  // J - Bodega
-        { width: 2 },   // K - Espacio
+        { width: 10 },  // K - Logo
         { width: 10 },  // L - Logo
-        { width: 10 },  // M - Logo
-        { width: 10 }   // N - Logo
+        { width: 10 }   // M - Logo
       ];
 
       // Aplicar fondo blanco a todas las celdas desde A1 hasta N1000
@@ -535,8 +534,8 @@ function InventarioEnLinea() {
       worksheet.getCell('C5').value = usuario;
       worksheet.mergeCells('C5:D5');
 
-      // Insertar logotipo en L2:N7 (3 columnas x 6 filas)
-      worksheet.mergeCells('L2:N7');
+      // Insertar logotipo en I2:K7 (3 columnas x 6 filas, inicia en columna I)
+      worksheet.mergeCells('I2:K7');
       
       // Cargar y agregar la imagen del logotipo
       try {
@@ -550,7 +549,7 @@ function InventarioEnLinea() {
         });
         
         worksheet.addImage(imageId, {
-          tl: { col: 11, row: 1 },
+          tl: { col: 8, row: 1 },
           ext: { width: 200, height: 90 }
         });
       } catch (error) {
