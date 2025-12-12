@@ -241,7 +241,7 @@ function Ingresos() {
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 420px)' }}>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 280px)' }}>
           <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0">
             <h3 className="text-lg font-medium text-gray-900">
               Documentos de Ingreso ({documentos.length})
