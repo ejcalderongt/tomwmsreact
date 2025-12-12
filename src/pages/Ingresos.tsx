@@ -189,6 +189,15 @@ function Ingresos() {
               </label>
               <div className="relative">
                 <input
+                  type="text"
+                  id="fechaInicioDisplay"
+                  value={fechaInicioDisplay}
+                  readOnly
+                  onClick={() => document.getElementById('fechaInicio')?.showPicker()}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer"
+                  placeholder="DD/MM/YYYY"
+                />
+                <input
                   type="date"
                   id="fechaInicio"
                   value={fechaInicio}
@@ -196,11 +205,8 @@ function Ingresos() {
                     setFechaInicio(e.target.value);
                     setFechaInicioDisplay(formatDateFromInput(e.target.value));
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="absolute opacity-0 w-0 h-0"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 pointer-events-none">
-                  {fechaInicioDisplay}
-                </div>
               </div>
             </div>
 
@@ -210,6 +216,15 @@ function Ingresos() {
               </label>
               <div className="relative">
                 <input
+                  type="text"
+                  id="fechaFinDisplay"
+                  value={fechaFinDisplay}
+                  readOnly
+                  onClick={() => document.getElementById('fechaFin')?.showPicker()}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer"
+                  placeholder="DD/MM/YYYY"
+                />
+                <input
                   type="date"
                   id="fechaFin"
                   value={fechaFin}
@@ -217,11 +232,8 @@ function Ingresos() {
                     setFechaFin(e.target.value);
                     setFechaFinDisplay(formatDateFromInput(e.target.value));
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  className="absolute opacity-0 w-0 h-0"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 pointer-events-none">
-                  {fechaFinDisplay}
-                </div>
               </div>
             </div>
 
