@@ -185,44 +185,88 @@ function Ingresos() {
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-48">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Fecha Inicio
+                Fecha Inicio (DD/MM/YYYY)
               </label>
-              <div 
-                className="relative w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 cursor-pointer bg-white"
-                onClick={() => (document.getElementById('fechaInicio') as HTMLInputElement)?.showPicker?.()}
-              >
-                <span className="text-gray-900">{fechaInicioDisplay || 'DD/MM/YYYY'}</span>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={fechaInicioDisplay}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFechaInicioDisplay(value);
+                    const parts = value.split('/');
+                    if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+                      const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                      if (!isNaN(new Date(isoDate).getTime())) {
+                        setFechaInicio(isoDate);
+                      }
+                    }
+                  }}
+                  placeholder="DD/MM/YYYY"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => (document.getElementById('fechaInicioHidden') as HTMLInputElement)?.showPicker?.()}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </button>
                 <input
                   type="date"
-                  id="fechaInicio"
+                  id="fechaInicioHidden"
                   value={fechaInicio}
                   onChange={(e) => {
                     setFechaInicio(e.target.value);
                     setFechaInicioDisplay(formatDateFromInput(e.target.value));
                   }}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className="absolute opacity-0 w-0 h-0 pointer-events-none"
                 />
               </div>
             </div>
 
             <div className="flex-1 min-w-48">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Fecha Fin
+                Fecha Fin (DD/MM/YYYY)
               </label>
-              <div 
-                className="relative w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 cursor-pointer bg-white"
-                onClick={() => (document.getElementById('fechaFin') as HTMLInputElement)?.showPicker?.()}
-              >
-                <span className="text-gray-900">{fechaFinDisplay || 'DD/MM/YYYY'}</span>
+              <div className="relative">
+                <input
+                  type="text"
+                  value={fechaFinDisplay}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFechaFinDisplay(value);
+                    const parts = value.split('/');
+                    if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+                      const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                      if (!isNaN(new Date(isoDate).getTime())) {
+                        setFechaFin(isoDate);
+                      }
+                    }
+                  }}
+                  placeholder="DD/MM/YYYY"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => (document.getElementById('fechaFinHidden') as HTMLInputElement)?.showPicker?.()}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </button>
                 <input
                   type="date"
-                  id="fechaFin"
+                  id="fechaFinHidden"
                   value={fechaFin}
                   onChange={(e) => {
                     setFechaFin(e.target.value);
                     setFechaFinDisplay(formatDateFromInput(e.target.value));
                   }}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className="absolute opacity-0 w-0 h-0 pointer-events-none"
                 />
               </div>
             </div>
