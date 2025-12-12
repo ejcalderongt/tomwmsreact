@@ -41,10 +41,13 @@ export const logout = () => {
   localStorage.removeItem('wms_idPropietario');
 };
 
-// Función para formatear fecha desde input (YYYY-MM-DD) a formato de visualización
+// Función para formatear fecha desde input (YYYY-MM-DD) a formato de visualización (DD/MM/YYYY)
 export const formatDateFromInput = (dateString: string): string => {
   if (!dateString) return '';
-  // Si ya está en formato YYYY-MM-DD, mantenerlo
+  const parts = dateString.split('-');
+  if (parts.length === 3) {
+    return `${parts[2]}/${parts[1]}/${parts[0]}`;
+  }
   return dateString;
 };
 
