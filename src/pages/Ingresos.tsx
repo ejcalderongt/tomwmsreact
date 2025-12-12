@@ -178,20 +178,8 @@ function Ingresos() {
   };
 
   return (
-    <Layout>
+    <Layout pageTitle="Documentos de Ingreso">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <ArrowRightOnRectangleIcon className="h-6 w-6 text-green-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Documentos de Ingreso</h1>
-            </div>
-          </div>
-        </div>
-
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">
