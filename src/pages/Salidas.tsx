@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { ArrowLeftOnRectangleIcon, CalendarDaysIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
+import { CalendarDaysIcon, DocumentArrowDownIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { salidasAPI } from '@/api/api';
 import { formatDateToDisplay, formatDateFromInput } from '@/utils/auth';
@@ -160,79 +160,114 @@ function Salidas() {
   };
 
   return (
-    <Layout>
+    <Layout pageTitle="Documentos de Salida">
       <div className="space-y-6">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <ArrowLeftOnRectangleIcon className="h-6 w-6 text-red-600" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Documentos de Salida</h1>
-              <p className="text-gray-600">Gestión de documentos de salida y despachos</p>
-            </div>
-          </div>
-        </div>
-
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-48">
-              <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-2">
-                Fecha Inicio
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fecha Inicio (DD/MM/YYYY)
               </label>
               <div className="relative">
                 <input
+                  type="text"
+                  value={fechaInicioDisplay}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFechaInicioDisplay(value);
+                    const parts = value.split('/');
+                    if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+                      const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                      if (!isNaN(new Date(isoDate).getTime())) {
+                        setFechaInicio(isoDate);
+                      }
+                    }
+                  }}
+                  placeholder="DD/MM/YYYY"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => (document.getElementById('fechaInicioHidden') as HTMLInputElement)?.showPicker?.()}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                <input
                   type="date"
-                  id="fechaInicio"
+                  id="fechaInicioHidden"
                   value={fechaInicio}
                   onChange={(e) => {
                     setFechaInicio(e.target.value);
                     setFechaInicioDisplay(formatDateFromInput(e.target.value));
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className="absolute opacity-0 w-0 h-0 pointer-events-none"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 pointer-events-none">
-                  {fechaInicioDisplay}
-                </div>
               </div>
             </div>
-            
+
             <div className="flex-1 min-w-48">
-              <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-2">
-                Fecha Fin
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fecha Fin (DD/MM/YYYY)
               </label>
               <div className="relative">
                 <input
+                  type="text"
+                  value={fechaFinDisplay}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setFechaFinDisplay(value);
+                    const parts = value.split('/');
+                    if (parts.length === 3 && parts[0].length === 2 && parts[1].length === 2 && parts[2].length === 4) {
+                      const isoDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                      if (!isNaN(new Date(isoDate).getTime())) {
+                        setFechaFin(isoDate);
+                      }
+                    }
+                  }}
+                  placeholder="DD/MM/YYYY"
+                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => (document.getElementById('fechaFinHidden') as HTMLInputElement)?.showPicker?.()}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                </button>
+                <input
                   type="date"
-                  id="fechaFin"
+                  id="fechaFinHidden"
                   value={fechaFin}
                   onChange={(e) => {
                     setFechaFin(e.target.value);
                     setFechaFinDisplay(formatDateFromInput(e.target.value));
                   }}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  className="absolute opacity-0 w-0 h-0 pointer-events-none"
                 />
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 pointer-events-none">
-                  {fechaFinDisplay}
-                </div>
               </div>
             </div>
-            
-            <button
-              onClick={cargarDocumentos}
-              disabled={loading}
-              className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <CalendarDaysIcon className="h-4 w-4 mr-2" />
-              {loading ? 'Cargando...' : 'Consultar'}
-            </button>
+
+            <div>
+              <button
+                onClick={cargarDocumentos}
+                disabled={loading}
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <CalendarDaysIcon className="h-4 w-4 mr-2" />
+                {loading ? 'Cargando...' : 'Consultar'}
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Table */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 420px)' }}>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 280px)' }}>
           <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
             <h3 className="text-lg font-medium text-gray-900">
               Documentos de Salida ({documentos.length})
