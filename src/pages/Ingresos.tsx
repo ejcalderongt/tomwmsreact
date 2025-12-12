@@ -187,8 +187,7 @@ function Ingresos() {
               <ArrowRightOnRectangleIcon className="h-6 w-6 text-green-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Documentos de Ingreso</h1>
-              <p className="text-gray-600">Gestión de documentos de ingreso</p>
+              <h1 className="text-2xl font-bold text-gray-900">Sistema de Gestión de Inventarios - Documentos de Ingreso</h1>
             </div>
           </div>
         </div>
