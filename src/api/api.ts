@@ -360,8 +360,12 @@ export const existenciasAPI = {
 
       // Map the API response to expected format
       if (data && data.data) {
+        const mappedData = data.data.map((item: Record<string, unknown>) => ({
+          ...item,
+          licencia: item.lic_plate || ''
+        }));
         const response = {
-          existencias: data.data,
+          existencias: mappedData,
           totalRegistros: data.total || data.data.length,
           totalPaginas: Math.ceil((data.total || data.data.length) / filtro.tamanoPagina),
           paginaActual: filtro.pagina
