@@ -573,7 +573,7 @@ function InventarioEnLinea() {
       };
 
       // Fila 10: Cabeceras de columnas (9 columnas)
-      const headers = ['Código', 'Producto', 'Disponible Umbas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso', 'Bodega'];
+      const headers = ['Código', 'Producto', 'Disponible', 'Lote', 'Licencia', 'Documento de Ingreso', 'Fecha Vencimiento', 'Fecha Ingreso', 'Bodega'];
       const row10 = worksheet.getRow(10);
       headers.forEach((header, index) => {
         const cell = row10.getCell(index + 1);
@@ -936,11 +936,11 @@ function InventarioEnLinea() {
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disponible Umbas</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disponible</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Licencia</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Referencia</th>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Vence</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento de Ingreso</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Vencimiento</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha Ingreso</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Bodega</th>
                     </tr>
