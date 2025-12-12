@@ -385,7 +385,12 @@ function InventarioEnLinea() {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('es-ES');
+    const date = new Date(dateString);
+    // Si la fecha es 1/1/1900, devolver vacío
+    if (date.getFullYear() === 1900 && date.getMonth() === 0 && date.getDate() === 1) {
+      return '';
+    }
+    return date.toLocaleDateString('es-ES');
   };
 
   const formatNumber = (value: number, precision: number = 2) => {
@@ -476,21 +481,20 @@ function InventarioEnLinea() {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Inventario Completo');
 
-      // Configurar anchos de columnas (10 columnas de datos + espacio para logo)
+      // Configurar anchos de columnas (9 columnas de datos + espacio para logo)
       worksheet.columns = [
-        { width: 14 },  // A - Propietario (reducido 50%)
-        { width: 24 },  // B - Código (aumentado para encabezados)
-        { width: 32 },  // C - Producto
-        { width: 18 },  // D - Disponible Umbas
-        { width: 14 },  // E - Lote
-        { width: 14 },  // F - Licencia
-        { width: 14 },  // G - Referencia
-        { width: 14 },  // H - Fecha Vence
-        { width: 14 },  // I - Fecha Ingreso
-        { width: 18 },  // J - Bodega
+        { width: 24 },  // A - Código (aumentado para encabezados)
+        { width: 32 },  // B - Producto
+        { width: 18 },  // C - Disponible Umbas
+        { width: 14 },  // D - Lote
+        { width: 14 },  // E - Licencia
+        { width: 14 },  // F - Referencia
+        { width: 14 },  // G - Fecha Vence
+        { width: 14 },  // H - Fecha Ingreso
+        { width: 18 },  // I - Bodega
+        { width: 10 },  // J - Logo
         { width: 10 },  // K - Logo
-        { width: 10 },  // L - Logo
-        { width: 10 }   // M - Logo
+        { width: 10 }   // L - Logo
       ];
 
       // Aplicar fondo blanco a todas las celdas desde A1 hasta N1000
@@ -506,36 +510,36 @@ function InventarioEnLinea() {
       }
 
       // Fila 2: EMPRESA
-      worksheet.getCell('B2').value = 'EMPRESA';
-      worksheet.getCell('B2').font = { bold: true };
-      worksheet.getCell('C2').value = propietario;
-      worksheet.mergeCells('C2:D2');
+      worksheet.getCell('A2').value = 'EMPRESA';
+      worksheet.getCell('A2').font = { bold: true };
+      worksheet.getCell('B2').value = propietario;
+      worksheet.mergeCells('B2:C2');
 
       // Fila 3: FECHA DE GENERACIÓN | TIPO DE CARGA
-      worksheet.getCell('B3').value = 'FECHA DE GENERACIÓN:';
-      worksheet.getCell('B3').font = { bold: true };
-      worksheet.getCell('C3').value = fechaGeneracion;
+      worksheet.getCell('A3').value = 'FECHA DE GENERACIÓN:';
+      worksheet.getCell('A3').font = { bold: true };
+      worksheet.getCell('B3').value = fechaGeneracion;
       
-      worksheet.getCell('E3').value = 'TIPO DE CARGA:';
-      worksheet.getCell('E3').font = { bold: true };
+      worksheet.getCell('D3').value = 'TIPO DE CARGA:';
+      worksheet.getCell('D3').font = { bold: true };
 
       // Fila 4: HORA DE GENERACIÓN | TOTAL DE INVENTARIO
-      worksheet.getCell('B4').value = 'HORA DE GENERACIÓN:';
-      worksheet.getCell('B4').font = { bold: true };
-      worksheet.getCell('C4').value = horaGeneracion;
+      worksheet.getCell('A4').value = 'HORA DE GENERACIÓN:';
+      worksheet.getCell('A4').font = { bold: true };
+      worksheet.getCell('B4').value = horaGeneracion;
       
-      worksheet.getCell('E4').value = 'TOTAL DE INVENTARIO:';
-      worksheet.getCell('E4').font = { bold: true };
-      worksheet.getCell('F4').value = totalInventario;
+      worksheet.getCell('D4').value = 'TOTAL DE INVENTARIO:';
+      worksheet.getCell('D4').font = { bold: true };
+      worksheet.getCell('E4').value = totalInventario;
 
       // Fila 5: USUARIO
-      worksheet.getCell('B5').value = 'USUARIO:';
-      worksheet.getCell('B5').font = { bold: true };
-      worksheet.getCell('C5').value = usuario;
-      worksheet.mergeCells('C5:D5');
+      worksheet.getCell('A5').value = 'USUARIO:';
+      worksheet.getCell('A5').font = { bold: true };
+      worksheet.getCell('B5').value = usuario;
+      worksheet.mergeCells('B5:C5');
 
-      // Insertar logotipo en I2:K7 (3 columnas x 6 filas, inicia en columna I)
-      worksheet.mergeCells('I2:K7');
+      // Insertar logotipo en H2:J7 (3 columnas x 6 filas, inicia en columna H)
+      worksheet.mergeCells('H2:J7');
       
       // Cargar y agregar la imagen del logotipo
       try {
@@ -549,15 +553,15 @@ function InventarioEnLinea() {
         });
         
         worksheet.addImage(imageId, {
-          tl: { col: 8, row: 1 },
+          tl: { col: 7, row: 1 },
           ext: { width: 200, height: 90 }
         });
       } catch (error) {
         console.log('No se pudo cargar el logotipo, continuando sin él');
       }
 
-      // Fila 9: Título "INVENTARIO" centrado (10 columnas: A-J)
-      worksheet.mergeCells('A9:J9');
+      // Fila 9: Título "INVENTARIO" centrado (9 columnas: A-I)
+      worksheet.mergeCells('A9:I9');
       const cellInventario = worksheet.getCell('A9');
       cellInventario.value = 'INVENTARIO';
       cellInventario.font = { bold: true, size: 14 };
@@ -568,8 +572,8 @@ function InventarioEnLinea() {
         fgColor: { argb: 'FFFFFFFF' }
       };
 
-      // Fila 10: Cabeceras de columnas (10 columnas)
-      const headers = ['Propietario', 'Código', 'Producto', 'Disponible Umbas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso', 'Bodega'];
+      // Fila 10: Cabeceras de columnas (9 columnas)
+      const headers = ['Código', 'Producto', 'Disponible Umbas', 'Lote', 'Licencia', 'Referencia', 'Fecha Vence', 'Fecha Ingreso', 'Bodega'];
       const row10 = worksheet.getRow(10);
       headers.forEach((header, index) => {
         const cell = row10.getCell(index + 1);
@@ -589,24 +593,23 @@ function InventarioEnLinea() {
         };
       });
 
-      // Agregar datos a partir de la fila 11 (10 columnas)
+      // Agregar datos a partir de la fila 11 (9 columnas)
       todosLosDatos.forEach((item: InventarioItem, index: number) => {
         const rowNum = 11 + index;
         const row = worksheet.getRow(rowNum);
         
-        row.getCell(1).value = item.propietario || '';
-        row.getCell(2).value = item.codigo || '';
-        row.getCell(3).value = item.nombre || '';
-        row.getCell(4).value = item.disponible_UMBas || 0;
-        row.getCell(5).value = item.lote || '';
-        row.getCell(6).value = item.licencia || '';
-        row.getCell(7).value = item.referencia || '';
-        row.getCell(8).value = item.fecha_vence ? formatDate(item.fecha_vence) : '';
-        row.getCell(9).value = item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '';
-        row.getCell(10).value = item.bodega || '';
+        row.getCell(1).value = item.codigo || '';
+        row.getCell(2).value = item.nombre || '';
+        row.getCell(3).value = item.disponible_UMBas || 0;
+        row.getCell(4).value = item.lote || '';
+        row.getCell(5).value = item.licencia || '';
+        row.getCell(6).value = item.referencia || '';
+        row.getCell(7).value = item.fecha_vence ? formatDate(item.fecha_vence) : '';
+        row.getCell(8).value = item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '';
+        row.getCell(9).value = item.bodega || '';
         
-        // Aplicar bordes a todas las celdas de datos (10 columnas)
-        for (let c = 1; c <= 10; c++) {
+        // Aplicar bordes a todas las celdas de datos (9 columnas)
+        for (let c = 1; c <= 9; c++) {
           row.getCell(c).border = {
             top: { style: 'thin' },
             left: { style: 'thin' },
@@ -616,9 +619,9 @@ function InventarioEnLinea() {
         }
       });
 
-      // Aplicar bordes desde fila 9 hasta fila 1000 (10 columnas)
+      // Aplicar bordes desde fila 9 hasta fila 1000 (9 columnas)
       for (let r = 9; r <= 1000; r++) {
-        for (let c = 1; c <= 10; c++) {
+        for (let c = 1; c <= 9; c++) {
           const cell = worksheet.getCell(r, c);
           if (!cell.border) {
             cell.border = {
@@ -635,7 +638,7 @@ function InventarioEnLinea() {
       const ultimaFilaDatos = 10 + todosLosDatos.length;
       
       // Borde superior grueso (fila 9)
-      for (let c = 1; c <= 10; c++) {
+      for (let c = 1; c <= 9; c++) {
         const cell = worksheet.getCell(9, c);
         cell.border = {
           ...cell.border,
@@ -644,7 +647,7 @@ function InventarioEnLinea() {
       }
       
       // Borde inferior grueso (última fila con datos)
-      for (let c = 1; c <= 10; c++) {
+      for (let c = 1; c <= 9; c++) {
         const cell = worksheet.getCell(ultimaFilaDatos, c);
         cell.border = {
           ...cell.border,
@@ -661,9 +664,9 @@ function InventarioEnLinea() {
         };
       }
       
-      // Borde derecho grueso (columna J)
+      // Borde derecho grueso (columna I)
       for (let r = 9; r <= ultimaFilaDatos; r++) {
-        const cell = worksheet.getCell(r, 10);
+        const cell = worksheet.getCell(r, 9);
         cell.border = {
           ...cell.border,
           right: { style: 'medium' }
@@ -944,10 +947,9 @@ function InventarioEnLinea() {
           ) : (
             <>
               <div className="flex-1 overflow-y-auto overflow-x-auto" style={{ overflowX: 'auto', overflowY: 'auto' }}>
-                <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: '1000px' }}>
+                <table className="min-w-full divide-y divide-gray-200" style={{ minWidth: '900px' }}>
                     <thead className="bg-gray-50 sticky top-0 z-10">
                     <tr>
-                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Propietario</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disponible Umbas</th>
@@ -962,9 +964,6 @@ function InventarioEnLinea() {
                   <tbody className="bg-white divide-y divide-gray-200">
                       {inventario.map((item, index) => (
                         <tr key={item.idStock || index} className="hover:bg-gray-50">
-                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {item.propietario || ''}
-                          </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                             {item.codigo}
                           </td>
