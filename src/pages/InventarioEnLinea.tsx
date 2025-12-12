@@ -883,22 +883,6 @@ function InventarioEnLinea() {
           </div>
         )}
 
-        {totalRegistros > 0 && (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-            <div className="flex justify-between items-center text-sm text-gray-600">
-              <span>
-                Mostrando {inventario.length} de {totalRegistros} items
-                {bodegaSeleccionada > 0 && (
-                  <> en {bodegas.find(b => b.idBodega === bodegaSeleccionada)?.nombre}</>
-                )}
-                {searchTerm && (
-                  <> (filtrados por: "{searchTerm}")</>
-                )}
-              </span>
-              <span>Página {paginaActual} de {totalPaginas}</span>
-            </div>
-          </div>
-        )}
 
         {/* Table */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col" style={{ height: 'calc(100vh - 350px)' }}>
