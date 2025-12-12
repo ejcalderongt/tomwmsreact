@@ -188,15 +188,9 @@ function Ingresos() {
                 Fecha Inicio
               </label>
               <div className="relative">
-                <input
-                  type="text"
-                  id="fechaInicioDisplay"
-                  value={fechaInicioDisplay}
-                  readOnly
-                  onClick={() => document.getElementById('fechaInicio')?.showPicker()}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer"
-                  placeholder="DD/MM/YYYY"
-                />
+                <div className="absolute inset-0 flex items-center px-3 pointer-events-none z-10">
+                  <span className="text-gray-900">{fechaInicioDisplay}</span>
+                </div>
                 <input
                   type="date"
                   id="fechaInicio"
@@ -205,7 +199,8 @@ function Ingresos() {
                     setFechaInicio(e.target.value);
                     setFechaInicioDisplay(formatDateFromInput(e.target.value));
                   }}
-                  className="absolute opacity-0 w-0 h-0"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer"
+                  style={{ color: 'transparent' }}
                 />
               </div>
             </div>
@@ -215,15 +210,9 @@ function Ingresos() {
                 Fecha Fin
               </label>
               <div className="relative">
-                <input
-                  type="text"
-                  id="fechaFinDisplay"
-                  value={fechaFinDisplay}
-                  readOnly
-                  onClick={() => document.getElementById('fechaFin')?.showPicker()}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer"
-                  placeholder="DD/MM/YYYY"
-                />
+                <div className="absolute inset-0 flex items-center px-3 pointer-events-none z-10">
+                  <span className="text-gray-900">{fechaFinDisplay}</span>
+                </div>
                 <input
                   type="date"
                   id="fechaFin"
@@ -232,7 +221,8 @@ function Ingresos() {
                     setFechaFin(e.target.value);
                     setFechaFinDisplay(formatDateFromInput(e.target.value));
                   }}
-                  className="absolute opacity-0 w-0 h-0"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer"
+                  style={{ color: 'transparent' }}
                 />
               </div>
             </div>
