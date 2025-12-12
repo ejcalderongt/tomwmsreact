@@ -481,20 +481,21 @@ function InventarioEnLinea() {
       const workbook = new ExcelJS.Workbook();
       const worksheet = workbook.addWorksheet('Inventario Completo');
 
-      // Configurar anchos de columnas (9 columnas de datos + espacio para logo)
+      // Configurar anchos de columnas (10 columnas de datos + espacio para logo)
       worksheet.columns = [
         { width: 24 },  // A - Código (aumentado para encabezados)
         { width: 32 },  // B - Producto
-        { width: 18 },  // C - Disponible Umbas
-        { width: 14 },  // D - Lote
-        { width: 14 },  // E - Licencia
-        { width: 14 },  // F - Referencia
-        { width: 14 },  // G - Fecha Vence
-        { width: 14 },  // H - Fecha Ingreso
-        { width: 18 },  // I - Bodega
-        { width: 10 },  // J - Logo
+        { width: 18 },  // C - Disponible
+        { width: 14 },  // D - Reservado
+        { width: 14 },  // E - Lote
+        { width: 14 },  // F - Licencia
+        { width: 14 },  // G - Referencia
+        { width: 14 },  // H - Fecha Vence
+        { width: 14 },  // I - Fecha Ingreso
+        { width: 18 },  // J - Bodega
         { width: 10 },  // K - Logo
-        { width: 10 }   // L - Logo
+        { width: 10 },  // L - Logo
+        { width: 10 }   // M - Logo
       ];
 
       // Aplicar fondo blanco a todas las celdas desde A1 hasta N1000
@@ -538,8 +539,8 @@ function InventarioEnLinea() {
       worksheet.getCell('B5').value = usuario;
       worksheet.mergeCells('B5:C5');
 
-      // Insertar logotipo en H2:J7 (3 columnas x 6 filas, inicia en columna H)
-      worksheet.mergeCells('H2:J7');
+      // Insertar logotipo en I2:K7 (3 columnas x 6 filas, inicia en columna I)
+      worksheet.mergeCells('I2:K7');
       
       // Cargar y agregar la imagen del logotipo
       try {
@@ -553,15 +554,15 @@ function InventarioEnLinea() {
         });
         
         worksheet.addImage(imageId, {
-          tl: { col: 7, row: 1 },
+          tl: { col: 8, row: 1 },
           ext: { width: 200, height: 90 }
         });
       } catch (error) {
         console.log('No se pudo cargar el logotipo, continuando sin él');
       }
 
-      // Fila 9: Título "INVENTARIO" centrado (9 columnas: A-I)
-      worksheet.mergeCells('A9:I9');
+      // Fila 9: Título "INVENTARIO" centrado (10 columnas: A-J)
+      worksheet.mergeCells('A9:J9');
       const cellInventario = worksheet.getCell('A9');
       cellInventario.value = 'INVENTARIO';
       cellInventario.font = { bold: true, size: 14 };
@@ -572,8 +573,8 @@ function InventarioEnLinea() {
         fgColor: { argb: 'FFFFFFFF' }
       };
 
-      // Fila 10: Cabeceras de columnas (9 columnas)
-      const headers = ['Código', 'Producto', 'Disponible', 'Lote', 'Licencia', 'Documento de Ingreso', 'Fecha Vencimiento', 'Fecha Ingreso', 'Bodega'];
+      // Fila 10: Cabeceras de columnas (10 columnas)
+      const headers = ['Código', 'Producto', 'Disponible', 'Reservado', 'Lote', 'Licencia', 'Documento de Ingreso', 'Fecha Vencimiento', 'Fecha Ingreso', 'Bodega'];
       const row10 = worksheet.getRow(10);
       headers.forEach((header, index) => {
         const cell = row10.getCell(index + 1);
@@ -601,15 +602,16 @@ function InventarioEnLinea() {
         row.getCell(1).value = item.codigo || '';
         row.getCell(2).value = item.nombre || '';
         row.getCell(3).value = item.disponible_UMBas || 0;
-        row.getCell(4).value = item.lote || '';
-        row.getCell(5).value = item.licencia || '';
-        row.getCell(6).value = item.referencia || '';
-        row.getCell(7).value = item.fecha_vence ? formatDate(item.fecha_vence) : '';
-        row.getCell(8).value = item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '';
-        row.getCell(9).value = item.bodega || '';
+        row.getCell(4).value = item.cantidadReservadaUmBas || 0;
+        row.getCell(5).value = item.lote || '';
+        row.getCell(6).value = item.licencia || '';
+        row.getCell(7).value = item.referencia || '';
+        row.getCell(8).value = item.fecha_vence ? formatDate(item.fecha_vence) : '';
+        row.getCell(9).value = item.fecha_ingreso ? formatDate(item.fecha_ingreso) : '';
+        row.getCell(10).value = item.bodega || '';
         
-        // Aplicar bordes a todas las celdas de datos (9 columnas)
-        for (let c = 1; c <= 9; c++) {
+        // Aplicar bordes a todas las celdas de datos (10 columnas)
+        for (let c = 1; c <= 10; c++) {
           row.getCell(c).border = {
             top: { style: 'thin' },
             left: { style: 'thin' },
@@ -619,9 +621,9 @@ function InventarioEnLinea() {
         }
       });
 
-      // Aplicar bordes desde fila 9 hasta fila 1000 (9 columnas)
+      // Aplicar bordes desde fila 9 hasta fila 1000 (10 columnas)
       for (let r = 9; r <= 1000; r++) {
-        for (let c = 1; c <= 9; c++) {
+        for (let c = 1; c <= 10; c++) {
           const cell = worksheet.getCell(r, c);
           if (!cell.border) {
             cell.border = {
@@ -937,6 +939,7 @@ function InventarioEnLinea() {
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Disponible</th>
+                      <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reservado</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Lote</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Licencia</th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Documento de Ingreso</th>
@@ -958,6 +961,9 @@ function InventarioEnLinea() {
                             <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStockStatus(item.disponible_UMBas)}`}>
                               {formatNumber(item.disponible_UMBas, 2)}
                             </span>
+                          </td>
+                          <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {formatNumber(item.cantidadReservadaUmBas, 2)}
                           </td>
                           <td className="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                             {item.lote}
