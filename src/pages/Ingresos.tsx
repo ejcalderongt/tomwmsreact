@@ -184,37 +184,47 @@ function Ingresos() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">
             <div className="flex-1 min-w-48">
-              <label htmlFor="fechaInicio" className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Fecha Inicio
               </label>
-              <input
-                type="date"
-                id="fechaInicio"
-                value={fechaInicio}
-                onChange={(e) => {
-                  setFechaInicio(e.target.value);
-                  setFechaInicioDisplay(formatDateFromInput(e.target.value));
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer"
-              />
-              <div className="text-xs text-gray-500 mt-1">{fechaInicioDisplay}</div>
+              <div 
+                className="relative w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 cursor-pointer bg-white"
+                onClick={() => (document.getElementById('fechaInicio') as HTMLInputElement)?.showPicker?.()}
+              >
+                <span className="text-gray-900">{fechaInicioDisplay || 'DD/MM/YYYY'}</span>
+                <input
+                  type="date"
+                  id="fechaInicio"
+                  value={fechaInicio}
+                  onChange={(e) => {
+                    setFechaInicio(e.target.value);
+                    setFechaInicioDisplay(formatDateFromInput(e.target.value));
+                  }}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </div>
             </div>
 
             <div className="flex-1 min-w-48">
-              <label htmlFor="fechaFin" className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Fecha Fin
               </label>
-              <input
-                type="date"
-                id="fechaFin"
-                value={fechaFin}
-                onChange={(e) => {
-                  setFechaFin(e.target.value);
-                  setFechaFinDisplay(formatDateFromInput(e.target.value));
-                }}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 cursor-pointer"
-              />
-              <div className="text-xs text-gray-500 mt-1">{fechaFinDisplay}</div>
+              <div 
+                className="relative w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus-within:ring-2 focus-within:ring-green-500 focus-within:border-green-500 cursor-pointer bg-white"
+                onClick={() => (document.getElementById('fechaFin') as HTMLInputElement)?.showPicker?.()}
+              >
+                <span className="text-gray-900">{fechaFinDisplay || 'DD/MM/YYYY'}</span>
+                <input
+                  type="date"
+                  id="fechaFin"
+                  value={fechaFin}
+                  onChange={(e) => {
+                    setFechaFin(e.target.value);
+                    setFechaFinDisplay(formatDateFromInput(e.target.value));
+                  }}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                />
+              </div>
             </div>
 
             <div>
