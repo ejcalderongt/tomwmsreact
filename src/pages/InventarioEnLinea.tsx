@@ -575,7 +575,7 @@ function InventarioEnLinea() {
       };
 
       // Fila 10: Cabeceras de columnas (11 columnas)
-      const headers = ['Código', 'Producto', 'Existencia Total', 'Disponible', 'Reservado', 'Lote', 'Licencia', 'Documento de Ingreso', 'Fecha Vencimiento', 'Fecha Ingreso', 'Bodega'];
+      const headers = ['CÓDIGO', 'PRODUCTO', 'EXISTENCIA TOTAL', 'DISPONIBLE', 'RESERVADO', 'LOTE', 'LICENCIA', 'DOCUMENTO DE INGRESO', 'FECHA VENCIMIENTO', 'FECHA INGRESO', 'BODEGA'];
       const row10 = worksheet.getRow(10);
       headers.forEach((header, index) => {
         const cell = row10.getCell(index + 1);
