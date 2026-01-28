@@ -94,6 +94,54 @@ const apiProxy = createProxyMiddleware({
   }
 });
 
+// KPI API proxy middleware - For KPI endpoints on port 8091
+const kpiApiProxy = createProxyMiddleware({
+  target: 'http://52.41.114.122:8091',
+  changeOrigin: true,
+  secure: false,
+  ws: true,
+  followRedirects: true,
+  timeout: 60000,
+  proxyTimeout: 60000,
+  pathRewrite: (path, req) => {
+    const newPath = `/api${path}`;
+    console.log(`🔀 [${new Date().toISOString()}] KPI Path rewrite: ${path} → ${newPath}`);
+    return newPath;
+  },
+  onProxyReq: (proxyReq, req, res) => {
+    proxyReq.removeHeader('referer');
+    proxyReq.removeHeader('origin');
+    proxyReq.removeHeader('host');
+    proxyReq.setHeader('Accept', 'application/json');
+    console.log(`🟣 [${new Date().toISOString()}] KPI Proxy Request: ${req.method} ${req.url} → ${proxyReq.path}`);
+  },
+  onProxyRes: (proxyRes, req, res) => {
+    const statusColor = proxyRes.statusCode >= 400 ? '🔴' : '🟢';
+    console.log(`${statusColor} [${new Date().toISOString()}] KPI Proxy Response: ${proxyRes.statusCode} for ${req.url}`);
+    delete proxyRes.headers['www-authenticate'];
+    delete proxyRes.headers['WWW-Authenticate'];
+    proxyRes.headers['access-control-allow-origin'] = '*';
+    proxyRes.headers['access-control-allow-methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+    proxyRes.headers['access-control-allow-headers'] = 'Content-Type, Authorization, Accept';
+  },
+  onError: (err, req, res) => {
+    console.error(`🔴 [${new Date().toISOString()}] KPI Proxy Error:`, err.message);
+    if (!res.headersSent) {
+      res.setHeader('Content-Type', 'application/json');
+      res.status(502).json({ 
+        error: 'KPI Backend proxy error', 
+        message: err.message,
+        details: 'Cannot connect to KPI backend server',
+        url: req.url,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+});
+
+// Apply KPI proxy middleware for /kpi routes
+app.use('/kpi', kpiApiProxy);
+
 // Apply proxy middleware FIRST
 app.use('/api', apiProxy);
 

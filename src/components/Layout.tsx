@@ -65,6 +65,19 @@ function Layout({ children, pageTitle }: LayoutProps) {
               Inventario en Línea
             </Link>
 
+            {/* KPI Picking */}
+            <Link
+              to="/kpi-picking"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/kpi-picking'
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ChartBarIcon className="mr-3 h-6 w-6" />
+              KPI Picking
+            </Link>
+
             {/* Ingresos y Salidas */}
             {navigation.filter(item => item.name !== 'Existencias').map((item) => {
               const isActive = location.pathname === item.href;
@@ -114,6 +127,19 @@ function Layout({ children, pageTitle }: LayoutProps) {
             >
               <WifiIcon className="mr-3 h-6 w-6" />
               Inventario en Línea
+            </Link>
+
+            {/* KPI Picking */}
+            <Link
+              to="/kpi-picking"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/kpi-picking'
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ChartBarIcon className="mr-3 h-6 w-6" />
+              KPI Picking
             </Link>
 
             {/* Ingresos y Salidas */}
