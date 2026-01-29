@@ -644,6 +644,38 @@ export interface KpiVerificacionItem {
   solicitud_SAP: string;
 }
 
+export interface KpiRecepcionItem {
+  fecha_Hora_Inicio: string;
+  fecha_Hora_Fin: string;
+  fecha_por_Linea: string;
+  tipo_Local_Importación: string;
+  código_Proveedor: string;
+  descripción_Proveedor: string;
+  tipo: string;
+  código_Departamento: string;
+  descripcion_Departamento: string;
+  código_Categoria: string;
+  descripcion_Categoría: string;
+  código_Producto: string;
+  nombre_Producto: string;
+  cantidad_Recibida: number;
+  cantidad_Solicita_OC: number;
+  nombre_Producto_Estado: string;
+  cantidad_Devolucion_OC: number;
+  nombre_Presentacion_MPQ: string;
+  cantidad_Recibida_Cajas_OC: number;
+  id_Recepcion: number;
+  número_de_OC: string;
+  idOC: number;
+  fecha_Vence: string;
+  lic_Plate: string;
+  código_Operador: string;
+  descripción_Operador: string;
+  código_Comprador: string;
+  descripción_Comprador: string;
+  contenedor: string;
+}
+
 export const kpiAPI = {
   async getPicking(from: string, to: string): Promise<KpiPickingItem[]> {
     const url = `${KPI_BASE}/Kpi/picking?from=${from}&to=${to}`;
@@ -692,6 +724,31 @@ export const kpiAPI = {
     
     const data = await response.json();
     console.log(`📊 KPI Verificacion Data received: ${Array.isArray(data) ? data.length : 0} records`);
+    return data;
+  },
+
+  async getRecepcion(from: string, to: string): Promise<KpiRecepcionItem[]> {
+    const url = `${KPI_BASE}/Kpi/recepcion?from=${from}&to=${to}`;
+    
+    console.log(`🌐 KPI API Call: GET ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+    
+    console.log(`📡 KPI Response: ${response.status}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`📊 KPI Recepcion Data received: ${Array.isArray(data) ? data.length : 0} records`);
     return data;
   }
 };
