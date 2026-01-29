@@ -616,6 +616,34 @@ export interface KpiPickingItem {
   solicitud_SAP: string;
 }
 
+export interface KpiVerificacionItem {
+  fecha_Hora_Inicio: string;
+  fecha_Hora_Fin: string;
+  fecha_Por_Línea: string;
+  tipo_Documento_Pedido: string;
+  tipo: string;
+  código_Departamento: string;
+  descripción_Departamento: string;
+  código_Categoría: string;
+  descripción_Categoría: string;
+  código_Producto: string;
+  nombre_Producto: string;
+  cantidad_Verificada: number;
+  cantidad_Solicita_Ver: number;
+  nombre_Producto_Estado: string;
+  cantidad_Merma_Ver: number;
+  nombre_Presentación_MPQ: string;
+  cantidad_Verificada_Cajas: number;
+  id_Picking: number;
+  fecha_Vence: string;
+  lic_Plate: string;
+  código_Operador: string;
+  descripción_Operador: string;
+  código_Comprador: string;
+  nombre_Comprador: string;
+  solicitud_SAP: string;
+}
+
 export const kpiAPI = {
   async getPicking(from: string, to: string): Promise<KpiPickingItem[]> {
     const url = `${KPI_BASE}/Kpi/picking?from=${from}&to=${to}`;
@@ -639,6 +667,31 @@ export const kpiAPI = {
     
     const data = await response.json();
     console.log(`📊 KPI Data received: ${Array.isArray(data) ? data.length : 0} records`);
+    return data;
+  },
+
+  async getVerificacion(from: string, to: string): Promise<KpiVerificacionItem[]> {
+    const url = `${KPI_BASE}/Kpi/verificacion?from=${from}&to=${to}`;
+    
+    console.log(`🌐 KPI API Call: GET ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+    
+    console.log(`📡 KPI Response: ${response.status}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`📊 KPI Verificacion Data received: ${Array.isArray(data) ? data.length : 0} records`);
     return data;
   }
 };

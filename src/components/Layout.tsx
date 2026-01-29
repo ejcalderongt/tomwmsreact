@@ -10,7 +10,8 @@ import {
   ArrowLeftOnRectangleIcon,
   ChartBarIcon,
   ArrowsRightLeftIcon,
-  WifiIcon
+  WifiIcon,
+  ClipboardDocumentCheckIcon
 } from '@heroicons/react/24/outline';
 import { logout } from '@/utils/auth';
 import toast from 'react-hot-toast';
@@ -78,6 +79,19 @@ function Layout({ children, pageTitle }: LayoutProps) {
               KPI Picking
             </Link>
 
+            {/* KPI Verificación */}
+            <Link
+              to="/kpi-verificacion"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/kpi-verificacion'
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ClipboardDocumentCheckIcon className="mr-3 h-6 w-6" />
+              KPI Verificación
+            </Link>
+
             {/* Ingresos y Salidas */}
             {navigation.filter(item => item.name !== 'Existencias').map((item) => {
               const isActive = location.pathname === item.href;
@@ -140,6 +154,19 @@ function Layout({ children, pageTitle }: LayoutProps) {
             >
               <ChartBarIcon className="mr-3 h-6 w-6" />
               KPI Picking
+            </Link>
+
+            {/* KPI Verificación */}
+            <Link
+              to="/kpi-verificacion"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/kpi-verificacion'
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ClipboardDocumentCheckIcon className="mr-3 h-6 w-6" />
+              KPI Verificación
             </Link>
 
             {/* Ingresos y Salidas */}
