@@ -22,6 +22,7 @@ import AnalisisMerma from '@/pages/AnalisisMerma';
 import AnalisisInventario from '@/pages/AnalisisInventario';
 import AnalisisUbicaciones from '@/pages/AnalisisUbicaciones';
 import AsistenteInventario from '@/pages/AsistenteInventario';
+import Automatizaciones from '@/pages/Automatizaciones';
 import SessionExpired from '@/pages/SessionExpired';
 import CambiarPassword from '@/pages/CambiarPassword';
 import NewPassword from '@/pages/NewPassword';
@@ -104,6 +105,9 @@ function App() {
         </Route>
         <Route path="/asistente-inventario" element={<PrivateRoute />}>
           <Route index element={<AsistenteInventario />} />
+        </Route>
+        <Route path="/automatizaciones" element={<PrivateRoute />}>
+          <Route index element={<Automatizaciones />} />
         </Route>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />

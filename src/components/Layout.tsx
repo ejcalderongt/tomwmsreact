@@ -21,7 +21,8 @@ import {
   ChevronRightIcon,
   ChartPieIcon,
   MapPinIcon,
-  SparklesIcon
+  SparklesIcon,
+  BoltIcon
 } from '@heroicons/react/24/outline';
 import { logout } from '@/utils/auth';
 import toast from 'react-hot-toast';
@@ -34,7 +35,7 @@ interface LayoutProps {
 const indicadoresRoutes = [
   '/kpi-picking', '/kpi-verificacion', '/kpi-recepcion', '/kpi-despacho', '/kpi-tendencias',
   '/dashboard-ejecutivo', '/analisis-ciclo', '/productividad-operadores', '/abc-productos', '/analisis-merma',
-  '/analisis-inventario', '/analisis-ubicaciones', '/asistente-inventario'
+  '/analisis-inventario', '/analisis-ubicaciones', '/asistente-inventario', '/automatizaciones'
 ];
 
 function Layout({ children, pageTitle }: LayoutProps) {
@@ -215,6 +216,20 @@ function Layout({ children, pageTitle }: LayoutProps) {
       >
         <SparklesIcon className="mr-3 h-5 w-5 text-emerald-500" />
         Kairos EC
+      </Link>
+
+      <p className="px-4 py-1 mt-3 text-xs font-semibold text-gray-400 uppercase">Automatización</p>
+
+      <Link
+        to="/automatizaciones"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/automatizaciones'
+            ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-900'
+            : 'text-gray-600 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-900'
+        }`}
+      >
+        <BoltIcon className="mr-3 h-5 w-5 text-indigo-500" />
+        Automatizaciones
       </Link>
     </div>
   );
