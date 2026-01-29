@@ -175,6 +175,18 @@ function Layout({ children, pageTitle }: LayoutProps) {
         <ExclamationTriangleIcon className="mr-3 h-5 w-5" />
         Análisis de Merma
       </Link>
+
+      <Link
+        to="/analisis-inventario"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/analisis-inventario'
+            ? 'bg-cyan-100 text-cyan-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <CubeIcon className="mr-3 h-5 w-5" />
+        Análisis de Inventario
+      </Link>
     </div>
   );
 

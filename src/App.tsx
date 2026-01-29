@@ -19,6 +19,7 @@ import AnalisisCiclo from '@/pages/AnalisisCiclo';
 import ProductividadOperadores from '@/pages/ProductividadOperadores';
 import ABCProductos from '@/pages/ABCProductos';
 import AnalisisMerma from '@/pages/AnalisisMerma';
+import AnalisisInventario from '@/pages/AnalisisInventario';
 import SessionExpired from '@/pages/SessionExpired';
 import CambiarPassword from '@/pages/CambiarPassword';
 import NewPassword from '@/pages/NewPassword';
@@ -92,6 +93,9 @@ function App() {
         </Route>
         <Route path="/analisis-merma" element={<PrivateRoute />}>
           <Route index element={<AnalisisMerma />} />
+        </Route>
+        <Route path="/analisis-inventario" element={<PrivateRoute />}>
+          <Route index element={<AnalisisInventario />} />
         </Route>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
