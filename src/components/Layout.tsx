@@ -19,7 +19,8 @@ import {
   ExclamationTriangleIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  ChartPieIcon
+  ChartPieIcon,
+  MapPinIcon
 } from '@heroicons/react/24/outline';
 import { logout } from '@/utils/auth';
 import toast from 'react-hot-toast';
@@ -31,7 +32,8 @@ interface LayoutProps {
 
 const indicadoresRoutes = [
   '/kpi-picking', '/kpi-verificacion', '/kpi-recepcion', '/kpi-despacho', '/kpi-tendencias',
-  '/dashboard-ejecutivo', '/analisis-ciclo', '/productividad-operadores', '/abc-productos', '/analisis-merma'
+  '/dashboard-ejecutivo', '/analisis-ciclo', '/productividad-operadores', '/abc-productos', '/analisis-merma',
+  '/analisis-inventario', '/analisis-ubicaciones'
 ];
 
 function Layout({ children, pageTitle }: LayoutProps) {
@@ -186,6 +188,18 @@ function Layout({ children, pageTitle }: LayoutProps) {
       >
         <CubeIcon className="mr-3 h-5 w-5" />
         Análisis de Inventario
+      </Link>
+
+      <Link
+        to="/analisis-ubicaciones"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/analisis-ubicaciones'
+            ? 'bg-violet-100 text-violet-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <MapPinIcon className="mr-3 h-5 w-5" />
+        Análisis de Ubicaciones
       </Link>
     </div>
   );
