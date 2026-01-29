@@ -45,9 +45,7 @@ interface InventarioItem {
 
 interface Bodega {
   idBodega: number;
-  codigo: string;
   nombre: string;
-  activo: boolean;
 }
 
 interface VencimientoResumen {
@@ -112,9 +110,16 @@ function AnalisisInventario() {
         return;
       }
       const data = await bodegasAPI.listar(token);
-      setBodegas(data || []);
+      console.log('Bodegas cargadas:', data);
+      if (Array.isArray(data)) {
+        setBodegas(data);
+      } else {
+        console.error('Formato de bodegas inesperado:', data);
+        setBodegas([]);
+      }
     } catch (error) {
       console.error('Error al cargar bodegas:', error);
+      toast.error('Error al cargar bodegas');
     }
   };
 
