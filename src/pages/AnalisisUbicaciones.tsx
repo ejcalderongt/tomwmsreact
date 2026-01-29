@@ -13,7 +13,11 @@ import {
   CubeIcon,
   BuildingStorefrontIcon,
   ChartBarIcon,
-  Squares2X2Icon
+  Squares2X2Icon,
+  TruckIcon,
+  ArchiveBoxIcon,
+  CheckCircleIcon,
+  ExclamationCircleIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI } from '@/api/api';
@@ -34,7 +38,15 @@ interface InventarioItem {
   fecha_vence: string;
   familia: string;
   propietario: string;
+  estado: string;
+  clasificacion: string;
 }
+
+const UBICACIONES_OPERATIVAS = ['RECEPCIÓN', 'MERMA', 'PICKING'];
+
+const getTipoUbicacion = (ubicacion: string): 'operativa' | 'rack' => {
+  return UBICACIONES_OPERATIVAS.includes(ubicacion.toUpperCase()) ? 'operativa' : 'rack';
+};
 
 interface Bodega {
   idBodega: string;
@@ -115,7 +127,9 @@ export default function AnalisisUbicaciones() {
         fecha_ingreso: item.fecha_ingreso || '',
         fecha_vence: item.fecha_vence || '',
         familia: item.familia || '',
-        propietario: item.propietario || ''
+        propietario: item.propietario || '',
+        estado: item.estado || 'Sin Estado',
+        clasificacion: item.clasificacion || ''
       }));
       
       setInventario(items);
@@ -229,6 +243,42 @@ export default function AnalisisUbicaciones() {
     skus: ubicacionesResumen.reduce((sum, u) => sum + u.totalSKUs, 0),
     unidades: ubicacionesResumen.reduce((sum, u) => sum + u.totalUnidades, 0)
   }), [ubicacionesResumen]);
+
+  const tipoUbicacionResumen = useMemo(() => {
+    const operativas = ubicacionesResumen.filter(u => getTipoUbicacion(u.ubicacion) === 'operativa');
+    const racks = ubicacionesResumen.filter(u => getTipoUbicacion(u.ubicacion) === 'rack');
+    
+    return {
+      operativas: {
+        count: operativas.length,
+        skus: operativas.reduce((sum, u) => sum + u.totalSKUs, 0),
+        unidades: operativas.reduce((sum, u) => sum + u.totalUnidades, 0),
+        ubicaciones: operativas
+      },
+      racks: {
+        count: racks.length,
+        skus: racks.reduce((sum, u) => sum + u.totalSKUs, 0),
+        unidades: racks.reduce((sum, u) => sum + u.totalUnidades, 0),
+        ubicaciones: racks
+      }
+    };
+  }, [ubicacionesResumen]);
+
+  const estadoResumen = useMemo(() => {
+    const estados = new Map<string, { count: number; unidades: number }>();
+    inventarioFiltrado.forEach(item => {
+      const estado = item.estado || 'Sin Estado';
+      if (!estados.has(estado)) {
+        estados.set(estado, { count: 0, unidades: 0 });
+      }
+      const e = estados.get(estado)!;
+      e.count++;
+      e.unidades += item.disponible_UMBas;
+    });
+    return Array.from(estados.entries())
+      .map(([estado, data]) => ({ estado, ...data }))
+      .sort((a, b) => b.unidades - a.unidades);
+  }, [inventarioFiltrado]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -465,6 +515,111 @@ export default function AnalisisUbicaciones() {
                           <div className="text-sm text-violet-600">Unidades Totales</div>
                         </div>
                       </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                        <TruckIcon className="h-5 w-5 text-amber-500" />
+                        Ubicaciones Operativas
+                      </h3>
+                      <div className="space-y-2">
+                        {tipoUbicacionResumen.operativas.ubicaciones.map((ubi, idx) => {
+                          const pct = totales.unidades > 0 ? (ubi.totalUnidades / totales.unidades) * 100 : 0;
+                          const colorMap: Record<string, string> = {
+                            'RECEPCIÓN': 'bg-blue-500',
+                            'PICKING': 'bg-green-500',
+                            'MERMA': 'bg-red-500'
+                          };
+                          const bgColor = colorMap[ubi.ubicacion.toUpperCase()] || 'bg-amber-500';
+                          return (
+                            <div key={idx}>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="font-medium">{ubi.ubicacion}</span>
+                                <div className="flex gap-3 text-gray-500">
+                                  <span>{ubi.totalSKUs} SKUs</span>
+                                  <span className="font-medium text-gray-900">{formatNumber(ubi.totalUnidades)} uni. ({pct.toFixed(1)}%)</span>
+                                </div>
+                              </div>
+                              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full ${bgColor} rounded-full`}
+                                  style={{ width: `${Math.min(pct * 2, 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                        <div className="pt-2 mt-2 border-t text-sm text-gray-600">
+                          <div className="flex justify-between">
+                            <span>Total Operativo:</span>
+                            <span className="font-medium">{formatNumber(tipoUbicacionResumen.operativas.unidades)} unidades ({totales.unidades > 0 ? ((tipoUbicacionResumen.operativas.unidades / totales.unidades) * 100).toFixed(1) : 0}%)</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="bg-white border border-gray-200 rounded-lg p-4">
+                      <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                        <ArchiveBoxIcon className="h-5 w-5 text-indigo-500" />
+                        Ubicaciones de Almacenaje (Racks)
+                      </h3>
+                      <div className="space-y-2 max-h-48 overflow-y-auto">
+                        {tipoUbicacionResumen.racks.ubicaciones.map((ubi, idx) => {
+                          const maxUni = Math.max(...tipoUbicacionResumen.racks.ubicaciones.map(u => u.totalUnidades), 1);
+                          const pct = (ubi.totalUnidades / maxUni) * 100;
+                          return (
+                            <div key={idx}>
+                              <div className="flex justify-between text-sm mb-1">
+                                <span className="font-medium">{ubi.ubicacion}</span>
+                                <span className="text-gray-900">{formatNumber(ubi.totalUnidades)}</span>
+                              </div>
+                              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div 
+                                  className="h-full bg-indigo-500 rounded-full"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className="pt-2 mt-2 border-t text-sm text-gray-600">
+                        <div className="flex justify-between">
+                          <span>Total Racks:</span>
+                          <span className="font-medium">{formatNumber(tipoUbicacionResumen.racks.unidades)} unidades ({totales.unidades > 0 ? ((tipoUbicacionResumen.racks.unidades / totales.unidades) * 100).toFixed(1) : 0}%)</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-4">
+                    <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <CheckCircleIcon className="h-5 w-5 text-green-500" />
+                      Estado del Inventario
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                      {estadoResumen.map((e, idx) => {
+                        const pct = totales.unidades > 0 ? (e.unidades / totales.unidades) * 100 : 0;
+                        const isBueno = e.estado.toLowerCase().includes('buen');
+                        const isMalo = e.estado.toLowerCase().includes('mal');
+                        const bgColor = isBueno ? 'bg-green-50 border-green-200' : isMalo ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200';
+                        const textColor = isBueno ? 'text-green-700' : isMalo ? 'text-red-700' : 'text-gray-700';
+                        const Icon = isBueno ? CheckCircleIcon : isMalo ? ExclamationCircleIcon : CubeIcon;
+                        const iconColor = isBueno ? 'text-green-500' : isMalo ? 'text-red-500' : 'text-gray-500';
+                        
+                        return (
+                          <div key={idx} className={`${bgColor} border rounded-lg p-3`}>
+                            <div className="flex items-center gap-2 mb-1">
+                              <Icon className={`h-5 w-5 ${iconColor}`} />
+                              <span className={`font-medium ${textColor}`}>{e.estado}</span>
+                            </div>
+                            <div className={`text-xl font-bold ${textColor}`}>{formatNumber(e.unidades)}</div>
+                            <div className="text-sm text-gray-500">{pct.toFixed(1)}% del total</div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
 
