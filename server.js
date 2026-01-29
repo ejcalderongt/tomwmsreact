@@ -171,8 +171,14 @@ CONTEXTO DEL INVENTARIO:
 ${inventoryContext || 'No hay datos de inventario disponibles actualmente.'}
 
 Formato de respuesta:
-- Usa viñetas cuando listes información
-- Destaca números importantes
+- NO uses asteriscos (**) ni markdown para formatear
+- Para mostrar datos de productos o inventario, usa formato de tabla o lista simple con guiones
+- Para códigos o valores importantes, preséntalos claramente sin formato markdown
+- Ejemplo de cómo mostrar un producto:
+  Producto: CHILE JALAPENO 48/5.8 oz. SEMIPICANTE
+  Código: 00025004
+  Stock: 7,680 unidades
+  Ubicación: RECEPCIÓN
 - Sé conciso pero informativo
 - Ofrece sugerencias prácticas cuando sea apropiado`;
 

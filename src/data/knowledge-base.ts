@@ -1,6 +1,11 @@
 export const KNOWLEDGE_BASE = `
 === BASE DE CONOCIMIENTO KAIROS EC ===
 
+SOBRE KAIROS EC:
+- Nombre: Kairos EC
+- Slogan: "Inteligencia Operativa en Tiempo Real"
+- Significado: Kairos (καιρός) es una palabra del griego antiguo que significa "el momento oportuno", el instante exacto para actuar, la mejor ventana de tiempo. No es "tiempo" en general, sino el tiempo con sentido.
+
 ACERCA DE LA EMPRESA:
 - Sistema de Gestión de Almacén (WMS) para operaciones logísticas
 - Manejo de inventario en tiempo real

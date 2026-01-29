@@ -269,6 +269,55 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
     }
   };
 
+  const formatMessageContent = (content: string) => {
+    const lines = content.split('\n');
+    const formattedLines: React.ReactNode[] = [];
+    let inDataBlock = false;
+    let dataBlockLines: string[] = [];
+    let blockKey = 0;
+
+    const isDataLine = (line: string) => {
+      return /^[\s]*[-•]?\s*(Producto|Código|Stock|Ubicación|Bodega|Unidades|Estado|SKU|Cantidad|Fecha|Total|Vencimiento):/i.test(line) ||
+             /^[\s]*\d+\.\s/.test(line) ||
+             /^[\s]*(R\d{2}-[A-Z]|RECEPCIÓN|PICKING|MERMA):/i.test(line);
+    };
+
+    const renderDataBlock = (lines: string[], key: number) => (
+      <div key={key} className="my-2 bg-gray-900 text-emerald-400 rounded-lg p-3 font-mono text-sm overflow-x-auto">
+        {lines.map((line, i) => (
+          <div key={i} className="py-0.5">{line}</div>
+        ))}
+      </div>
+    );
+
+    lines.forEach((line, index) => {
+      if (isDataLine(line)) {
+        if (!inDataBlock) {
+          inDataBlock = true;
+          dataBlockLines = [];
+        }
+        dataBlockLines.push(line);
+      } else {
+        if (inDataBlock && dataBlockLines.length > 0) {
+          formattedLines.push(renderDataBlock(dataBlockLines, blockKey++));
+          inDataBlock = false;
+          dataBlockLines = [];
+        }
+        if (line.trim()) {
+          formattedLines.push(<p key={`text-${index}`} className="py-1">{line}</p>);
+        } else {
+          formattedLines.push(<div key={`space-${index}`} className="h-2" />);
+        }
+      }
+    });
+
+    if (inDataBlock && dataBlockLines.length > 0) {
+      formattedLines.push(renderDataBlock(dataBlockLines, blockKey++));
+    }
+
+    return formattedLines;
+  };
+
   return (
     <Layout pageTitle="Kairos EC">
       <div className="flex flex-col h-[calc(100vh-120px)]">
@@ -371,9 +420,12 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
               <div className="bg-emerald-100 p-4 rounded-full mb-4">
                 <CpuChipIcon className="h-12 w-12 text-emerald-600" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 ¡Hola! Soy Kairos EC
               </h3>
+              <p className="text-xs text-emerald-600 font-medium mb-2 tracking-wide">
+                "Inteligencia Operativa en Tiempo Real"
+              </p>
               <p className="text-gray-500 mb-6 max-w-md">
                 Tu asistente inteligente de inventario. Puedo responder preguntas sobre productos, 
                 ubicaciones, vencimientos y más. También puedes personalizar mi conocimiento.
@@ -410,13 +462,15 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
                   </div>
                 )}
                 <div
-                  className={`max-w-[75%] p-3 rounded-lg ${
+                  className={`max-w-[80%] p-4 rounded-lg ${
                     msg.role === 'user'
                       ? 'bg-emerald-600 text-white rounded-br-none'
                       : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm'
                   }`}
                 >
-                  <div className="whitespace-pre-wrap text-sm">{msg.content || '...'}</div>
+                  <div className={`${msg.role === 'user' ? 'text-base' : 'text-base leading-relaxed'}`}>
+                    {msg.role === 'assistant' && msg.content ? formatMessageContent(msg.content) : (msg.content || '...')}
+                  </div>
                   <div className={`text-xs mt-1 ${msg.role === 'user' ? 'text-emerald-200' : 'text-gray-400'}`}>
                     {msg.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                   </div>
