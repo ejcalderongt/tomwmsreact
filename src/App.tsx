@@ -12,6 +12,7 @@ import InventarioEnLinea from '@/pages/InventarioEnLinea';
 import KPIPicking from '@/pages/KPIPicking';
 import KPIVerificacion from '@/pages/KPIVerificacion';
 import KPIRecepcion from '@/pages/KPIRecepcion';
+import KPIDespacho from '@/pages/KPIDespacho';
 import SessionExpired from '@/pages/SessionExpired';
 import CambiarPassword from '@/pages/CambiarPassword';
 import NewPassword from '@/pages/NewPassword';
@@ -64,6 +65,9 @@ function App() {
         </Route>
         <Route path="/kpi-recepcion" element={<PrivateRoute />}>
           <Route index element={<KPIRecepcion />} />
+        </Route>
+        <Route path="/kpi-despacho" element={<PrivateRoute />}>
+          <Route index element={<KPIDespacho />} />
         </Route>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />

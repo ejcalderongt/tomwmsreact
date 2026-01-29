@@ -644,6 +644,40 @@ export interface KpiVerificacionItem {
   solicitud_SAP: string;
 }
 
+export interface KpiDespachoItem {
+  fecha_Hora_Inicio: string;
+  fecha_Hora_Fin: string;
+  fecha_Por_Linea: string;
+  tipo_Documento_Pedido: string;
+  código_Proveedor: string;
+  descripción_Proveedor: string;
+  no_Tienda: string;
+  tipo: string;
+  código_Departamento: string;
+  descripción_Departamento: string;
+  código_Categoría: string;
+  descripción_Categoría: string;
+  código_Producto: string;
+  nombre_Producto: string;
+  cantidad_Despachada: number;
+  cantidad_Solicitada_Despacho: number;
+  nombre_Producto_Estado: string;
+  cantidad_Merma_Despacho: number;
+  cantidad_Reservada: number;
+  cantidad_Dañada_Picking: number;
+  cantidad_Dañada_Verificacion: number;
+  cantidad_No_Encontrada: number;
+  nombre_Presentación_MPQ: string;
+  cantidad_Despacho_Cajas: number;
+  id_Despacho: number;
+  orden_traslado: string;
+  fecha_Vence: string;
+  lic_Plate: string;
+  licencia_Despacho: string;
+  código_Usuario: string;
+  descripción_Usuario: string;
+}
+
 export interface KpiRecepcionItem {
   fecha_Hora_Inicio: string;
   fecha_Hora_Fin: string;
@@ -749,6 +783,31 @@ export const kpiAPI = {
     
     const data = await response.json();
     console.log(`📊 KPI Recepcion Data received: ${Array.isArray(data) ? data.length : 0} records`);
+    return data;
+  },
+
+  async getDespacho(from: string, to: string): Promise<KpiDespachoItem[]> {
+    const url = `${KPI_BASE}/Kpi/despacho?from=${from}&to=${to}`;
+    
+    console.log(`🌐 KPI API Call: GET ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+    
+    console.log(`📡 KPI Response: ${response.status}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`📊 KPI Despacho Data received: ${Array.isArray(data) ? data.length : 0} records`);
     return data;
   }
 };
