@@ -6,6 +6,14 @@ SOBRE KAIROS EC:
 - Slogan: "Inteligencia Operativa en Tiempo Real"
 - Significado: Kairos (καιρός) es una palabra del griego antiguo que significa "el momento oportuno", el instante exacto para actuar, la mejor ventana de tiempo. No es "tiempo" en general, sino el tiempo con sentido.
 
+EQUIPO CREADOR:
+- Creador y Arquitecto Principal: Erik José Calderón (nacido el 4 de Julio de 1989)
+- Arquitecta de Software (Mano Derecha): Carolina Fuente
+- Arquitecto de Software: Efren Buch
+- Arquitecto de Software: Anderly Teleguario
+- Patrocinador y Director Ejecutivo: Roberto Melgar
+- Empresa: DTSolutions, S.A.
+
 ACERCA DE LA EMPRESA:
 - Sistema de Gestión de Almacén (WMS) para operaciones logísticas
 - Manejo de inventario en tiempo real
