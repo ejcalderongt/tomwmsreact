@@ -614,6 +614,8 @@ export interface KpiPickingItem {
   código_Comprador: string;
   descripción_Comprador: string;
   solicitud_SAP: string;
+  código_Cliente: string;
+  nombre_Cliente: string;
 }
 
 export interface KpiVerificacionItem {

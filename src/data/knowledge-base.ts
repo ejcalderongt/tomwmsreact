@@ -40,6 +40,12 @@ PROCESOS OPERATIVOS:
 4. VERIFICACIÓN: Control de calidad antes del despacho
 5. DESPACHO: Salida de mercadería hacia clientes/tiendas
 
+CLIENTES:
+- El sistema registra operaciones por cliente (código y nombre)
+- En picking se puede analizar: líneas por cliente, unidades despachadas, participación
+- Los clientes se identifican por código_Cliente y nombre_Cliente
+- Métricas disponibles: top clientes por volumen, distribución de pedidos
+
 MÉTRICAS CLAVE:
 - SKU: Unidad de mantenimiento de stock (cada producto único)
 - Unidades: Cantidad física de productos

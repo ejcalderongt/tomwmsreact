@@ -16,7 +16,9 @@ interface KPIMetrics {
   totalDevoluciones: number;
   pickingsPorOperador: { [key: string]: number };
   pickingsPorTipo: { [key: string]: number };
+  pickingsPorCliente: { [key: string]: { lineas: number; unidades: number; codigo: string } };
   promedioLineasPorPicking: number;
+  totalClientes: number;
 }
 
 interface ProductividadMetrics {
@@ -52,13 +54,22 @@ function KPIPicking() {
     
     const pickingsPorOperador: { [key: string]: number } = {};
     const pickingsPorTipo: { [key: string]: number } = {};
+    const pickingsPorCliente: { [key: string]: { lineas: number; unidades: number; codigo: string } } = {};
     
     items.forEach(item => {
       const operador = item.descripción_Operador?.trim() || 'Sin asignar';
       const tipo = item.tipo_Documento_Pedido || 'Sin tipo';
+      const cliente = item.nombre_Cliente?.trim() || 'Sin cliente';
+      const codigoCliente = item.código_Cliente?.trim() || '';
       
       pickingsPorOperador[operador] = (pickingsPorOperador[operador] || 0) + 1;
       pickingsPorTipo[tipo] = (pickingsPorTipo[tipo] || 0) + 1;
+      
+      if (!pickingsPorCliente[cliente]) {
+        pickingsPorCliente[cliente] = { lineas: 0, unidades: 0, codigo: codigoCliente };
+      }
+      pickingsPorCliente[cliente].lineas += 1;
+      pickingsPorCliente[cliente].unidades += (item.cantidad_Recibida || 0);
     });
 
     return {
@@ -70,7 +81,9 @@ function KPIPicking() {
       totalDevoluciones,
       pickingsPorOperador,
       pickingsPorTipo,
-      promedioLineasPorPicking: pickingsUnicos.size > 0 ? items.length / pickingsUnicos.size : 0
+      pickingsPorCliente,
+      promedioLineasPorPicking: pickingsUnicos.size > 0 ? items.length / pickingsUnicos.size : 0,
+      totalClientes: Object.keys(pickingsPorCliente).filter(c => c !== 'Sin cliente').length
     };
   };
 
@@ -420,6 +433,76 @@ function KPIPicking() {
                       );
                     })}
                 </div>
+              </div>
+            </div>
+
+            {/* Análisis por Cliente */}
+            <div className="border-t-4 border-teal-500 pt-6">
+              <div className="flex items-center mb-6">
+                <svg className="h-8 w-8 text-teal-600 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <h2 className="text-xl font-bold text-gray-900">Análisis por Cliente</h2>
+                <span className="ml-3 px-3 py-1 bg-teal-100 text-teal-700 text-sm font-medium rounded-full">
+                  {metrics.totalClientes} clientes
+                </span>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-teal-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-teal-700 uppercase tracking-wider">Cliente</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-teal-700 uppercase tracking-wider">Código</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-teal-700 uppercase tracking-wider">Líneas</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-teal-700 uppercase tracking-wider">Unidades</th>
+                        <th className="px-6 py-3 text-right text-xs font-medium text-teal-700 uppercase tracking-wider">% del Total</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-teal-700 uppercase tracking-wider">Participación</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {Object.entries(metrics.pickingsPorCliente)
+                        .sort((a, b) => b[1].lineas - a[1].lineas)
+                        .slice(0, 15)
+                        .map(([cliente, data], idx) => {
+                          const porcentaje = (data.lineas / metrics.totalLineas) * 100;
+                          return (
+                            <tr key={cliente} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 max-w-xs truncate" title={cliente}>
+                                {cliente}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                                {data.codigo || '-'}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                                {formatNumber(data.lineas)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right">
+                                {formatNumber(data.unidades)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-right font-medium">
+                                {formatPercent(porcentaje)}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap">
+                                <div className="w-32 bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className="bg-teal-500 h-2 rounded-full" 
+                                    style={{ width: `${Math.min(porcentaje * 2, 100)}%` }}
+                                  ></div>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                    </tbody>
+                  </table>
+                </div>
+                {Object.keys(metrics.pickingsPorCliente).length > 15 && (
+                  <div className="px-6 py-3 bg-gray-50 border-t text-sm text-gray-500">
+                    Mostrando top 15 de {Object.keys(metrics.pickingsPorCliente).length} clientes
+                  </div>
+                )}
               </div>
             </div>
 

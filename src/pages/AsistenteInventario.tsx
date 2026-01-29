@@ -38,9 +38,9 @@ const DEFAULT_KNOWLEDGE_BASE = KNOWLEDGE_BASE;
 const SUGERENCIAS = [
   "¿Cuántos productos tengo en inventario?",
   "¿Qué productos están próximos a vencer?",
-  "¿Cuál es la distribución por ubicación?",
+  "¿Cuáles son mis principales clientes?",
   "Dame un resumen del estado del inventario",
-  "¿Cuántos productos están en RECEPCIÓN?",
+  "¿Cuántos clientes atendimos este mes?",
   "¿Cuáles son los productos con más stock?"
 ];
 
@@ -77,12 +77,17 @@ export default function AsistenteInventario() {
   const cargarInventario = async () => {
     setLoadingInventory(true);
     try {
-      const [stockData, bodegasData] = await Promise.all([
+      const hoy = new Date();
+      const primerDiaMes = new Date(hoy.getFullYear(), hoy.getMonth(), 1);
+      const fechaDesde = primerDiaMes.toISOString().split('T')[0];
+      const fechaHasta = hoy.toISOString().split('T')[0];
+
+      const [stockData, bodegasData, pickingData] = await Promise.all([
         kpiAPI.getStock(),
-        kpiAPI.getBodegas()
+        kpiAPI.getBodegas(),
+        kpiAPI.getPicking(fechaDesde, fechaHasta).catch(() => [])
       ]);
 
-      const hoy = new Date();
       const en30Dias = new Date();
       en30Dias.setDate(en30Dias.getDate() + 30);
 
@@ -100,6 +105,21 @@ export default function AsistenteInventario() {
 
       const ubicaciones = [...new Set(stockData.map((item: any) => item.ubicacion || 'Sin Ubicación'))];
       const totalUnidades = stockData.reduce((sum: number, item: any) => sum + (item.disponible_UMBas || 0), 0);
+
+      const clientesData: { [key: string]: { codigo: string; lineas: number; unidades: number } } = {};
+      pickingData.forEach((item: any) => {
+        const cliente = item.nombre_Cliente?.trim() || 'Sin cliente';
+        const codigo = item.código_Cliente?.trim() || '';
+        if (!clientesData[cliente]) {
+          clientesData[cliente] = { codigo, lineas: 0, unidades: 0 };
+        }
+        clientesData[cliente].lineas += 1;
+        clientesData[cliente].unidades += (item.cantidad_Recibida || 0);
+      });
+
+      const topClientes = Object.entries(clientesData)
+        .sort((a, b) => b[1].lineas - a[1].lineas)
+        .slice(0, 10);
 
       const stats: InventoryStats = {
         totalSKUs: stockData.length,
@@ -126,6 +146,12 @@ export default function AsistenteInventario() {
         .slice(0, 10)
         .map((p: any) => `${p.nombre} (${p.codigo}): ${p.disponible_UMBas} unidades en ${p.ubicacion}`);
 
+      const clientesContext = topClientes.length > 0 
+        ? `\nTOP 10 CLIENTES DEL MES (por líneas de picking):\n${topClientes.map(([nombre, data], i) => 
+            `${i + 1}. ${nombre} (${data.codigo}): ${data.lineas} líneas, ${data.unidades.toLocaleString()} unidades`
+          ).join('\n')}\n\nTotal clientes activos: ${Object.keys(clientesData).filter(c => c !== 'Sin cliente').length}`
+        : '';
+
       const context = `
 RESUMEN DE INVENTARIO (${new Date().toLocaleDateString('es-ES')}):
 - Total de SKUs/Productos: ${stats.totalSKUs}
@@ -141,6 +167,7 @@ ${Object.entries(ubicacionResumen).map(([ubi, data]: [string, any]) =>
 
 TOP 10 PRODUCTOS CON MÁS STOCK:
 ${topProductos.map((p, i) => `${i + 1}. ${p}`).join('\n')}
+${clientesContext}
 
 BODEGAS DISPONIBLES:
 ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbodega})`).join('\n')}
