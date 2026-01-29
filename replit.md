@@ -47,6 +47,46 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
 
 ## Mejoras Recientes
 
+### Enero 29, 2026
+1. ✅ **Módulos de Análisis Avanzado - Sistema Completo de Reportes**
+   - **Dashboard Ejecutivo** (`/dashboard-ejecutivo`):
+     - Vista unificada de métricas de los 4 KPIs operativos
+     - Cards con cumplimiento, tiempos promedio y alertas automáticas
+     - Flujo operativo visual: Recepción → Picking → Verificación → Despacho
+     - Alertas por bajo cumplimiento (<80%) o merma elevada
+   
+   - **Análisis de Ciclo Completo** (`/analisis-ciclo`):
+     - Lead time desde Picking hasta Verificación
+     - Detección automática de cuellos de botella
+     - Distribución de tiempos por rangos
+     - Top 10 documentos con mayor lead time
+     - Flujo visual con tiempos por etapa
+   
+   - **Productividad de Operadores** (`/productividad-operadores`):
+     - Ranking cruzado entre Picking, Verificación y Recepción
+     - Métricas: líneas/hora por operador por área
+     - Comparativo vs promedio con códigos de color
+     - Medallas para top 3 operadores (🥇🥈🥉)
+   
+   - **ABC de Productos (Pareto)** (`/abc-productos`):
+     - Clasificación automática: A (80%), B (15%), C (5%)
+     - Basado en datos históricos de despacho
+     - Filtros por clasificación
+     - Curva de Pareto visual
+     - Usa endpoint `/api/Kpi/tendencias/despacho`
+   
+   - **Análisis de Merma y Calidad** (`/analisis-merma`):
+     - Tasa de merma global
+     - Desglose por tipo: Merma, Dañado Picking, Dañado Verificación, No Encontrado
+     - Top 20 productos con mayor merma
+     - Top 10 clientes con mayor merma
+     - Indicadores con colores según severidad
+
+2. ✅ **Navegación Actualizada**
+   - Nueva sección "Análisis Avanzado" en el sidebar
+   - Colores diferenciados para cada módulo analítico
+   - Separador visual entre KPIs operativos y análisis avanzado
+
 ### Octubre 17, 2025
 1. ✅ **Navegación Simplificada - Sistema Completo**
    - **Sidebar:** Ocultado acceso a Detalle, Resumen y Movimientos
