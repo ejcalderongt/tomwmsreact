@@ -1,0 +1,65 @@
+DECLARE @from date = '2021-01-01';
+DECLARE @to   date = '2026-01-31';
+DECLARE @gran char(1) = 'D'; -- D=Diario, W=Semanal, M=Mensual
+
+;WITH Base AS (
+    SELECT
+        -- Fecha base para trend (usa la fecha agregada del despacho; si no hay, cae a Fecha_Pedido+1)
+        CAST(ISNULL(a.fec_agr, DATEADD(day, 1, c.Fecha_Pedido)) AS datetime) AS FechaBase,
+        f.codigo AS Codigo_Producto,
+        f.nombre AS Nombre_Producto,
+        ISNULL(g.nombre, 'ND') AS Familia,
+        ISNULL(a.CantidadDespachada, 0) AS Cantidad_Despachada
+    FROM trans_pe_enc c
+    INNER JOIN trans_pe_det t            WITH (NOLOCK) ON t.IdPedidoEnc = c.IdPedidoEnc
+    INNER JOIN producto_bodega e         WITH (NOLOCK) ON e.IdProductoBodega = t.IdProductoBodega
+    INNER JOIN producto f                WITH (NOLOCK) ON f.IdProducto = e.IdProducto
+    LEFT  JOIN producto_familia g        WITH (NOLOCK) ON g.IdFamilia = f.IdFamilia
+    INNER JOIN trans_despacho_det a      WITH (NOLOCK) ON a.IdPedidoEnc = c.IdPedidoEnc AND a.IdPedidoDet = t.IdPedidoDet
+    -- (opcional) si quieres asegurar que existe encabezado de despacho:
+    -- LEFT JOIN trans_despacho_enc b    WITH (NOLOCK) ON b.IdDespachoEnc = a.IdDespachoEnc
+    WHERE c.estado <> 'Anulado'
+      AND c.ubicacion <> 'TMP'
+      AND (@from IS NULL OR CAST(c.Fecha_Pedido AS date) >= @from)
+      AND (@to   IS NULL OR CAST(c.Fecha_Pedido AS date) <  DATEADD(day, 1, @to))
+),
+Bucket AS (
+    SELECT
+        CASE 
+            WHEN @gran = 'D' THEN CONVERT(date, FechaBase)
+            WHEN @gran = 'W' THEN CONVERT(date, DATEADD(week, DATEDIFF(week, 0, FechaBase), 0))
+            WHEN @gran = 'M' THEN CONVERT(date, DATEFROMPARTS(YEAR(FechaBase), MONTH(FechaBase), 1))
+            ELSE CONVERT(date, FechaBase)
+        END AS Periodo,
+        Codigo_Producto,
+        Nombre_Producto,
+        Familia,
+        Cantidad_Despachada
+    FROM Base
+)
+
+-- 1) Tendencia por PRODUCTO
+SELECT
+    Periodo,
+    'PRODUCTO' AS Nivel,
+    Codigo_Producto,
+    Nombre_Producto,
+    Familia,
+    SUM(Cantidad_Despachada) AS Cantidad_Despachada
+FROM Bucket
+GROUP BY Periodo, Codigo_Producto, Nombre_Producto, Familia
+
+UNION ALL
+
+-- 2) Tendencia por FAMILIA
+SELECT
+    Periodo,
+    'FAMILIA' AS Nivel,
+    NULL AS Codigo_Producto,
+    NULL AS Nombre_Producto,
+    Familia,
+    SUM(Cantidad_Despachada) AS Cantidad_Despachada
+FROM Bucket
+GROUP BY Periodo, Familia
+
+ORDER BY Periodo, Nivel, Familia, Codigo_Producto;

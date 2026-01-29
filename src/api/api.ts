@@ -644,6 +644,24 @@ export interface KpiVerificacionItem {
   solicitud_SAP: string;
 }
 
+export interface KpiTendenciaDespachoItem {
+  periodo: string;
+  nivel: string;
+  codigo_Producto: string | null;
+  nombre_Producto: string | null;
+  familia: string;
+  cantidad_Despachada: number;
+}
+
+export interface KpiHeatmapItem {
+  diaSemana: number;
+  diaNombre: string;
+  hora: number;
+  despachos: number;
+  lineas: number;
+  cantidad: number;
+}
+
 export interface KpiDespachoItem {
   fecha_Hora_Inicio: string;
   fecha_Hora_Fin: string;
@@ -808,6 +826,56 @@ export const kpiAPI = {
     
     const data = await response.json();
     console.log(`📊 KPI Despacho Data received: ${Array.isArray(data) ? data.length : 0} records`);
+    return data;
+  },
+
+  async getTendenciasDespacho(from: string, to: string): Promise<KpiTendenciaDespachoItem[]> {
+    const url = `${KPI_BASE}/Kpi/tendencias/despacho?from=${from}&to=${to}`;
+    
+    console.log(`🌐 KPI API Call: GET ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+    
+    console.log(`📡 KPI Response: ${response.status}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`📊 KPI Tendencias Despacho Data received: ${Array.isArray(data) ? data.length : 0} records`);
+    return data;
+  },
+
+  async getHeatmapDiaHora(from: string, to: string): Promise<KpiHeatmapItem[]> {
+    const url = `${KPI_BASE}/Kpi/tendencias/operacion/heatmap-diahora?from=${from}&to=${to}`;
+    
+    console.log(`🌐 KPI API Call: GET ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+    
+    console.log(`📡 KPI Response: ${response.status}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log(`📊 KPI Heatmap Data received: ${Array.isArray(data) ? data.length : 0} records`);
     return data;
   }
 };

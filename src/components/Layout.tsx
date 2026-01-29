@@ -13,7 +13,8 @@ import {
   WifiIcon,
   ClipboardDocumentCheckIcon,
   TruckIcon,
-  PaperAirplaneIcon
+  PaperAirplaneIcon,
+  ChartBarSquareIcon
 } from '@heroicons/react/24/outline';
 import { logout } from '@/utils/auth';
 import toast from 'react-hot-toast';
@@ -120,6 +121,19 @@ function Layout({ children, pageTitle }: LayoutProps) {
               KPI Despacho
             </Link>
 
+            {/* KPI Tendencias */}
+            <Link
+              to="/kpi-tendencias"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/kpi-tendencias'
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ChartBarSquareIcon className="mr-3 h-6 w-6" />
+              KPI Tendencias
+            </Link>
+
             {/* Ingresos y Salidas */}
             {navigation.filter(item => item.name !== 'Existencias').map((item) => {
               const isActive = location.pathname === item.href;
@@ -221,6 +235,19 @@ function Layout({ children, pageTitle }: LayoutProps) {
             >
               <PaperAirplaneIcon className="mr-3 h-6 w-6" />
               KPI Despacho
+            </Link>
+
+            {/* KPI Tendencias */}
+            <Link
+              to="/kpi-tendencias"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/kpi-tendencias'
+                  ? 'bg-blue-100 text-blue-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ChartBarSquareIcon className="mr-3 h-6 w-6" />
+              KPI Tendencias
             </Link>
 
             {/* Ingresos y Salidas */}
