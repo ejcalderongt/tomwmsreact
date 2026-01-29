@@ -8,11 +8,14 @@ import {
   UserIcon,
   CpuChipIcon,
   TrashIcon,
-  LightBulbIcon
+  LightBulbIcon,
+  BookOpenIcon,
+  PencilSquareIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI } from '@/api/api';
 import { getToken } from '@/utils/auth';
+import { KNOWLEDGE_BASE } from '@/data/knowledge-base';
 
 interface Message {
   id: string;
@@ -29,6 +32,8 @@ interface InventoryStats {
   productosVencidos: number;
   productosPorVencer: number;
 }
+
+const DEFAULT_KNOWLEDGE_BASE = KNOWLEDGE_BASE;
 
 const SUGERENCIAS = [
   "¿Cuántos productos tengo en inventario?",
@@ -47,6 +52,12 @@ export default function AsistenteInventario() {
   const [inventoryStats, setInventoryStats] = useState<InventoryStats | null>(null);
   const [inventoryContext, setInventoryContext] = useState<string>('');
   const [loadingInventory, setLoadingInventory] = useState(true);
+  const [knowledgeBase, setKnowledgeBase] = useState<string>(() => {
+    const saved = localStorage.getItem('kairos_knowledge_base');
+    return saved || DEFAULT_KNOWLEDGE_BASE;
+  });
+  const [showKnowledgeEditor, setShowKnowledgeEditor] = useState(false);
+  const [editingKnowledge, setEditingKnowledge] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -175,7 +186,8 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: textoEnviar,
-          inventoryContext
+          inventoryContext,
+          knowledgeBase
         })
       });
 
@@ -234,6 +246,22 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
     toast.success('Conversación limpiada');
   };
 
+  const openKnowledgeEditor = () => {
+    setEditingKnowledge(knowledgeBase);
+    setShowKnowledgeEditor(true);
+  };
+
+  const saveKnowledgeBase = () => {
+    setKnowledgeBase(editingKnowledge);
+    localStorage.setItem('kairos_knowledge_base', editingKnowledge);
+    setShowKnowledgeEditor(false);
+    toast.success('Base de conocimiento actualizada');
+  };
+
+  const resetKnowledgeBase = () => {
+    setEditingKnowledge(DEFAULT_KNOWLEDGE_BASE);
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -242,22 +270,82 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
   };
 
   return (
-    <Layout pageTitle="Asistente de Inventario">
+    <Layout pageTitle="Kairos EC">
       <div className="flex flex-col h-[calc(100vh-120px)]">
-        <div className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white p-4 rounded-t-lg">
+        {showKnowledgeEditor && (
+          <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+              <div className="p-4 border-b flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BookOpenIcon className="h-6 w-6 text-indigo-600" />
+                  <h3 className="font-semibold text-lg">Base de Conocimiento</h3>
+                </div>
+                <button
+                  onClick={() => setShowKnowledgeEditor(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="p-4 flex-1 overflow-hidden">
+                <p className="text-sm text-gray-600 mb-3">
+                  Edita la base de conocimiento para personalizar las respuestas de Kairos EC.
+                  Esta información se incluirá como contexto en cada conversación.
+                </p>
+                <textarea
+                  value={editingKnowledge}
+                  onChange={(e) => setEditingKnowledge(e.target.value)}
+                  className="w-full h-[50vh] p-3 border rounded-lg font-mono text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Escribe aquí la información que Kairos EC debe conocer..."
+                />
+              </div>
+              <div className="p-4 border-t flex justify-between">
+                <button
+                  onClick={resetKnowledgeBase}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                >
+                  Restaurar predeterminado
+                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowKnowledgeEditor(false)}
+                    className="px-4 py-2 border rounded-lg hover:bg-gray-50"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={saveKnowledgeBase}
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                  >
+                    Guardar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="bg-gradient-to-r from-emerald-600 to-teal-600 text-white p-4 rounded-t-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 p-2 rounded-full">
                 <SparklesIcon className="h-6 w-6" />
               </div>
               <div>
-                <h2 className="font-semibold text-lg">Asistente TOM</h2>
+                <h2 className="font-semibold text-lg">Kairos EC</h2>
                 <p className="text-sm text-white/80">
                   {loadingInventory ? 'Cargando datos...' : `${inventoryStats?.totalSKUs || 0} productos en contexto`}
                 </p>
               </div>
             </div>
             <div className="flex gap-2">
+              <button
+                onClick={openKnowledgeEditor}
+                className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                title="Base de conocimiento"
+              >
+                <BookOpenIcon className="h-5 w-5" />
+              </button>
               <button
                 onClick={cargarInventario}
                 disabled={loadingInventory}
@@ -280,15 +368,15 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
         <div className="flex-1 overflow-y-auto bg-gray-50 p-4 space-y-4">
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <div className="bg-indigo-100 p-4 rounded-full mb-4">
-                <CpuChipIcon className="h-12 w-12 text-indigo-600" />
+              <div className="bg-emerald-100 p-4 rounded-full mb-4">
+                <CpuChipIcon className="h-12 w-12 text-emerald-600" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">
-                ¡Hola! Soy tu Asistente de Inventario
+                ¡Hola! Soy Kairos EC
               </h3>
               <p className="text-gray-500 mb-6 max-w-md">
-                Puedo ayudarte a entender tu inventario, responder preguntas sobre productos, 
-                ubicaciones, vencimientos y más.
+                Tu asistente inteligente de inventario. Puedo responder preguntas sobre productos, 
+                ubicaciones, vencimientos y más. También puedes personalizar mi conocimiento.
               </p>
               
               <div className="w-full max-w-lg">
@@ -302,7 +390,7 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
                       key={idx}
                       onClick={() => enviarMensaje(sugerencia)}
                       disabled={isLoading || loadingInventory}
-                      className="text-left p-3 bg-white border border-gray-200 rounded-lg hover:border-indigo-300 hover:bg-indigo-50 transition-colors text-sm text-gray-700"
+                      className="text-left p-3 bg-white border border-gray-200 rounded-lg hover:border-emerald-300 hover:bg-emerald-50 transition-colors text-sm text-gray-700"
                     >
                       {sugerencia}
                     </button>
@@ -317,19 +405,19 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
                 className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'assistant' && (
-                  <div className="flex-shrink-0 w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center">
+                  <div className="flex-shrink-0 w-8 h-8 bg-emerald-600 rounded-full flex items-center justify-center">
                     <SparklesIcon className="h-4 w-4 text-white" />
                   </div>
                 )}
                 <div
                   className={`max-w-[75%] p-3 rounded-lg ${
                     msg.role === 'user'
-                      ? 'bg-indigo-600 text-white rounded-br-none'
+                      ? 'bg-emerald-600 text-white rounded-br-none'
                       : 'bg-white border border-gray-200 text-gray-800 rounded-bl-none shadow-sm'
                   }`}
                 >
                   <div className="whitespace-pre-wrap text-sm">{msg.content || '...'}</div>
-                  <div className={`text-xs mt-1 ${msg.role === 'user' ? 'text-indigo-200' : 'text-gray-400'}`}>
+                  <div className={`text-xs mt-1 ${msg.role === 'user' ? 'text-emerald-200' : 'text-gray-400'}`}>
                     {msg.timestamp.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -354,12 +442,12 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
               onKeyPress={handleKeyPress}
               placeholder={loadingInventory ? "Cargando datos de inventario..." : "Escribe tu pregunta..."}
               disabled={isLoading || loadingInventory}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-100"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent disabled:bg-gray-100"
             />
             <button
               onClick={() => enviarMensaje()}
               disabled={!inputMessage.trim() || isLoading || loadingInventory}
-              className="px-4 py-2 bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+              className="px-4 py-2 bg-emerald-600 text-white rounded-full hover:bg-emerald-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
             >
               {isLoading ? (
                 <ArrowPathIcon className="h-5 w-5 animate-spin" />
@@ -370,7 +458,7 @@ ${bodegasData.map((b: any) => `- ${b.bodega || b.nombre} (${b.idBodega || b.idbo
             </button>
           </div>
           <p className="text-xs text-gray-400 mt-2 text-center">
-            Powered by OpenAI • Los datos se actualizan del sistema en tiempo real
+            Kairos EC • Powered by AI • Los datos se actualizan del sistema en tiempo real
           </p>
         </div>
       </div>

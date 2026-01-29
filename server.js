@@ -152,17 +152,20 @@ app.use('/ai', express.json());
 // AI Chat endpoint for inventory assistant
 app.post('/ai/chat', async (req, res) => {
   try {
-    const { message, inventoryContext } = req.body;
+    const { message, inventoryContext, knowledgeBase } = req.body;
     
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const systemPrompt = `Eres un asistente experto en gestión de almacén (WMS) para la empresa. Tu nombre es "Asistente TOM".
-Ayudas a los usuarios a entender su inventario, responder preguntas sobre productos, ubicaciones, vencimientos y estado del almacén.
+    const systemPrompt = `Eres Kairos EC, un asistente inteligente experto en gestión de almacén (WMS).
+Tu personalidad es profesional pero amigable, enfocado en soluciones prácticas.
 Responde siempre en español, de forma clara y concisa.
 Si te proporcionan datos de inventario, úsalos para responder con precisión.
+Si detectas problemas (vencimientos, stock bajo), sugiere acciones.
 Si no tienes información suficiente, indícalo amablemente.
+
+${knowledgeBase ? `BASE DE CONOCIMIENTO:\n${knowledgeBase}\n` : ''}
 
 CONTEXTO DEL INVENTARIO:
 ${inventoryContext || 'No hay datos de inventario disponibles actualmente.'}
@@ -170,7 +173,8 @@ ${inventoryContext || 'No hay datos de inventario disponibles actualmente.'}
 Formato de respuesta:
 - Usa viñetas cuando listes información
 - Destaca números importantes
-- Sé conciso pero informativo`;
+- Sé conciso pero informativo
+- Ofrece sugerencias prácticas cuando sea apropiado`;
 
     // Set up SSE headers
     res.setHeader('Content-Type', 'text/event-stream');

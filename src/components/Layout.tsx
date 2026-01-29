@@ -209,12 +209,12 @@ function Layout({ children, pageTitle }: LayoutProps) {
         to="/asistente-inventario"
         className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
           location.pathname === '/asistente-inventario'
-            ? 'bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-900'
-            : 'text-gray-600 hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 hover:text-indigo-900'
+            ? 'bg-gradient-to-r from-emerald-100 to-teal-100 text-emerald-900'
+            : 'text-gray-600 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-teal-50 hover:text-emerald-900'
         }`}
       >
-        <SparklesIcon className="mr-3 h-5 w-5 text-indigo-500" />
-        Asistente IA
+        <SparklesIcon className="mr-3 h-5 w-5 text-emerald-500" />
+        Kairos EC
       </Link>
     </div>
   );
