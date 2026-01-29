@@ -1,15 +1,12 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  HomeIcon, 
-  DocumentTextIcon, 
   CubeIcon, 
   ArrowRightOnRectangleIcon,
   Bars3Icon,
   XMarkIcon,
   ArrowLeftOnRectangleIcon,
   ChartBarIcon,
-  ArrowsRightLeftIcon,
   WifiIcon,
   ClipboardDocumentCheckIcon,
   TruckIcon,
@@ -19,7 +16,10 @@ import {
   ClockIcon,
   UsersIcon,
   CubeTransparentIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  ChartPieIcon
 } from '@heroicons/react/24/outline';
 import { logout } from '@/utils/auth';
 import toast from 'react-hot-toast';
@@ -29,29 +29,161 @@ interface LayoutProps {
   pageTitle?: string;
 }
 
-const navigation = [
-  { name: 'Existencias', href: '/existencias', icon: CubeIcon },
-  { name: 'Ingresos', href: '/ingresos', icon: ArrowRightOnRectangleIcon },
-  { name: 'Salidas', href: '/salidas', icon: ArrowLeftOnRectangleIcon },
+const indicadoresRoutes = [
+  '/kpi-picking', '/kpi-verificacion', '/kpi-recepcion', '/kpi-despacho', '/kpi-tendencias',
+  '/dashboard-ejecutivo', '/analisis-ciclo', '/productividad-operadores', '/abc-productos', '/analisis-merma'
 ];
 
 function Layout({ children, pageTitle }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [indicadoresOpen, setIndicadoresOpen] = useState(true);
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isIndicadorActive = indicadoresRoutes.includes(location.pathname);
+
   const handleLogout = () => {
     logout();
-    toast.success('Sesión została zamknięta');
+    toast.success('Sesión cerrada correctamente');
     navigate('/login');
   };
+
+  const IndicadoresSubmenu = () => (
+    <div className="ml-4 space-y-1">
+      {/* KPIs Operativos */}
+      <p className="px-4 py-1 text-xs font-semibold text-gray-400 uppercase">KPIs Operativos</p>
+      
+      <Link
+        to="/kpi-picking"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/kpi-picking'
+            ? 'bg-blue-100 text-blue-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <ChartBarIcon className="mr-3 h-5 w-5" />
+        KPI Picking
+      </Link>
+
+      <Link
+        to="/kpi-verificacion"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/kpi-verificacion'
+            ? 'bg-green-100 text-green-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <ClipboardDocumentCheckIcon className="mr-3 h-5 w-5" />
+        KPI Verificación
+      </Link>
+
+      <Link
+        to="/kpi-recepcion"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/kpi-recepcion'
+            ? 'bg-cyan-100 text-cyan-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <TruckIcon className="mr-3 h-5 w-5" />
+        KPI Recepción
+      </Link>
+
+      <Link
+        to="/kpi-despacho"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/kpi-despacho'
+            ? 'bg-purple-100 text-purple-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <PaperAirplaneIcon className="mr-3 h-5 w-5" />
+        KPI Despacho
+      </Link>
+
+      <Link
+        to="/kpi-tendencias"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/kpi-tendencias'
+            ? 'bg-indigo-100 text-indigo-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <ChartBarSquareIcon className="mr-3 h-5 w-5" />
+        KPI Tendencias
+      </Link>
+
+      {/* Análisis Avanzado */}
+      <p className="px-4 py-1 mt-3 text-xs font-semibold text-gray-400 uppercase">Análisis Avanzado</p>
+
+      <Link
+        to="/dashboard-ejecutivo"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/dashboard-ejecutivo'
+            ? 'bg-purple-100 text-purple-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <PresentationChartBarIcon className="mr-3 h-5 w-5" />
+        Dashboard Ejecutivo
+      </Link>
+
+      <Link
+        to="/analisis-ciclo"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/analisis-ciclo'
+            ? 'bg-amber-100 text-amber-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <ClockIcon className="mr-3 h-5 w-5" />
+        Análisis de Ciclo
+      </Link>
+
+      <Link
+        to="/productividad-operadores"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/productividad-operadores'
+            ? 'bg-teal-100 text-teal-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <UsersIcon className="mr-3 h-5 w-5" />
+        Productividad Operadores
+      </Link>
+
+      <Link
+        to="/abc-productos"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/abc-productos'
+            ? 'bg-emerald-100 text-emerald-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <CubeTransparentIcon className="mr-3 h-5 w-5" />
+        ABC Productos
+      </Link>
+
+      <Link
+        to="/analisis-merma"
+        className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+          location.pathname === '/analisis-merma'
+            ? 'bg-rose-100 text-rose-900'
+            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+        }`}
+      >
+        <ExclamationTriangleIcon className="mr-3 h-5 w-5" />
+        Análisis de Merma
+      </Link>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Mobile sidebar */}
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
-        <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-xl">
+        <div className="fixed inset-y-0 left-0 flex w-72 flex-col bg-white shadow-xl overflow-y-auto">
           <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200">
             <Link to="/" className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer">
               TOMWMSUX
@@ -74,159 +206,55 @@ function Layout({ children, pageTitle }: LayoutProps) {
               Inventario en Línea
             </Link>
 
-            {/* KPI Picking */}
+            {/* Ingresos */}
             <Link
-              to="/kpi-picking"
+              to="/ingresos"
               className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-picking'
+                location.pathname === '/ingresos'
                   ? 'bg-blue-100 text-blue-900'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <ChartBarIcon className="mr-3 h-6 w-6" />
-              KPI Picking
+              <ArrowRightOnRectangleIcon className="mr-3 h-6 w-6" />
+              Ingresos
             </Link>
 
-            {/* KPI Verificación */}
+            {/* Salidas */}
             <Link
-              to="/kpi-verificacion"
+              to="/salidas"
               className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-verificacion'
+                location.pathname === '/salidas'
                   ? 'bg-blue-100 text-blue-900'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <ClipboardDocumentCheckIcon className="mr-3 h-6 w-6" />
-              KPI Verificación
+              <ArrowLeftOnRectangleIcon className="mr-3 h-6 w-6" />
+              Salidas
             </Link>
 
-            {/* KPI Recepción */}
-            <Link
-              to="/kpi-recepcion"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-recepcion'
-                  ? 'bg-blue-100 text-blue-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <TruckIcon className="mr-3 h-6 w-6" />
-              KPI Recepción
-            </Link>
-
-            {/* KPI Despacho */}
-            <Link
-              to="/kpi-despacho"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-despacho'
-                  ? 'bg-blue-100 text-blue-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <PaperAirplaneIcon className="mr-3 h-6 w-6" />
-              KPI Despacho
-            </Link>
-
-            {/* KPI Tendencias */}
-            <Link
-              to="/kpi-tendencias"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-tendencias'
-                  ? 'bg-blue-100 text-blue-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <ChartBarSquareIcon className="mr-3 h-6 w-6" />
-              KPI Tendencias
-            </Link>
-
-            {/* Separador Análisis Avanzado */}
-            <div className="pt-4 pb-2 px-4">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Análisis Avanzado</p>
+            {/* Indicadores - Menú colapsable */}
+            <div className="pt-2">
+              <button
+                onClick={() => setIndicadoresOpen(!indicadoresOpen)}
+                className={`w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md ${
+                  isIndicadorActive
+                    ? 'bg-indigo-100 text-indigo-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <div className="flex items-center">
+                  <ChartPieIcon className="mr-3 h-6 w-6" />
+                  Indicadores
+                </div>
+                {indicadoresOpen ? (
+                  <ChevronDownIcon className="h-4 w-4" />
+                ) : (
+                  <ChevronRightIcon className="h-4 w-4" />
+                )}
+              </button>
+              
+              {indicadoresOpen && <IndicadoresSubmenu />}
             </div>
-
-            {/* Dashboard Ejecutivo */}
-            <Link
-              to="/dashboard-ejecutivo"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/dashboard-ejecutivo'
-                  ? 'bg-purple-100 text-purple-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <PresentationChartBarIcon className="mr-3 h-6 w-6" />
-              Dashboard Ejecutivo
-            </Link>
-
-            {/* Análisis de Ciclo */}
-            <Link
-              to="/analisis-ciclo"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/analisis-ciclo'
-                  ? 'bg-amber-100 text-amber-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <ClockIcon className="mr-3 h-6 w-6" />
-              Análisis de Ciclo
-            </Link>
-
-            {/* Productividad Operadores */}
-            <Link
-              to="/productividad-operadores"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/productividad-operadores'
-                  ? 'bg-teal-100 text-teal-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <UsersIcon className="mr-3 h-6 w-6" />
-              Productividad Operadores
-            </Link>
-
-            {/* ABC Productos */}
-            <Link
-              to="/abc-productos"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/abc-productos'
-                  ? 'bg-emerald-100 text-emerald-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <CubeTransparentIcon className="mr-3 h-6 w-6" />
-              ABC Productos
-            </Link>
-
-            {/* Análisis de Merma */}
-            <Link
-              to="/analisis-merma"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/analisis-merma'
-                  ? 'bg-rose-100 text-rose-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <ExclamationTriangleIcon className="mr-3 h-6 w-6" />
-              Análisis de Merma
-            </Link>
-
-            {/* Ingresos y Salidas */}
-            {navigation.filter(item => item.name !== 'Existencias').map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`group flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                    isActive
-                      ? 'bg-blue-100 text-blue-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                >
-                  <item.icon className="mr-3 h-6 w-6" />
-                  {item.name}
-                </Link>
-              );
-            })}
           </nav>
           <div className="border-t border-gray-200 p-4">
             <button
@@ -241,8 +269,8 @@ function Layout({ children, pageTitle }: LayoutProps) {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex min-h-0 flex-1 flex-col bg-white border-r border-gray-200">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-72 lg:flex-col">
+        <div className="flex min-h-0 flex-1 flex-col bg-white border-r border-gray-200 overflow-y-auto">
           <Link to="/" className="flex h-16 items-center justify-center border-b border-gray-200 bg-blue-600 hover:bg-blue-700 transition-colors cursor-pointer">
             <h1 className="text-xl font-bold text-white">TOMWMSUX</h1>
           </Link>
@@ -260,159 +288,55 @@ function Layout({ children, pageTitle }: LayoutProps) {
               Inventario en Línea
             </Link>
 
-            {/* KPI Picking */}
+            {/* Ingresos */}
             <Link
-              to="/kpi-picking"
+              to="/ingresos"
               className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-picking'
+                location.pathname === '/ingresos'
                   ? 'bg-blue-100 text-blue-900'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <ChartBarIcon className="mr-3 h-6 w-6" />
-              KPI Picking
+              <ArrowRightOnRectangleIcon className="mr-3 h-6 w-6" />
+              Ingresos
             </Link>
 
-            {/* KPI Verificación */}
+            {/* Salidas */}
             <Link
-              to="/kpi-verificacion"
+              to="/salidas"
               className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-verificacion'
+                location.pathname === '/salidas'
                   ? 'bg-blue-100 text-blue-900'
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`}
             >
-              <ClipboardDocumentCheckIcon className="mr-3 h-6 w-6" />
-              KPI Verificación
+              <ArrowLeftOnRectangleIcon className="mr-3 h-6 w-6" />
+              Salidas
             </Link>
 
-            {/* KPI Recepción */}
-            <Link
-              to="/kpi-recepcion"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-recepcion'
-                  ? 'bg-blue-100 text-blue-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <TruckIcon className="mr-3 h-6 w-6" />
-              KPI Recepción
-            </Link>
-
-            {/* KPI Despacho */}
-            <Link
-              to="/kpi-despacho"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-despacho'
-                  ? 'bg-blue-100 text-blue-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <PaperAirplaneIcon className="mr-3 h-6 w-6" />
-              KPI Despacho
-            </Link>
-
-            {/* KPI Tendencias */}
-            <Link
-              to="/kpi-tendencias"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/kpi-tendencias'
-                  ? 'bg-blue-100 text-blue-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <ChartBarSquareIcon className="mr-3 h-6 w-6" />
-              KPI Tendencias
-            </Link>
-
-            {/* Separador Análisis Avanzado */}
-            <div className="pt-4 pb-2 px-4">
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Análisis Avanzado</p>
+            {/* Indicadores - Menú colapsable */}
+            <div className="pt-2">
+              <button
+                onClick={() => setIndicadoresOpen(!indicadoresOpen)}
+                className={`w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md ${
+                  isIndicadorActive
+                    ? 'bg-indigo-100 text-indigo-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`}
+              >
+                <div className="flex items-center">
+                  <ChartPieIcon className="mr-3 h-6 w-6" />
+                  Indicadores
+                </div>
+                {indicadoresOpen ? (
+                  <ChevronDownIcon className="h-4 w-4" />
+                ) : (
+                  <ChevronRightIcon className="h-4 w-4" />
+                )}
+              </button>
+              
+              {indicadoresOpen && <IndicadoresSubmenu />}
             </div>
-
-            {/* Dashboard Ejecutivo */}
-            <Link
-              to="/dashboard-ejecutivo"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/dashboard-ejecutivo'
-                  ? 'bg-purple-100 text-purple-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <PresentationChartBarIcon className="mr-3 h-6 w-6" />
-              Dashboard Ejecutivo
-            </Link>
-
-            {/* Análisis de Ciclo */}
-            <Link
-              to="/analisis-ciclo"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/analisis-ciclo'
-                  ? 'bg-amber-100 text-amber-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <ClockIcon className="mr-3 h-6 w-6" />
-              Análisis de Ciclo
-            </Link>
-
-            {/* Productividad Operadores */}
-            <Link
-              to="/productividad-operadores"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/productividad-operadores'
-                  ? 'bg-teal-100 text-teal-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <UsersIcon className="mr-3 h-6 w-6" />
-              Productividad Operadores
-            </Link>
-
-            {/* ABC Productos */}
-            <Link
-              to="/abc-productos"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/abc-productos'
-                  ? 'bg-emerald-100 text-emerald-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <CubeTransparentIcon className="mr-3 h-6 w-6" />
-              ABC Productos
-            </Link>
-
-            {/* Análisis de Merma */}
-            <Link
-              to="/analisis-merma"
-              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                location.pathname === '/analisis-merma'
-                  ? 'bg-rose-100 text-rose-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`}
-            >
-              <ExclamationTriangleIcon className="mr-3 h-6 w-6" />
-              Análisis de Merma
-            </Link>
-
-            {/* Ingresos y Salidas */}
-            {navigation.filter(item => item.name !== 'Existencias').map((item) => {
-              const isActive = location.pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`group flex items-center px-4 py-2 text-sm font-medium rounded-md ${
-                    isActive
-                      ? 'bg-blue-100 text-blue-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                    }`}
-                >
-                  <item.icon className="mr-3 h-6 w-6" />
-                  {item.name}
-                </Link>
-              );
-            })}
           </nav>
           <div className="border-t border-gray-200 p-4">
             <button
@@ -427,7 +351,7 @@ function Layout({ children, pageTitle }: LayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-64">
+      <div className="lg:pl-72">
         {/* Top bar */}
         <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
           <button
