@@ -2,12 +2,19 @@ import express from 'express';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import OpenAI from 'openai';
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Initialize OpenAI client with Replit AI Integrations
+const openai = new OpenAI({
+  apiKey: process.env.AI_INTEGRATIONS_OPENAI_API_KEY,
+  baseURL: process.env.AI_INTEGRATIONS_OPENAI_BASE_URL,
+});
 // Use environment PORT or default to 5000 (configured in .replit)
 const PORT = process.env.PORT || 5000;
 
@@ -135,6 +142,67 @@ const kpiApiProxy = createProxyMiddleware({
         url: req.url,
         timestamp: new Date().toISOString()
       });
+    }
+  }
+});
+
+// Parse JSON for AI chat endpoint (must be before proxy)
+app.use('/ai', express.json());
+
+// AI Chat endpoint for inventory assistant
+app.post('/ai/chat', async (req, res) => {
+  try {
+    const { message, inventoryContext } = req.body;
+    
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    const systemPrompt = `Eres un asistente experto en gestión de almacén (WMS) para la empresa. Tu nombre es "Asistente TOM".
+Ayudas a los usuarios a entender su inventario, responder preguntas sobre productos, ubicaciones, vencimientos y estado del almacén.
+Responde siempre en español, de forma clara y concisa.
+Si te proporcionan datos de inventario, úsalos para responder con precisión.
+Si no tienes información suficiente, indícalo amablemente.
+
+CONTEXTO DEL INVENTARIO:
+${inventoryContext || 'No hay datos de inventario disponibles actualmente.'}
+
+Formato de respuesta:
+- Usa viñetas cuando listes información
+- Destaca números importantes
+- Sé conciso pero informativo`;
+
+    // Set up SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const stream = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ],
+      stream: true,
+      max_tokens: 1024,
+    });
+
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content || '';
+      if (content) {
+        res.write(`data: ${JSON.stringify({ content })}\n\n`);
+      }
+    }
+
+    res.write(`data: ${JSON.stringify({ done: true })}\n\n`);
+    res.end();
+  } catch (error) {
+    console.error('AI Chat Error:', error);
+    if (res.headersSent) {
+      res.write(`data: ${JSON.stringify({ error: 'Error al procesar la solicitud' })}\n\n`);
+      res.end();
+    } else {
+      res.status(500).json({ error: 'Failed to process chat request' });
     }
   }
 });
