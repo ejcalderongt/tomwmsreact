@@ -9,38 +9,32 @@ import {
   ExclamationTriangleIcon,
   ClockIcon,
   BuildingStorefrontIcon,
-  ChartPieIcon
+  ChartPieIcon,
+  MapPinIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
-import { existenciasAPI, kpiAPI } from '@/api/api';
+import { kpiAPI } from '@/api/api';
 import { getToken, logout } from '@/utils/auth';
 
 interface InventarioItem {
-  idStock: number;
+  idbodega: number;
+  bodega: string;
+  propietario: string;
   codigo: string;
   nombre: string;
   unidadMedida: string;
-  cantidad_UMBas: number;
-  disponible_UMBas: number;
-  cantidadReservadaUmBas: number;
-  nombre_Completo: string;
-  lote: string;
-  fecha_vence: string;
-  bodega: string;
-  idBodega: number;
   presentacion: string;
-  cantidad_Presentacion: number;
+  lote: string;
+  fecha_ingreso: string;
+  fecha_vence: string;
+  disponible_UMBas: number;
   disponible_Presentacion: number;
-  cantidad_Reservada_Pres: number;
-  costo: number;
-  valor_total: number;
-  nomEstado: string;
-  marca: string;
+  estado: string;
+  licencia: string;
   familia: string;
-  licencia?: string;
-  referencia?: string;
-  fecha_ingreso?: string;
-  propietario?: string;
+  area: string;
+  clasificacion: string;
+  ubicacion: string;
 }
 
 interface Bodega {
@@ -79,6 +73,13 @@ interface FamiliaResumen {
   porcentaje: number;
 }
 
+interface UbicacionResumen {
+  ubicacion: string;
+  area: string;
+  totalSKUs: number;
+  totalUnidades: number;
+}
+
 function AnalisisInventario() {
   const navigate = useNavigate();
   const [inventario, setInventario] = useState<InventarioItem[]>([]);
@@ -94,8 +95,9 @@ function AnalisisInventario() {
   });
   const [bodegaResumen, setBodegaResumen] = useState<BodegaResumen[]>([]);
   const [familiaResumen, setFamiliaResumen] = useState<FamiliaResumen[]>([]);
+  const [ubicacionResumen, setUbicacionResumen] = useState<UbicacionResumen[]>([]);
 
-  const [seccionActiva, setSeccionActiva] = useState<'vencimientos' | 'antiguedad' | 'bodegas' | 'composicion'>('vencimientos');
+  const [seccionActiva, setSeccionActiva] = useState<'vencimientos' | 'antiguedad' | 'bodegas' | 'ubicaciones' | 'composicion'>('vencimientos');
 
   useEffect(() => {
     document.title = 'TOMWMSUX - Análisis de Inventario';
@@ -133,32 +135,16 @@ function AnalisisInventario() {
         return;
       }
 
-      let allData: InventarioItem[] = [];
-      let pagina = 1;
-      let hasMore = true;
-
-      while (hasMore) {
-        const response = await existenciasAPI.listar({
-          idBodega: bodegaSeleccionada,
-          idPropietario: 0,
-          pagina: pagina,
-          tamanoPagina: 500
-        }, token);
-
-        if (response.existencias && response.existencias.length > 0) {
-          allData = [...allData, ...response.existencias];
-          pagina++;
-          hasMore = response.existencias.length === 500;
-        } else {
-          hasMore = false;
-        }
-
-        if (pagina > 20) hasMore = false;
+      const data = await kpiAPI.getStock(bodegaSeleccionada);
+      
+      if (Array.isArray(data)) {
+        setInventario(data);
+        procesarAnalisis(data);
+        toast.success(`${data.length} productos cargados`);
+      } else {
+        console.error('Formato de stock inesperado:', data);
+        toast.error('Error al cargar inventario');
       }
-
-      setInventario(allData);
-      procesarAnalisis(allData);
-      toast.success(`${allData.length} productos cargados`);
     } catch (error) {
       console.error('Error al cargar inventario:', error);
       toast.error('Error al cargar inventario');
@@ -217,19 +203,19 @@ function AnalisisInventario() {
         antig.sinFechaIngreso.push(item);
       }
 
-      if (!bodegaMap.has(item.idBodega)) {
-        bodegaMap.set(item.idBodega, {
+      if (!bodegaMap.has(item.idbodega)) {
+        bodegaMap.set(item.idbodega, {
           nombre: item.bodega,
-          idBodega: item.idBodega,
+          idBodega: item.idbodega,
           totalSKUs: 0,
           totalUnidades: 0,
           valorTotal: 0
         });
       }
-      const bodegaData = bodegaMap.get(item.idBodega)!;
+      const bodegaData = bodegaMap.get(item.idbodega)!;
       bodegaData.totalSKUs++;
       bodegaData.totalUnidades += item.disponible_UMBas || 0;
-      bodegaData.valorTotal += item.valor_total || 0;
+      bodegaData.valorTotal += 0;
 
       const familia = item.familia || 'Sin Familia';
       if (!familiaMap.has(familia)) {
@@ -238,6 +224,17 @@ function AnalisisInventario() {
       const familiaData = familiaMap.get(familia)!;
       familiaData.totalSKUs++;
       familiaData.totalUnidades += item.disponible_UMBas || 0;
+    });
+
+    const ubicacionMap = new Map<string, { area: string; totalSKUs: number; totalUnidades: number }>();
+    data.forEach(item => {
+      const ubi = item.ubicacion || 'Sin Ubicación';
+      if (!ubicacionMap.has(ubi)) {
+        ubicacionMap.set(ubi, { area: item.area || 'Sin Área', totalSKUs: 0, totalUnidades: 0 });
+      }
+      const ubiData = ubicacionMap.get(ubi)!;
+      ubiData.totalSKUs++;
+      ubiData.totalUnidades += item.disponible_UMBas || 0;
     });
 
     setVencimientos(venc);
@@ -254,6 +251,16 @@ function AnalisisInventario() {
       }))
       .sort((a, b) => b.totalUnidades - a.totalUnidades);
     setFamiliaResumen(familias);
+
+    const ubicaciones: UbicacionResumen[] = Array.from(ubicacionMap.entries())
+      .map(([ubicacion, data]) => ({
+        ubicacion,
+        area: data.area,
+        totalSKUs: data.totalSKUs,
+        totalUnidades: data.totalUnidades
+      }))
+      .sort((a, b) => b.totalUnidades - a.totalUnidades);
+    setUbicacionResumen(ubicaciones);
   };
 
   const formatNumber = (value: number) => value.toLocaleString('es-ES');
@@ -376,6 +383,21 @@ function AnalisisInventario() {
               </button>
 
               <button
+                onClick={() => setSeccionActiva('ubicaciones')}
+                className={`p-4 rounded-lg border-2 transition-all ${
+                  seccionActiva === 'ubicaciones' 
+                    ? 'border-purple-500 bg-purple-50' 
+                    : 'border-gray-200 bg-white hover:border-purple-300'
+                }`}
+              >
+                <MapPinIcon className="h-8 w-8 mx-auto text-purple-500 mb-2" />
+                <div className="text-sm font-medium">Ubicaciones</div>
+                <div className="text-xs text-gray-500">
+                  {ubicacionResumen.length} ubicaciones
+                </div>
+              </button>
+
+              <button
                 onClick={() => setSeccionActiva('composicion')}
                 className={`p-4 rounded-lg border-2 transition-all ${
                   seccionActiva === 'composicion' 
@@ -430,6 +452,7 @@ function AnalisisInventario() {
                             <th className="text-left px-4 py-2 font-medium">Producto</th>
                             <th className="text-left px-4 py-2 font-medium">Lote</th>
                             <th className="text-right px-4 py-2 font-medium">Disponible</th>
+                            <th className="text-left px-4 py-2 font-medium">Ubicación</th>
                             <th className="text-center px-4 py-2 font-medium">Fecha Vence</th>
                             <th className="text-center px-4 py-2 font-medium">Días</th>
                             <th className="text-left px-4 py-2 font-medium">Bodega</th>
@@ -447,6 +470,7 @@ function AnalisisInventario() {
                                   <td className="px-4 py-2">{item.nombre}</td>
                                   <td className="px-4 py-2">{item.lote || '-'}</td>
                                   <td className="px-4 py-2 text-right">{formatNumber(item.disponible_UMBas)}</td>
+                                  <td className="px-4 py-2 text-xs">{item.ubicacion || '-'}</td>
                                   <td className="px-4 py-2 text-center">{formatDate(item.fecha_vence)}</td>
                                   <td className="px-4 py-2 text-center">
                                     <span className={`px-2 py-1 rounded text-xs font-bold ${
@@ -542,7 +566,7 @@ function AnalisisInventario() {
                             <th className="text-left px-4 py-2 font-medium">Código</th>
                             <th className="text-left px-4 py-2 font-medium">Producto</th>
                             <th className="text-right px-4 py-2 font-medium">Disponible</th>
-                            <th className="text-right px-4 py-2 font-medium">Valor</th>
+                            <th className="text-left px-4 py-2 font-medium">Ubicación</th>
                             <th className="text-center px-4 py-2 font-medium">Fecha Ingreso</th>
                             <th className="text-center px-4 py-2 font-medium">Días</th>
                             <th className="text-left px-4 py-2 font-medium">Bodega</th>
@@ -559,7 +583,7 @@ function AnalisisInventario() {
                                   <td className="px-4 py-2 font-mono text-xs">{item.codigo}</td>
                                   <td className="px-4 py-2">{item.nombre}</td>
                                   <td className="px-4 py-2 text-right">{formatNumber(item.disponible_UMBas)}</td>
-                                  <td className="px-4 py-2 text-right">{formatCurrency(item.valor_total)}</td>
+                                  <td className="px-4 py-2">{item.ubicacion || '-'}</td>
                                   <td className="px-4 py-2 text-center">{formatDate(item.fecha_ingreso || '')}</td>
                                   <td className="px-4 py-2 text-center">
                                     <span className="px-2 py-1 rounded text-xs font-bold bg-red-100 text-red-700">
@@ -706,6 +730,136 @@ function AnalisisInventario() {
                         })}
                       </tbody>
                     </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {seccionActiva === 'ubicaciones' && (
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                    <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <MapPinIcon className="h-5 w-5 text-purple-500" />
+                      Distribución por Área
+                    </h3>
+                    <div className="space-y-3">
+                      {(() => {
+                        const areaMap = new Map<string, number>();
+                        ubicacionResumen.forEach(u => {
+                          const area = u.area || 'Sin Área';
+                          areaMap.set(area, (areaMap.get(area) || 0) + u.totalUnidades);
+                        });
+                        const areas = Array.from(areaMap.entries()).sort((a, b) => b[1] - a[1]);
+                        const maxUnidades = Math.max(...areas.map(a => a[1]), 1);
+                        return areas.slice(0, 10).map(([area, unidades], idx) => (
+                          <div key={idx}>
+                            <div className="flex justify-between text-sm mb-1">
+                              <span className="truncate">{area}</span>
+                              <span className="font-medium">{formatNumber(unidades)}</span>
+                            </div>
+                            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-purple-500 rounded-full"
+                                style={{ width: `${(unidades / maxUnidades) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        ));
+                      })()}
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                    <h3 className="font-medium text-gray-900 mb-3 flex items-center gap-2">
+                      <CubeIcon className="h-5 w-5 text-indigo-500" />
+                      Mapa de Ubicaciones (Top 20)
+                    </h3>
+                    <div className="flex flex-wrap gap-1">
+                      {ubicacionResumen.slice(0, 20).map((ubi, idx) => {
+                        const maxUni = Math.max(...ubicacionResumen.slice(0, 20).map(u => u.totalUnidades), 1);
+                        const intensity = Math.min(ubi.totalUnidades / maxUni, 1);
+                        const bgColor = intensity > 0.7 ? 'bg-purple-600' : 
+                                       intensity > 0.4 ? 'bg-purple-400' : 
+                                       intensity > 0.2 ? 'bg-purple-300' : 'bg-purple-200';
+                        const textColor = intensity > 0.5 ? 'text-white' : 'text-purple-900';
+                        
+                        return (
+                          <div
+                            key={idx}
+                            className={`${bgColor} ${textColor} rounded px-2 py-1 text-xs`}
+                            title={`${ubi.ubicacion}: ${formatNumber(ubi.totalUnidades)} unidades`}
+                          >
+                            {ubi.ubicacion.length > 20 ? ubi.ubicacion.substring(0, 20) + '...' : ubi.ubicacion}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                  <div className="bg-purple-600 text-white px-4 py-3 font-medium flex items-center gap-2">
+                    <MapPinIcon className="h-5 w-5" />
+                    Detalle de Ubicaciones
+                  </div>
+                  <div className="overflow-x-auto max-h-96 overflow-y-auto">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50 sticky top-0">
+                        <tr>
+                          <th className="text-left px-4 py-3 font-medium">#</th>
+                          <th className="text-left px-4 py-3 font-medium">Ubicación</th>
+                          <th className="text-left px-4 py-3 font-medium">Área</th>
+                          <th className="text-right px-4 py-3 font-medium">SKUs</th>
+                          <th className="text-right px-4 py-3 font-medium">Unidades</th>
+                          <th className="text-left px-4 py-3 font-medium">Ocupación</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {ubicacionResumen.slice(0, 50).map((ubi, idx) => {
+                          const maxUni = Math.max(...ubicacionResumen.map(u => u.totalUnidades), 1);
+                          const pct = (ubi.totalUnidades / maxUni) * 100;
+                          return (
+                            <tr key={idx} className="border-t hover:bg-gray-50">
+                              <td className="px-4 py-2 text-gray-500">{idx + 1}</td>
+                              <td className="px-4 py-2 font-medium">{ubi.ubicacion}</td>
+                              <td className="px-4 py-2">{ubi.area}</td>
+                              <td className="px-4 py-2 text-right">{formatNumber(ubi.totalSKUs)}</td>
+                              <td className="px-4 py-2 text-right font-medium">{formatNumber(ubi.totalUnidades)}</td>
+                              <td className="px-4 py-2">
+                                <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
+                                  <div 
+                                    className="h-full bg-purple-500 rounded-full"
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                    <div className="text-sm text-purple-600 mb-1">Total Ubicaciones</div>
+                    <div className="text-2xl font-bold text-purple-700">
+                      {formatNumber(ubicacionResumen.length)}
+                    </div>
+                  </div>
+                  <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
+                    <div className="text-sm text-indigo-600 mb-1">Total SKUs</div>
+                    <div className="text-2xl font-bold text-indigo-700">
+                      {formatNumber(ubicacionResumen.reduce((sum, u) => sum + u.totalSKUs, 0))}
+                    </div>
+                  </div>
+                  <div className="bg-violet-50 border border-violet-200 rounded-lg p-4">
+                    <div className="text-sm text-violet-600 mb-1">Total Unidades</div>
+                    <div className="text-2xl font-bold text-violet-700">
+                      {formatNumber(ubicacionResumen.reduce((sum, u) => sum + u.totalUnidades, 0))}
+                    </div>
                   </div>
                 </div>
               </div>

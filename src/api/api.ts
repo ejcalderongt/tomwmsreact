@@ -900,6 +900,32 @@ export const kpiAPI = {
     const data = await response.json();
     console.log(`📊 KPI Bodegas Data received: ${Array.isArray(data) ? data.length : 0} bodegas`);
     return data;
+  },
+
+  async getStock(idBodega?: number): Promise<any[]> {
+    let url = `${KPI_BASE}/Kpi/stock/res`;
+    if (idBodega && idBodega > 0) {
+      url += `?idBodega=${idBodega}`;
+    }
+    
+    console.log(`🌐 KPI Stock API Call: GET ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      console.error(`❌ KPI Stock API Error: ${response.status} ${response.statusText}`);
+      throw new Error(`KPI API Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log(`📊 KPI Stock Data received: ${Array.isArray(data) ? data.length : 0} items`);
+    return data;
   }
 };
 
