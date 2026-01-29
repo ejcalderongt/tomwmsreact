@@ -48,7 +48,23 @@ Ninguna variable de entorno requerida. La configuración del proxy está hardcod
 ## Mejoras Recientes
 
 ### Enero 29, 2026
-1. ✅ **Módulos de Análisis Avanzado - Sistema Completo de Reportes**
+1. ✅ **Nuevo Módulo: Análisis de Inventario**
+   - Ruta: `/analisis-inventario`
+   - 4 secciones de análisis visual interactivo:
+     - **Vencimientos**: Semáforo de productos vencidos/próximos a vencer (30d, 90d, OK)
+     - **Antigüedad**: Distribución por días en inventario (0-30, 31-60, 61-90, >90)
+     - **Por Bodega**: Distribución de SKUs, unidades y valor por bodega
+     - **Composición**: Treemap de familias por volumen con tabla detallada
+   - Navegación por tabs con contadores de productos críticos
+   - Tabla de productos críticos (vencidos y estancados)
+   - Gráficos de barras horizontales para distribución
+
+2. ✅ **Descripciones Elegantes en Todos los Reportes**
+   - Componente ReportDescription añadido a los 11 módulos de indicadores
+   - Cada reporte incluye: título, descripción, métricas clave, interpretación
+   - Códigos de color diferenciados por módulo
+
+3. ✅ **Módulos de Análisis Avanzado - Sistema Completo de Reportes**
    - **Dashboard Ejecutivo** (`/dashboard-ejecutivo`):
      - Vista unificada de métricas de los 4 KPIs operativos
      - Cards con cumplimiento, tiempos promedio y alertas automáticas
