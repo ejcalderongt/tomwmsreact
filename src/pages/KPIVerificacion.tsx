@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { ClipboardDocumentCheckIcon, CalendarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
+import { ClipboardDocumentCheckIcon, CalendarIcon, ArrowPathIcon, ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
-import { kpiAPI, KpiVerificacionItem } from '@/api/api';
+import { kpiAPI, KpiVerificacionItem, KpiPickingItem } from '@/api/api';
 import { getToken, logout } from '@/utils/auth';
 
 interface KPIMetrics {
@@ -19,11 +19,26 @@ interface KPIMetrics {
   promedioLineasPorVerificacion: number;
 }
 
+interface AnalisisCruzado {
+  totalPickings: number;
+  pickingsVerificados: number;
+  pickingsSinVerificar: number;
+  porcentajeVerificados: number;
+  unidadesPickingRecibidas: number;
+  unidadesVerificadas: number;
+  discrepanciaUnidades: number;
+  porcentajeCoincidencia: number;
+  mermaPorOperadorPicking: { operador: string; merma: number; lineas: number }[];
+  productosMayorDiscrepancia: { producto: string; recibido: number; verificado: number; diferencia: number }[];
+}
+
 function KPIVerificacion() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<KpiVerificacionItem[]>([]);
+  const [pickingData, setPickingData] = useState<KpiPickingItem[]>([]);
   const [metrics, setMetrics] = useState<KPIMetrics | null>(null);
+  const [analisisCruzado, setAnalisisCruzado] = useState<AnalisisCruzado | null>(null);
 
   const today = new Date();
   const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -69,6 +84,87 @@ function KPIVerificacion() {
     };
   };
 
+  const calcularAnalisisCruzado = (verificacion: KpiVerificacionItem[], picking: KpiPickingItem[]): AnalisisCruzado => {
+    const pickingsUnicos = new Set(picking.map(p => p.número_Picking));
+    const verificacionesUnicas = new Set(verificacion.map(v => v.id_Picking));
+    
+    const pickingsVerificados = [...pickingsUnicos].filter(p => verificacionesUnicas.has(p)).length;
+    const pickingsSinVerificar = pickingsUnicos.size - pickingsVerificados;
+    
+    const unidadesPickingRecibidas = picking.reduce((sum, p) => sum + (p.cantidad_Recibida || 0), 0);
+    const unidadesVerificadas = verificacion.reduce((sum, v) => sum + (v.cantidad_Verificada || 0), 0);
+    
+    const mermaPorOperadorMap: { [key: string]: { merma: number; lineas: number } } = {};
+    const pickingPorNumero: { [key: number]: KpiPickingItem[] } = {};
+    
+    picking.forEach(p => {
+      if (!pickingPorNumero[p.número_Picking]) {
+        pickingPorNumero[p.número_Picking] = [];
+      }
+      pickingPorNumero[p.número_Picking].push(p);
+    });
+    
+    verificacion.forEach(v => {
+      if (v.cantidad_Merma_Ver > 0) {
+        const pickingItems = pickingPorNumero[v.id_Picking];
+        if (pickingItems && pickingItems.length > 0) {
+          const operador = pickingItems[0].descripción_Operador?.trim() || 'Sin asignar';
+          if (!mermaPorOperadorMap[operador]) {
+            mermaPorOperadorMap[operador] = { merma: 0, lineas: 0 };
+          }
+          mermaPorOperadorMap[operador].merma += v.cantidad_Merma_Ver;
+          mermaPorOperadorMap[operador].lineas += 1;
+        }
+      }
+    });
+    
+    const mermaPorOperadorPicking = Object.entries(mermaPorOperadorMap)
+      .map(([operador, data]) => ({ operador, ...data }))
+      .sort((a, b) => b.merma - a.merma)
+      .slice(0, 10);
+    
+    const productosPickingMap: { [key: string]: number } = {};
+    const productosVerificacionMap: { [key: string]: number } = {};
+    const productosNombres: { [key: string]: string } = {};
+    
+    picking.forEach(p => {
+      const codigo = p.código_Producto;
+      productosPickingMap[codigo] = (productosPickingMap[codigo] || 0) + (p.cantidad_Recibida || 0);
+      productosNombres[codigo] = p.nombre_Producto;
+    });
+    
+    verificacion.forEach(v => {
+      const codigo = v.código_Producto;
+      productosVerificacionMap[codigo] = (productosVerificacionMap[codigo] || 0) + (v.cantidad_Verificada || 0);
+      productosNombres[codigo] = v.nombre_Producto;
+    });
+    
+    const todosProductos = new Set([...Object.keys(productosPickingMap), ...Object.keys(productosVerificacionMap)]);
+    const productosMayorDiscrepancia = [...todosProductos]
+      .map(codigo => ({
+        producto: productosNombres[codigo] || codigo,
+        recibido: productosPickingMap[codigo] || 0,
+        verificado: productosVerificacionMap[codigo] || 0,
+        diferencia: Math.abs((productosPickingMap[codigo] || 0) - (productosVerificacionMap[codigo] || 0))
+      }))
+      .filter(p => p.diferencia > 0)
+      .sort((a, b) => b.diferencia - a.diferencia)
+      .slice(0, 10);
+    
+    return {
+      totalPickings: pickingsUnicos.size,
+      pickingsVerificados,
+      pickingsSinVerificar,
+      porcentajeVerificados: pickingsUnicos.size > 0 ? (pickingsVerificados / pickingsUnicos.size) * 100 : 0,
+      unidadesPickingRecibidas,
+      unidadesVerificadas,
+      discrepanciaUnidades: unidadesPickingRecibidas - unidadesVerificadas,
+      porcentajeCoincidencia: unidadesPickingRecibidas > 0 ? (unidadesVerificadas / unidadesPickingRecibidas) * 100 : 0,
+      mermaPorOperadorPicking,
+      productosMayorDiscrepancia
+    };
+  };
+
   const consultarKPI = async () => {
     const token = getToken();
     if (!token) {
@@ -79,24 +175,39 @@ function KPIVerificacion() {
 
     setLoading(true);
     try {
-      const resultado = await kpiAPI.getVerificacion(fechaDesde, fechaHasta);
-      setData(resultado);
+      const [resultadoVerificacion, resultadoPicking] = await Promise.all([
+        kpiAPI.getVerificacion(fechaDesde, fechaHasta),
+        kpiAPI.getPicking(fechaDesde, fechaHasta)
+      ]);
       
-      if (resultado.length === 0) {
-        toast('No se encontraron datos para el rango de fechas seleccionado', {
+      setData(resultadoVerificacion);
+      setPickingData(resultadoPicking);
+      
+      if (resultadoVerificacion.length === 0) {
+        toast('No se encontraron datos de verificación para el rango seleccionado', {
           icon: 'ℹ️',
           style: { background: '#3b82f6', color: '#fff' }
         });
         setMetrics(null);
+        setAnalisisCruzado(null);
       } else {
-        const metricas = calcularMetricas(resultado);
+        const metricas = calcularMetricas(resultadoVerificacion);
         setMetrics(metricas);
-        toast.success(`Se procesaron ${resultado.length} registros de verificación`);
+        
+        if (resultadoPicking.length > 0) {
+          const cruzado = calcularAnalisisCruzado(resultadoVerificacion, resultadoPicking);
+          setAnalisisCruzado(cruzado);
+        } else {
+          setAnalisisCruzado(null);
+        }
+        
+        toast.success(`Verificación: ${resultadoVerificacion.length} registros | Picking: ${resultadoPicking.length} registros`);
       }
     } catch (error) {
       console.error('Error al consultar KPI:', error);
       toast.error('Error al consultar los indicadores');
       setMetrics(null);
+      setAnalisisCruzado(null);
     } finally {
       setLoading(false);
     }
@@ -350,6 +461,177 @@ function KPIVerificacion() {
                 </div>
               </div>
             </div>
+
+            {/* Análisis Cruzado Picking vs Verificación */}
+            {analisisCruzado && (
+              <>
+                <div className="border-t-4 border-indigo-500 pt-6">
+                  <div className="flex items-center mb-6">
+                    <ArrowsRightLeftIcon className="h-8 w-8 text-indigo-600 mr-3" />
+                    <h2 className="text-xl font-bold text-gray-900">Análisis Cruzado: Picking vs Verificación</h2>
+                  </div>
+
+                  {/* Indicadores de cruce principales */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    {/* Pickings Verificados */}
+                    <div className="bg-gradient-to-br from-indigo-50 to-indigo-100 rounded-lg shadow-sm border border-indigo-200 p-6">
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-indigo-700 mb-2">Pickings Verificados</p>
+                        <p className="text-3xl font-bold text-indigo-900">{formatNumber(analisisCruzado.pickingsVerificados)}</p>
+                        <p className="text-xs text-indigo-600 mt-1">de {formatNumber(analisisCruzado.totalPickings)} totales</p>
+                      </div>
+                    </div>
+
+                    {/* Pickings Sin Verificar */}
+                    <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg shadow-sm border border-orange-200 p-6">
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-orange-700 mb-2">Pickings Sin Verificar</p>
+                        <p className="text-3xl font-bold text-orange-900">{formatNumber(analisisCruzado.pickingsSinVerificar)}</p>
+                        <p className="text-xs text-orange-600 mt-1">{formatPercent(100 - analisisCruzado.porcentajeVerificados)} pendientes</p>
+                      </div>
+                    </div>
+
+                    {/* Tasa de Verificación */}
+                    <div className={`bg-gradient-to-br rounded-lg shadow-sm border p-6 ${
+                      analisisCruzado.porcentajeVerificados >= 90 
+                        ? 'from-green-50 to-green-100 border-green-200' 
+                        : analisisCruzado.porcentajeVerificados >= 70 
+                          ? 'from-yellow-50 to-yellow-100 border-yellow-200'
+                          : 'from-red-50 to-red-100 border-red-200'
+                    }`}>
+                      <div className="text-center">
+                        <p className={`text-sm font-medium mb-2 ${
+                          analisisCruzado.porcentajeVerificados >= 90 ? 'text-green-700' :
+                          analisisCruzado.porcentajeVerificados >= 70 ? 'text-yellow-700' : 'text-red-700'
+                        }`}>Tasa de Verificación</p>
+                        <p className={`text-3xl font-bold ${
+                          analisisCruzado.porcentajeVerificados >= 90 ? 'text-green-900' :
+                          analisisCruzado.porcentajeVerificados >= 70 ? 'text-yellow-900' : 'text-red-900'
+                        }`}>{formatPercent(analisisCruzado.porcentajeVerificados)}</p>
+                      </div>
+                    </div>
+
+                    {/* Coincidencia Unidades */}
+                    <div className={`bg-gradient-to-br rounded-lg shadow-sm border p-6 ${
+                      analisisCruzado.porcentajeCoincidencia >= 95 
+                        ? 'from-green-50 to-green-100 border-green-200' 
+                        : analisisCruzado.porcentajeCoincidencia >= 85 
+                          ? 'from-yellow-50 to-yellow-100 border-yellow-200'
+                          : 'from-red-50 to-red-100 border-red-200'
+                    }`}>
+                      <div className="text-center">
+                        <p className={`text-sm font-medium mb-2 ${
+                          analisisCruzado.porcentajeCoincidencia >= 95 ? 'text-green-700' :
+                          analisisCruzado.porcentajeCoincidencia >= 85 ? 'text-yellow-700' : 'text-red-700'
+                        }`}>Coincidencia Unidades</p>
+                        <p className={`text-3xl font-bold ${
+                          analisisCruzado.porcentajeCoincidencia >= 95 ? 'text-green-900' :
+                          analisisCruzado.porcentajeCoincidencia >= 85 ? 'text-yellow-900' : 'text-red-900'
+                        }`}>{formatPercent(analisisCruzado.porcentajeCoincidencia)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Comparativa de Unidades */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-500 mb-2">Unidades Recibidas (Picking)</p>
+                        <p className="text-3xl font-bold text-purple-600">{formatNumber(analisisCruzado.unidadesPickingRecibidas)}</p>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-500 mb-2">Unidades Verificadas</p>
+                        <p className="text-3xl font-bold text-teal-600">{formatNumber(analisisCruzado.unidadesVerificadas)}</p>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                      <div className="text-center">
+                        <p className="text-sm font-medium text-gray-500 mb-2">Discrepancia</p>
+                        <p className={`text-3xl font-bold ${analisisCruzado.discrepanciaUnidades === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          {analisisCruzado.discrepanciaUnidades > 0 ? '+' : ''}{formatNumber(analisisCruzado.discrepanciaUnidades)}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Tablas de análisis detallado */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Merma por Operador de Picking */}
+                    {analisisCruzado.mermaPorOperadorPicking.length > 0 && (
+                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">Merma por Operador de Picking</h3>
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Operador</th>
+                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Merma</th>
+                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Líneas</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {analisisCruzado.mermaPorOperadorPicking.map((item, idx) => (
+                                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                  <td className="px-4 py-2 text-sm text-gray-900 truncate max-w-48" title={item.operador}>{item.operador}</td>
+                                  <td className="px-4 py-2 text-sm text-red-600 font-medium text-right">{formatNumber(item.merma)}</td>
+                                  <td className="px-4 py-2 text-sm text-gray-600 text-right">{formatNumber(item.lineas)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Productos con Mayor Discrepancia */}
+                    {analisisCruzado.productosMayorDiscrepancia.length > 0 && (
+                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <h3 className="text-lg font-medium text-gray-900 mb-4">Productos con Mayor Discrepancia</h3>
+                        <div className="overflow-x-auto">
+                          <table className="min-w-full divide-y divide-gray-200">
+                            <thead className="bg-gray-50">
+                              <tr>
+                                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Recibido</th>
+                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Verificado</th>
+                                <th className="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Diferencia</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                              {analisisCruzado.productosMayorDiscrepancia.map((item, idx) => (
+                                <tr key={idx} className={idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                  <td className="px-4 py-2 text-sm text-gray-900 truncate max-w-48" title={item.producto}>{item.producto}</td>
+                                  <td className="px-4 py-2 text-sm text-purple-600 text-right">{formatNumber(item.recibido)}</td>
+                                  <td className="px-4 py-2 text-sm text-teal-600 text-right">{formatNumber(item.verificado)}</td>
+                                  <td className="px-4 py-2 text-sm text-red-600 font-medium text-right">{formatNumber(item.diferencia)}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Mensaje si no hay discrepancias */}
+                  {analisisCruzado.mermaPorOperadorPicking.length === 0 && analisisCruzado.productosMayorDiscrepancia.length === 0 && (
+                    <div className="bg-green-50 rounded-lg border border-green-200 p-6">
+                      <div className="text-center">
+                        <svg className="mx-auto h-12 w-12 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <h3 className="mt-2 text-sm font-medium text-green-900">Sin discrepancias significativas</h3>
+                        <p className="mt-1 text-sm text-green-700">
+                          No se detectaron mermas ni diferencias importantes entre picking y verificación.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
           </>
         )}
 
