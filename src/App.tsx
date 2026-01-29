@@ -14,6 +14,11 @@ import KPIVerificacion from '@/pages/KPIVerificacion';
 import KPIRecepcion from '@/pages/KPIRecepcion';
 import KPIDespacho from '@/pages/KPIDespacho';
 import KPITendencias from '@/pages/KPITendencias';
+import DashboardEjecutivo from '@/pages/DashboardEjecutivo';
+import AnalisisCiclo from '@/pages/AnalisisCiclo';
+import ProductividadOperadores from '@/pages/ProductividadOperadores';
+import ABCProductos from '@/pages/ABCProductos';
+import AnalisisMerma from '@/pages/AnalisisMerma';
 import SessionExpired from '@/pages/SessionExpired';
 import CambiarPassword from '@/pages/CambiarPassword';
 import NewPassword from '@/pages/NewPassword';
@@ -72,6 +77,21 @@ function App() {
         </Route>
         <Route path="/kpi-tendencias" element={<PrivateRoute />}>
           <Route index element={<KPITendencias />} />
+        </Route>
+        <Route path="/dashboard-ejecutivo" element={<PrivateRoute />}>
+          <Route index element={<DashboardEjecutivo />} />
+        </Route>
+        <Route path="/analisis-ciclo" element={<PrivateRoute />}>
+          <Route index element={<AnalisisCiclo />} />
+        </Route>
+        <Route path="/productividad-operadores" element={<PrivateRoute />}>
+          <Route index element={<ProductividadOperadores />} />
+        </Route>
+        <Route path="/abc-productos" element={<PrivateRoute />}>
+          <Route index element={<ABCProductos />} />
+        </Route>
+        <Route path="/analisis-merma" element={<PrivateRoute />}>
+          <Route index element={<AnalisisMerma />} />
         </Route>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/login" replace />} />

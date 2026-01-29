@@ -14,7 +14,12 @@ import {
   ClipboardDocumentCheckIcon,
   TruckIcon,
   PaperAirplaneIcon,
-  ChartBarSquareIcon
+  ChartBarSquareIcon,
+  PresentationChartBarIcon,
+  ClockIcon,
+  UsersIcon,
+  CubeTransparentIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { logout } from '@/utils/auth';
 import toast from 'react-hot-toast';
@@ -134,6 +139,76 @@ function Layout({ children, pageTitle }: LayoutProps) {
               KPI Tendencias
             </Link>
 
+            {/* Separador Análisis Avanzado */}
+            <div className="pt-4 pb-2 px-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Análisis Avanzado</p>
+            </div>
+
+            {/* Dashboard Ejecutivo */}
+            <Link
+              to="/dashboard-ejecutivo"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/dashboard-ejecutivo'
+                  ? 'bg-purple-100 text-purple-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <PresentationChartBarIcon className="mr-3 h-6 w-6" />
+              Dashboard Ejecutivo
+            </Link>
+
+            {/* Análisis de Ciclo */}
+            <Link
+              to="/analisis-ciclo"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/analisis-ciclo'
+                  ? 'bg-amber-100 text-amber-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ClockIcon className="mr-3 h-6 w-6" />
+              Análisis de Ciclo
+            </Link>
+
+            {/* Productividad Operadores */}
+            <Link
+              to="/productividad-operadores"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/productividad-operadores'
+                  ? 'bg-teal-100 text-teal-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <UsersIcon className="mr-3 h-6 w-6" />
+              Productividad Operadores
+            </Link>
+
+            {/* ABC Productos */}
+            <Link
+              to="/abc-productos"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/abc-productos'
+                  ? 'bg-emerald-100 text-emerald-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <CubeTransparentIcon className="mr-3 h-6 w-6" />
+              ABC Productos
+            </Link>
+
+            {/* Análisis de Merma */}
+            <Link
+              to="/analisis-merma"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/analisis-merma'
+                  ? 'bg-rose-100 text-rose-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ExclamationTriangleIcon className="mr-3 h-6 w-6" />
+              Análisis de Merma
+            </Link>
+
             {/* Ingresos y Salidas */}
             {navigation.filter(item => item.name !== 'Existencias').map((item) => {
               const isActive = location.pathname === item.href;
@@ -248,6 +323,76 @@ function Layout({ children, pageTitle }: LayoutProps) {
             >
               <ChartBarSquareIcon className="mr-3 h-6 w-6" />
               KPI Tendencias
+            </Link>
+
+            {/* Separador Análisis Avanzado */}
+            <div className="pt-4 pb-2 px-4">
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Análisis Avanzado</p>
+            </div>
+
+            {/* Dashboard Ejecutivo */}
+            <Link
+              to="/dashboard-ejecutivo"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/dashboard-ejecutivo'
+                  ? 'bg-purple-100 text-purple-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <PresentationChartBarIcon className="mr-3 h-6 w-6" />
+              Dashboard Ejecutivo
+            </Link>
+
+            {/* Análisis de Ciclo */}
+            <Link
+              to="/analisis-ciclo"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/analisis-ciclo'
+                  ? 'bg-amber-100 text-amber-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ClockIcon className="mr-3 h-6 w-6" />
+              Análisis de Ciclo
+            </Link>
+
+            {/* Productividad Operadores */}
+            <Link
+              to="/productividad-operadores"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/productividad-operadores'
+                  ? 'bg-teal-100 text-teal-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <UsersIcon className="mr-3 h-6 w-6" />
+              Productividad Operadores
+            </Link>
+
+            {/* ABC Productos */}
+            <Link
+              to="/abc-productos"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/abc-productos'
+                  ? 'bg-emerald-100 text-emerald-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <CubeTransparentIcon className="mr-3 h-6 w-6" />
+              ABC Productos
+            </Link>
+
+            {/* Análisis de Merma */}
+            <Link
+              to="/analisis-merma"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                location.pathname === '/analisis-merma'
+                  ? 'bg-rose-100 text-rose-900'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              }`}
+            >
+              <ExclamationTriangleIcon className="mr-3 h-6 w-6" />
+              Análisis de Merma
             </Link>
 
             {/* Ingresos y Salidas */}
