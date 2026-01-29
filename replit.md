@@ -8,8 +8,9 @@ Key Capabilities:
 - Advanced analytics for stock aging, expiry, warehouse distribution, and product composition.
 - Executive dashboards and operational KPIs for comprehensive oversight.
 - Operator productivity tracking and ABC analysis for product classification.
-- AI Assistant for conversational queries about inventory data.
+- AI Assistant (Kairos EC) for conversational queries about inventory data.
 - Professional Excel export functionality for inventory data.
+- Automation module with configurable rules and alerts system.
 
 The project aims to streamline warehouse operations, improve inventory accuracy, reduce waste from expired or slow-moving goods, and enhance decision-making through data-driven insights.
 
@@ -50,6 +51,8 @@ The application follows a client-server architecture. The frontend is a React 18
 **Feature Specifications:**
 - **Inventory Modules:** `InventarioEnLinea`, `Existencias`, `ResumenExistencias`, `Movimientos`.
 - **Analysis Modules:** `AnalisisInventario` (Vencimientos, Antigüedad, Por Bodega, Composición), `DashboardEjecutivo`, `AnalisisCiclo`, `ProductividadOperadores`, `ABCProductos`, `AnalisisMerma`.
+- **AI Module:** `AsistenteInventario` (Kairos EC) - Chatbot with editable knowledge base, real-time inventory context.
+- **Automation Module:** `Automatizaciones` - Configurable rules system with conditions (stock bajo, productos por vencer, merma alta, etc.), actions (alertas dashboard, críticas), and frequency settings (tiempo real, diaria, semanal). Includes alert management panel.
 - **Login Module:** `Login.tsx`.
 
 ## External Dependencies

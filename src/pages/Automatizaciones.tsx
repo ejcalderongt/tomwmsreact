@@ -19,6 +19,7 @@ import { BellIcon } from '@heroicons/react/24/solid';
 import toast from 'react-hot-toast';
 import { getToken } from '@/utils/auth';
 import { automationService } from '@/services/automationService';
+import { ruleEngine } from '@/services/ruleEngine';
 import { 
   AutomationRule, 
   Alert,
@@ -41,6 +42,7 @@ export default function Automatizaciones() {
   const [activeTab, setActiveTab] = useState<'reglas' | 'alertas'>('reglas');
   const [showModal, setShowModal] = useState(false);
   const [editingRule, setEditingRule] = useState<AutomationRule | null>(null);
+  const [evaluating, setEvaluating] = useState(false);
   
   const [formData, setFormData] = useState({
     nombre: '',
@@ -53,6 +55,25 @@ export default function Automatizaciones() {
     accionMensaje: '',
     frecuencia: 'diaria' as FrequencyType
   });
+
+  const handleEvaluateRules = async () => {
+    setEvaluating(true);
+    try {
+      const result = await ruleEngine.evaluateRules();
+      if (result.alertasGeneradas > 0) {
+        toast.success(`${result.alertasGeneradas} alerta(s) generada(s)`);
+        setActiveTab('alertas');
+      } else {
+        toast.success(`${result.reglasEvaluadas} regla(s) evaluada(s), sin alertas nuevas`);
+      }
+      loadData();
+    } catch (error) {
+      console.error('Error evaluating rules:', error);
+      toast.error('Error al evaluar reglas');
+    } finally {
+      setEvaluating(false);
+    }
+  };
 
   useEffect(() => {
     const token = getToken();
@@ -210,13 +231,23 @@ export default function Automatizaciones() {
                 <p className="text-indigo-100">Configura reglas inteligentes para optimizar tus operaciones</p>
               </div>
             </div>
-            <button
-              onClick={handleNewRule}
-              className="flex items-center px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-50 transition-colors"
-            >
-              <PlusIcon className="h-5 w-5 mr-2" />
-              Nueva Regla
-            </button>
+            <div className="flex items-center space-x-3">
+              <button
+                onClick={handleEvaluateRules}
+                disabled={evaluating}
+                className="flex items-center px-4 py-2 bg-indigo-800 text-white rounded-lg font-medium hover:bg-indigo-900 transition-colors disabled:opacity-50"
+              >
+                <PlayIcon className={`h-5 w-5 mr-2 ${evaluating ? 'animate-pulse' : ''}`} />
+                {evaluating ? 'Evaluando...' : 'Evaluar Ahora'}
+              </button>
+              <button
+                onClick={handleNewRule}
+                className="flex items-center px-4 py-2 bg-white text-indigo-600 rounded-lg font-medium hover:bg-indigo-50 transition-colors"
+              >
+                <PlusIcon className="h-5 w-5 mr-2" />
+                Nueva Regla
+              </button>
+            </div>
           </div>
         </div>
 
