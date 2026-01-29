@@ -877,6 +877,29 @@ export const kpiAPI = {
     const data = await response.json();
     console.log(`📊 KPI Heatmap Data received: ${Array.isArray(data) ? data.length : 0} records`);
     return data;
+  },
+
+  async getBodegas(): Promise<{ idBodega: number; nombre: string }[]> {
+    const url = `${KPI_BASE}/Bodegas/listar`;
+    
+    console.log(`🌐 KPI Bodegas API Call: GET ${url}`);
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+    });
+    
+    if (!response.ok) {
+      console.error(`❌ KPI Bodegas API Error: ${response.status} ${response.statusText}`);
+      throw new Error(`KPI API Error: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log(`📊 KPI Bodegas Data received: ${Array.isArray(data) ? data.length : 0} bodegas`);
+    return data;
   }
 };
 

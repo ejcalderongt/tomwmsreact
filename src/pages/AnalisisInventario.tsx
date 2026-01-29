@@ -12,7 +12,7 @@ import {
   ChartPieIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
-import { existenciasAPI, bodegasAPI } from '@/api/api';
+import { existenciasAPI, kpiAPI } from '@/api/api';
 import { getToken, logout } from '@/utils/auth';
 
 interface InventarioItem {
@@ -109,8 +109,8 @@ function AnalisisInventario() {
         navigate('/login');
         return;
       }
-      const data = await bodegasAPI.listar(token);
-      console.log('Bodegas cargadas:', data);
+      const data = await kpiAPI.getBodegas();
+      console.log('Bodegas KPI cargadas:', data);
       if (Array.isArray(data)) {
         setBodegas(data);
       } else {
