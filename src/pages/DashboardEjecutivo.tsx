@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { 
   PresentationChartBarIcon, 
   CalendarIcon, 
@@ -214,6 +215,19 @@ function DashboardEjecutivo() {
   return (
     <Layout pageTitle="Dashboard Ejecutivo">
       <div className="space-y-6">
+        <ReportDescription
+          title="Dashboard Ejecutivo"
+          description="Vista consolidada de las métricas operativas de todo el almacén. Integra los 4 KPIs principales (Picking, Verificación, Recepción y Despacho) en una sola pantalla para obtener una visión 360° del desempeño operativo."
+          metrics={[
+            "Cumplimiento % por área operativa",
+            "Tiempos promedio de procesamiento",
+            "Flujo operativo visual de líneas",
+            "Alertas automáticas por desviaciones"
+          ]}
+          interpretation="Los semáforos de color indican salud operativa: verde (≥95%), amarillo (80-95%), rojo (<80%). Las alertas aparecen automáticamente cuando hay bajo cumplimiento o merma elevada. Use este dashboard para reuniones de seguimiento diario."
+          color="purple"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

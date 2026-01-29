@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { ClipboardDocumentCheckIcon, CalendarIcon, ArrowPathIcon, ArrowsRightLeftIcon, ClockIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI, KpiVerificacionItem, KpiPickingItem } from '@/api/api';
@@ -358,6 +359,19 @@ function KPIVerificacion() {
   return (
     <Layout pageTitle="KPI Verificación">
       <div className="space-y-6">
+        <ReportDescription
+          title="Indicador de Verificación"
+          description="Controla la calidad del proceso de verificación de pedidos antes del despacho. Cruza información con picking para detectar discrepancias, mermas y evaluar la precisión del proceso de preparación."
+          metrics={[
+            "% Cumplimiento: unidades verificadas vs solicitadas",
+            "Merma detectada durante verificación",
+            "Cruce Picking-Verificación: discrepancias",
+            "Tiempo promedio de verificación por documento"
+          ]}
+          interpretation="Este indicador es crítico para la calidad del servicio. Alta merma en verificación puede indicar problemas en picking. Compare tiempos entre operadores para identificar eficiencias. Los productos con mayor discrepancia requieren revisión de procesos."
+          color="green"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

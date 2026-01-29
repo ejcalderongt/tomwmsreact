@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { TruckIcon, CalendarIcon, ArrowPathIcon, ClockIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI, KpiRecepcionItem } from '@/api/api';
@@ -210,6 +211,19 @@ function KPIRecepcion() {
   return (
     <Layout pageTitle="KPI Recepción">
       <div className="space-y-6">
+        <ReportDescription
+          title="Indicador de Recepción"
+          description="Evalúa la eficiencia del proceso de ingreso de mercadería al almacén. Compara las cantidades recibidas contra las solicitadas en órdenes de compra, identificando discrepancias con proveedores y tiempos de procesamiento."
+          metrics={[
+            "% Cumplimiento: unidades recibidas vs solicitadas",
+            "Recepciones y líneas procesadas por período",
+            "Devoluciones a proveedores",
+            "Productividad por operador de recepción"
+          ]}
+          interpretation="Cumplimiento ideal ≥95%. Devoluciones frecuentes pueden indicar problemas con proveedores específicos. Analice la distribución por hora para optimizar la programación de entregas y asignación de personal."
+          color="cyan"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

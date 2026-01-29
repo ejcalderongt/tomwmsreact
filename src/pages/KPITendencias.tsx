@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { ChartBarSquareIcon, CalendarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI, KpiTendenciaDespachoItem, KpiHeatmapItem } from '@/api/api';
@@ -241,6 +242,19 @@ function KPITendencias() {
   return (
     <Layout pageTitle="KPI Tendencias">
       <div className="space-y-6">
+        <ReportDescription
+          title="Análisis de Tendencias"
+          description="Visualiza patrones históricos de despacho y actividad operativa. Incluye análisis de tendencias por período y un mapa de calor día/hora para identificar picos de demanda y optimizar la planificación de recursos."
+          metrics={[
+            "Tendencia de despachos en el tiempo",
+            "Crecimiento % entre períodos",
+            "Top familias y productos más despachados",
+            "Heatmap: actividad por día y hora"
+          ]}
+          interpretation="Use las tendencias para detectar estacionalidad y planificar inventario. El heatmap muestra las horas y días de mayor actividad para optimizar turnos de personal. Los productos top ayudan a priorizar ubicaciones de picking."
+          color="indigo"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

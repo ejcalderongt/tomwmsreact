@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { ExclamationTriangleIcon, CalendarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI, KpiDespachoItem } from '@/api/api';
@@ -121,6 +122,19 @@ function AnalisisMerma() {
   return (
     <Layout pageTitle="Análisis de Merma y Calidad">
       <div className="space-y-6">
+        <ReportDescription
+          title="Análisis de Merma y Calidad"
+          description="Monitorea las pérdidas de inventario por diferentes causas: merma operativa, productos dañados durante picking o verificación, y productos no encontrados. Identifica patrones y productos problemáticos para implementar acciones correctivas."
+          metrics={[
+            "Tasa de merma global (%)",
+            "Desglose por tipo de pérdida",
+            "Top productos con mayor merma",
+            "Top clientes afectados"
+          ]}
+          interpretation="Tasa de merma ideal <1%. Entre 1-3% requiere atención. Mayor a 3% es crítico. Los productos con merma recurrente pueden necesitar revisión de embalaje o ubicación. Clientes con alta merma pueden tener pedidos complejos que requieren atención especial."
+          color="rose"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

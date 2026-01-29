@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { CubeIcon, CalendarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI, KpiTendenciaDespachoItem } from '@/api/api';
@@ -155,6 +156,19 @@ function ABCProductos() {
   return (
     <Layout pageTitle="Análisis ABC de Productos">
       <div className="space-y-6">
+        <ReportDescription
+          title="Análisis ABC de Productos (Pareto)"
+          description="Clasificación de productos según el principio de Pareto (80/20). Agrupa productos en categorías A (alta rotación), B (media) y C (baja) basándose en el volumen histórico de despachos para optimizar la gestión de inventario."
+          metrics={[
+            "Clasificación A (80% del movimiento)",
+            "Clasificación B (15% del movimiento)",
+            "Clasificación C (5% del movimiento)",
+            "Curva de Pareto visual"
+          ]}
+          interpretation="Productos A: ubicar cerca de zonas de picking, mantener alto stock. Productos B: ubicación intermedia, stock moderado. Productos C: candidatos para revisión de surtido o promociones. Use este análisis para optimizar la distribución física del almacén."
+          color="emerald"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

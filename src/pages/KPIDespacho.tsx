@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { PaperAirplaneIcon, CalendarIcon, ArrowPathIcon, ClockIcon, ArrowsRightLeftIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI, KpiDespachoItem, KpiPickingItem, KpiVerificacionItem } from '@/api/api';
@@ -388,6 +389,19 @@ function KPIDespacho() {
   return (
     <Layout pageTitle="KPI Despacho">
       <div className="space-y-6">
+        <ReportDescription
+          title="Indicador de Despacho"
+          description="Mide la eficiencia final del ciclo de pedidos, desde la preparación hasta la entrega al cliente. Rastrea la trazabilidad completa incluyendo picking, verificación y despacho, identificando pérdidas en cada etapa."
+          metrics={[
+            "% Cumplimiento: unidades despachadas vs solicitadas",
+            "Merma total y por etapa (picking, verificación)",
+            "Productos dañados y no encontrados",
+            "Análisis cruzado con flujo completo"
+          ]}
+          interpretation="El cumplimiento de despacho es el indicador más importante para el cliente. La merma acumulada muestra pérdidas en toda la cadena. Use el análisis cruzado para identificar en qué etapa ocurren los problemas."
+          color="purple"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

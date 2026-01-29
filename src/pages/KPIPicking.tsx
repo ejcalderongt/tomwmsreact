@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { ChartBarIcon, CalendarIcon, ArrowPathIcon, ClockIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI, KpiPickingItem } from '@/api/api';
@@ -201,6 +202,19 @@ function KPIPicking() {
   return (
     <Layout pageTitle="KPI Picking">
       <div className="space-y-6">
+        <ReportDescription
+          title="Indicador de Picking"
+          description="Mide la eficiencia del proceso de preparación de pedidos. Muestra cuántas unidades fueron recogidas correctamente vs las solicitadas, identificando desviaciones y oportunidades de mejora en la operación de picking."
+          metrics={[
+            "% Cumplimiento: unidades pickeadas vs solicitadas",
+            "Documentos y líneas procesadas en el período",
+            "Productividad: líneas procesadas por hora",
+            "Ranking de operadores por desempeño"
+          ]}
+          interpretation="Un cumplimiento óptimo es ≥95% (verde). Entre 80-95% indica oportunidad de mejora (amarillo). Por debajo del 80% requiere atención inmediata (rojo). Compare la productividad entre operadores para identificar mejores prácticas."
+          color="blue"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

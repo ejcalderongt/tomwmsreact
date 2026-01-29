@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { ClockIcon, CalendarIcon, ArrowPathIcon, ArrowLongRightIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI, KpiPickingItem, KpiVerificacionItem } from '@/api/api';
@@ -204,6 +205,19 @@ function AnalisisCiclo() {
   return (
     <Layout pageTitle="Análisis de Ciclo Completo">
       <div className="space-y-6">
+        <ReportDescription
+          title="Análisis de Ciclo Completo"
+          description="Mide el tiempo total (Lead Time) que toma un pedido desde que inicia el picking hasta que se completa la verificación. Identifica cuellos de botella y documentos con tiempos excesivos para optimizar el flujo operativo."
+          metrics={[
+            "Lead Time promedio por etapa",
+            "Detección de cuellos de botella",
+            "Distribución de tiempos por rangos",
+            "Top documentos más lentos"
+          ]}
+          interpretation="Un Lead Time ideal es menor a 60 minutos. Los cuellos de botella indican etapas donde se acumulan retrasos. Los documentos más lentos pueden revelar problemas específicos (productos difíciles, operadores nuevos, etc.)."
+          color="amber"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">

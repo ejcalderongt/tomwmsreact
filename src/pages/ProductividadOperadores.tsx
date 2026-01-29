@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '@/components/Layout';
+import ReportDescription from '@/components/ReportDescription';
 import { UsersIcon, CalendarIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { kpiAPI } from '@/api/api';
@@ -171,6 +172,19 @@ function ProductividadOperadores() {
   return (
     <Layout pageTitle="Productividad Operadores">
       <div className="space-y-6">
+        <ReportDescription
+          title="Productividad de Operadores"
+          description="Ranking comparativo de rendimiento individual de cada operador en las diferentes áreas operativas (Picking, Verificación, Recepción). Permite identificar mejores prácticas y oportunidades de capacitación."
+          metrics={[
+            "Líneas por hora por operador",
+            "Comparativo vs promedio del equipo",
+            "Ranking global de productividad",
+            "Desglose por área operativa"
+          ]}
+          interpretation="Verde = sobre el promedio (>120%), Amarillo = cerca del promedio, Rojo = bajo el promedio (<80%). Los operadores top (medallas) pueden servir como mentores. Use esta información para balancear cargas de trabajo y planes de capacitación."
+          color="teal"
+        />
+        
         {/* Filtros */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex flex-wrap items-end gap-4">
