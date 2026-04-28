@@ -146,6 +146,153 @@ const kpiApiProxy = createProxyMiddleware({
   }
 });
 
+// Agent Info endpoint - Exposes structured context for external AI agents
+app.get('/agent-info', (req, res) => {
+  const BASE_URL = `${req.protocol}://${req.get('host')}`;
+
+  res.json({
+    sistema: {
+      nombre: "TOM WMS",
+      version: "1.0.0",
+      descripcion: "Sistema de Gestión de Almacén (Warehouse Management System) para control de inventario en tiempo real, análisis avanzado de stock y operaciones de bodega.",
+      idioma: "Español",
+      estado: "Producción activa",
+      url_base: BASE_URL
+    },
+
+    asistente_ia: {
+      nombre: "Kairos EC",
+      descripcion: "Asistente conversacional especializado en inventario y operaciones de almacén. Conectado a datos reales del sistema vía contexto inyectado en cada consulta.",
+      modelo: "gpt-4o",
+      endpoint: `${BASE_URL}/ai/chat`,
+      metodo: "POST",
+      formato_request: {
+        message: "string — Pregunta o instrucción del usuario",
+        inventoryContext: "string (opcional) — Datos de inventario actuales para contextualizar la respuesta",
+        knowledgeBase: "string (opcional) — Base de conocimiento personalizada del negocio"
+      },
+      formato_response: "Server-Sent Events (SSE). Cada evento: data: {content: string}. Fin: data: {done: true}",
+      ejemplo_uso: {
+        message: "¿Cuáles son los productos con stock más bajo?",
+        inventoryContext: "Producto: LECHE ENTERA, Stock: 5 unidades, Ubicación: PICKING...",
+        knowledgeBase: "Esta bodega maneja productos perecederos..."
+      }
+    },
+
+    modulos: [
+      {
+        nombre: "Inventario en Línea",
+        ruta: "/inventario",
+        descripcion: "Consulta de stock en tiempo real por ubicación, producto y bodega",
+        datos_disponibles: ["stock_actual", "ubicacion", "lote", "fecha_vence", "codigo_producto"]
+      },
+      {
+        nombre: "Existencias",
+        ruta: "/existencias",
+        descripcion: "Resumen consolidado de existencias con exportación Excel",
+        datos_disponibles: ["cantidad_disponible", "unidad_base", "bodega", "agrupaciones"]
+      },
+      {
+        nombre: "Movimientos",
+        ruta: "/movimientos",
+        descripcion: "Historial de ingresos, salidas y traspasos de mercadería",
+        datos_disponibles: ["tipo_movimiento", "fecha", "documento", "usuario", "cantidad"]
+      },
+      {
+        nombre: "Dashboard Ejecutivo",
+        ruta: "/dashboard",
+        descripcion: "KPIs ejecutivos: valor de inventario, rotación, alertas críticas",
+        datos_disponibles: ["valor_total", "productos_criticos", "rotacion", "kpis_resumen"]
+      },
+      {
+        nombre: "Análisis de Vencimientos",
+        ruta: "/analisis/vencimientos",
+        descripcion: "Productos próximos a vencer y ya vencidos con semáforo de urgencia",
+        datos_disponibles: ["dias_para_vencer", "estado_semaforo", "valor_en_riesgo"]
+      },
+      {
+        nombre: "Análisis de Antigüedad",
+        ruta: "/analisis/antiguedad",
+        descripcion: "Clasificación de stock por tiempo de permanencia en bodega",
+        datos_disponibles: ["dias_en_bodega", "rango_antiguedad", "valor_antiguo"]
+      },
+      {
+        nombre: "Análisis por Bodega",
+        ruta: "/analisis/bodega",
+        descripcion: "Distribución del inventario por ubicación física",
+        datos_disponibles: ["nombre_bodega", "porcentaje_ocupacion", "valor_por_bodega"]
+      },
+      {
+        nombre: "Análisis de Merma",
+        ruta: "/analisis/merma",
+        descripcion: "Productos con pérdidas, daños o merma registrada",
+        datos_disponibles: ["tipo_merma", "valor_perdido", "tendencia"]
+      },
+      {
+        nombre: "Análisis ABC",
+        ruta: "/analisis/abc",
+        descripcion: "Clasificación de productos por rotación: A (alta), B (media), C (baja)",
+        datos_disponibles: ["clasificacion_abc", "frecuencia_movimiento", "valor_relativo"]
+      },
+      {
+        nombre: "Productividad Operadores",
+        ruta: "/productividad",
+        descripcion: "Rendimiento del personal de bodega por operación y turno",
+        datos_disponibles: ["operador", "picking_por_hora", "documentos_procesados"]
+      },
+      {
+        nombre: "Análisis de Ciclo",
+        ruta: "/ciclo",
+        descripcion: "KPIs de picking: velocidad, documentos pendientes, tiempos promedio",
+        datos_disponibles: ["documentos_abiertos", "tiempo_promedio_ciclo", "cliente"]
+      },
+      {
+        nombre: "Automatizaciones",
+        ruta: "/automatizaciones",
+        descripcion: "Motor de reglas configurable: alertas automáticas por stock bajo, vencimientos, merma alta",
+        datos_disponibles: ["reglas_activas", "alertas_generadas", "historial_ejecuciones"]
+      }
+    ],
+
+    api_endpoints: {
+      descripcion: "Los siguientes endpoints proxy están disponibles para consultar datos en tiempo real",
+      inventario: {
+        stock: { url: `${BASE_URL}/kpi/stock`, metodo: "GET", descripcion: "Lista completa de stock con ubicación, lotes y vencimientos" },
+        bodegas: { url: `${BASE_URL}/kpi/bodegas`, metodo: "GET", descripcion: "Catálogo de bodegas y ubicaciones del almacén" },
+        existencias: { url: `${BASE_URL}/api/existencias/listar`, metodo: "POST", descripcion: "Consulta de existencias actuales", autenticacion: "Bearer token requerido" },
+        movimientos: { url: `${BASE_URL}/api/movimientos/listar`, metodo: "POST", descripcion: "Historial de movimientos", autenticacion: "Bearer token requerido" },
+        picking: { url: `${BASE_URL}/kpi/picking`, metodo: "GET", descripcion: "Documentos de picking activos con datos de cliente" }
+      }
+    },
+
+    integraciones: {
+      openai: { estado: "activo", modelo: "gpt-4o", uso: "Asistente Kairos EC" },
+      backend_principal: { host: "52.41.114.122", puerto: 8097, protocolo: "HTTP", estado: "proxy_activo" },
+      backend_kpi: { host: "52.41.114.122", puerto: 8091, protocolo: "HTTP", estado: "proxy_activo" }
+    },
+
+    capacidades_kairos: [
+      "Consultar stock de productos específicos por nombre o código",
+      "Identificar productos próximos a vencer o ya vencidos",
+      "Analizar niveles de stock bajo y hacer recomendaciones",
+      "Revisar movimientos recientes de un producto",
+      "Comparar rendimiento entre bodegas",
+      "Resumir KPIs ejecutivos del inventario",
+      "Detectar anomalías en merma o rotación",
+      "Responder preguntas sobre operaciones de almacén"
+    ],
+
+    instrucciones_para_agente: {
+      como_consultar_kairos: "Haz POST a /ai/chat con {message, inventoryContext}. Usa SSE para leer la respuesta en streaming.",
+      como_obtener_contexto: "Primero llama a /kpi/stock para obtener inventario actual, luego pásalo como string en inventoryContext al llamar /ai/chat.",
+      autenticacion_requerida: "Los endpoints /api/* requieren header Authorization: Bearer <token>. Los endpoints /kpi/* y /ai/chat son abiertos.",
+      formato_inventoryContext: "Texto plano con datos de productos, uno por línea. Ejemplo: 'Producto: X, Stock: 100, Ubicación: PICKING, Vence: 2025-06-01'"
+    },
+
+    generado_en: new Date().toISOString()
+  });
+});
+
 // Parse JSON for AI chat endpoint (must be before proxy)
 app.use('/ai', express.json());
 
