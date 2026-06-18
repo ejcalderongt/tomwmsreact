@@ -1,1 +1,1 @@
-- [WMS API topology](wms-api-topology.md) — 8097 live (serves KPI), 8091 dead, `/kpi`→8097; picking times out because the WebAPI SQL has NO date filter (returns all ~444K rows); AWS SQL DB reachable via mssql port 1437 after IP whitelist.
+- [WMS API topology](wms-api-topology.md) — 8091 vivo con fix picking; proxy /kpi→8091 con pathRewrite=/api/Kpi${path}; 8097 como API principal; 4 endpoints KPI pendientes en 8091 (stock/bodegas/tendencias/heatmap).

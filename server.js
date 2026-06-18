@@ -101,11 +101,12 @@ const apiProxy = createProxyMiddleware({
   }
 });
 
-// KPI API proxy middleware - Points to port 8097 (main API)
-// NOTE: Port 8091 (dedicated KPI server) is DOWN (HTTP 500.30 - ASP.NET Core failed to start).
-// All KPI endpoints (Kpi/*, Bodegas/listar) are also served by the main API on 8097, which is healthy.
+// KPI API proxy middleware - Points to port 8091 (dedicated KPI server)
+// Port 8091 is the correct KPI server. Currently serves: picking, recepcion, despacho, verificacion.
+// Endpoints 404 on 8091 (stock, bodegas, tendencias, heatmap) need to be added by the backend team.
+// Port 8097 (main API) is healthy but does NOT have the picking date-filter fix applied.
 const kpiApiProxy = createProxyMiddleware({
-  target: 'http://52.41.114.122:8097',
+  target: 'http://52.41.114.122:8091',
   changeOrigin: true,
   secure: false,
   ws: true,
@@ -113,7 +114,7 @@ const kpiApiProxy = createProxyMiddleware({
   timeout: 60000,
   proxyTimeout: 60000,
   pathRewrite: (path, req) => {
-    const newPath = `/api${path}`;
+    const newPath = `/api/Kpi${path}`;
     console.log(`🔀 [${new Date().toISOString()}] KPI Path rewrite: ${path} → ${newPath}`);
     return newPath;
   },
@@ -269,8 +270,8 @@ app.get('/agent-info', (req, res) => {
 
     integraciones: {
       openai: { estado: "activo", modelo: "gpt-4o", uso: "Asistente Kairos EC" },
-      backend_principal: { host: "52.41.114.122", puerto: 8097, protocolo: "HTTP", estado: "proxy_activo" },
-      backend_kpi: { host: "52.41.114.122", puerto: 8091, protocolo: "HTTP", estado: "proxy_activo" }
+      backend_principal: { host: "52.41.114.122", puerto: 8097, protocolo: "HTTP", estado: "activo" },
+      backend_kpi: { host: "52.41.114.122", puerto: 8091, protocolo: "HTTP", estado: "activo_con_fix_picking" }
     },
 
     capacidades_kairos: [
@@ -383,5 +384,5 @@ app.use((req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Production server running on http://0.0.0.0:${PORT}`);
   console.log(`📁 Serving static files from: ${path.join(__dirname, 'dist')}`);
-  console.log(`🔄 API proxy configured for: http://52.41.114.122:8097`);
+  console.log(`🔄 KPI proxy configured for: http://52.41.114.122:8091 | Main API proxy: http://52.41.114.122:8097`);
 });
