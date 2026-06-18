@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "z4d-OR_TDGfYZcVpqnHmW"
+uri = "file://REPORTE_PICKING_KPI.md"
+type = "text"
+title = "Reporte técnico — Fix del timeout de Kpi/picking (para Codex)"
