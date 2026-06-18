@@ -367,6 +367,30 @@ Formato de respuesta:
   }
 });
 
+// Direct login handler — bypasses proxy to avoid body-forwarding issues with http-proxy-middleware v3
+// Must be registered BEFORE the generic /api proxy mount
+app.post('/api/Auth/login-propietario', express.json({ limit: '1mb' }), async (req, res) => {
+  try {
+    console.log(`🔐 [${new Date().toISOString()}] Direct login handler for user: ${req.body?.username}`);
+    const response = await fetch('http://52.41.114.122:8097/api/Auth/login-propietario', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({ username: req.body?.username, password: req.body?.password }),
+    });
+    const text = await response.text();
+    console.log(`🔐 [${new Date().toISOString()}] Backend login response: HTTP ${response.status}`);
+    res.status(response.status);
+    res.setHeader('Content-Type', 'application/json');
+    res.send(text || '{}');
+  } catch (error) {
+    console.error(`🔴 [${new Date().toISOString()}] Direct login error:`, error.message);
+    res.status(502).json({ error: 'Backend connection error', message: error.message });
+  }
+});
+
 // Apply KPI proxy middleware for /kpi routes
 app.use('/kpi', kpiApiProxy);
 
