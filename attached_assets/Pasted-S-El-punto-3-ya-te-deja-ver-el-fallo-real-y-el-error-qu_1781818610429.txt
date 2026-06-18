@@ -1,0 +1,77 @@
+Sí. El punto 3 ya te deja ver el fallo real, y el error que viste en vivo no es “login roto por React”, es desalineación de esquema entre la API y Propietarios.
+
+Qué significa exactamente el punto 3
+
+    Está en AuthController.Login_proietario.
+    Envuelve todo el login en un try/catch.
+    Si algo explota, devuelve JSON con mensaje y, si MostrarDetallesErrores=true, también detalle.
+    O sea: ya no te tapa el error con un 500 vacío.
+
+Dónde está el problema real
+
+    La tabla base en scriptBD.sql define propietarios hasta color.
+    Pero el DAL actual en clsLnPropietarios.Cargar intenta leer:
+        NIT
+        codigo_acceso
+        clave_acceso
+        IdBodegaAreaSAP
+        es_consolidador
+    Y además EsPropietarioValido exige codigo_acceso y clave_acceso para autenticar.
+
+El error que ya te devolvió el host
+
+    GET /api/Propietario/GetAll cayó con:
+        Column 'IdBodegaAreaSAP' does not belong to table.
+    Eso prueba que la BD viva no tiene al menos esa columna, y el Cargar(...) todavía no coincide con el esquema.
+
+SQL exacto para alinear la tabla con esta API
+Te dejo el mínimo razonable para que el código actual deje de reventar y el login pueda funcionar:
+
+IF COL_LENGTH('dbo.propietarios', 'codigo_acceso') IS NULL
+    ALTER TABLE dbo.propietarios ADD codigo_acceso NVARCHAR(50) NULL;
+
+IF COL_LENGTH('dbo.propietarios', 'clave_acceso') IS NULL
+    ALTER TABLE dbo.propietarios ADD clave_acceso NVARCHAR(50) NULL;
+
+IF COL_LENGTH('dbo.propietarios', 'controlux') IS NULL
+    ALTER TABLE dbo.propietarios ADD controlux BIT NULL
+        CONSTRAINT DF_propietarios_controlux DEFAULT (0);
+
+IF COL_LENGTH('dbo.propietarios', 'IdBodegaAreaSAP') IS NULL
+    ALTER TABLE dbo.propietarios ADD IdBodegaAreaSAP INT NULL;
+
+IF COL_LENGTH('dbo.propietarios', 'es_consolidador') IS NULL
+    ALTER TABLE dbo.propietarios ADD es_consolidador BIT NULL
+        CONSTRAINT DF_propietarios_es_consolidador DEFAULT (0);
+
+Para el usuario de prueba manuchar
+La contraseña Admin1965!* cifrada con el mismo algoritmo de la app da:
+
+KMekvu1P5C3tA/nKOzrwlw==
+
+Entonces, si ese propietario existe en la tabla, el update sería algo así:
+
+UPDATE dbo.propietarios
+SET codigo_acceso = 'manuchar',
+    clave_acceso = 'KMekvu1P5C3tA/nKOzrwlw==',
+    controlux = 1,
+    activo = 1
+WHERE IdPropietario = <ID_REAL>;
+
+Si no sabes el IdPropietario, primero ubícalo con:
+
+SELECT IdPropietario, nombre_comercial, codigo, email, activo,
+       codigo_acceso, clave_acceso, controlux, IdBodegaAreaSAP, es_consolidador
+FROM dbo.propietarios
+WHERE nombre_comercial LIKE '%manuchar%'
+   OR codigo LIKE '%manuchar%'
+   OR email LIKE '%manuchar%';
+
+Qué deberías ver después
+
+    GetAll ya no debería fallar en IdBodegaAreaSAP.
+    login-propietario debería pasar de 500 a:
+        200 con token, si el propietario tiene codigo_acceso/clave_acceso correctos.
+        401, si la fila existe pero las credenciales no coinciden.
+
+Si quieres, te escribo ahora mismo el script completo en versión “migración segura” con BEGIN TRAN / COMMIT / ROLLBACK para correrlo sin dejar la tabla a medias.
