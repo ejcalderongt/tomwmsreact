@@ -114,7 +114,7 @@ const kpiApiProxy = createProxyMiddleware({
   timeout: 60000,
   proxyTimeout: 60000,
   pathRewrite: (path, req) => {
-    const newPath = `/api/Kpi${path}`;
+    const newPath = `/api${path}`;
     console.log(`🔀 [${new Date().toISOString()}] KPI Path rewrite: ${path} → ${newPath}`);
     return newPath;
   },
