@@ -36,9 +36,10 @@ function DashboardEjecutivo() {
   const [alertas, setAlertas] = useState<Alerta[]>([]);
 
   const today = new Date();
-  const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
   
-  const [fechaDesde, setFechaDesde] = useState<string>(firstDayOfMonth.toISOString().split('T')[0]);
+  const [fechaDesde, setFechaDesde] = useState<string>(thirtyDaysAgo.toISOString().split('T')[0]);
   const [fechaHasta, setFechaHasta] = useState<string>(today.toISOString().split('T')[0]);
 
   useEffect(() => {
@@ -50,6 +51,12 @@ function DashboardEjecutivo() {
     if (!token) {
       logout();
       navigate('/login', { replace: true });
+      return;
+    }
+
+    const diffDays = Math.ceil((new Date(fechaHasta).getTime() - new Date(fechaDesde).getTime()) / 86400000);
+    if (diffDays > 31) {
+      toast.error(`Rango máximo permitido: 31 días. El período seleccionado tiene ${diffDays} días. Reduzca el rango para evitar timeout.`, { duration: 6000 });
       return;
     }
 

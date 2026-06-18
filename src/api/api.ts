@@ -733,152 +733,152 @@ export interface KpiRecepcionItem {
 export const kpiAPI = {
   async getPicking(from: string, to: string): Promise<KpiPickingItem[]> {
     const url = `${KPI_BASE}/Kpi/picking?from=${from}&to=${to}`;
-    
     console.log(`🌐 KPI API Call: GET ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    });
-    
-    console.log(`📡 KPI Response: ${response.status}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
-    }
-    
-    const data = await response.json();
-    console.log(`📊 KPI Data received: ${Array.isArray(data) ? data.length : 0} records`);
-    return data;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      console.log(`📡 KPI Response: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+      }
+      const data = await response.json();
+      console.log(`📊 KPI Data received: ${Array.isArray(data) ? data.length : 0} records`);
+      return data;
+    } catch (e: any) {
+      if (e.name === 'AbortError') throw new Error('TIMEOUT: La consulta tardó más de 90 segundos. Reduzca el rango de fechas.');
+      throw e;
+    } finally { clearTimeout(timer); }
   },
 
   async getVerificacion(from: string, to: string): Promise<KpiVerificacionItem[]> {
     const url = `${KPI_BASE}/Kpi/verificacion?from=${from}&to=${to}`;
-    
     console.log(`🌐 KPI API Call: GET ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    });
-    
-    console.log(`📡 KPI Response: ${response.status}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
-    }
-    
-    const data = await response.json();
-    console.log(`📊 KPI Verificacion Data received: ${Array.isArray(data) ? data.length : 0} records`);
-    return data;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      console.log(`📡 KPI Response: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+      }
+      const data = await response.json();
+      console.log(`📊 KPI Verificacion Data received: ${Array.isArray(data) ? data.length : 0} records`);
+      return data;
+    } catch (e: any) {
+      if (e.name === 'AbortError') throw new Error('TIMEOUT: La consulta tardó más de 90 segundos. Reduzca el rango de fechas.');
+      throw e;
+    } finally { clearTimeout(timer); }
   },
 
   async getRecepcion(from: string, to: string): Promise<KpiRecepcionItem[]> {
     const url = `${KPI_BASE}/Kpi/recepcion?from=${from}&to=${to}`;
-    
     console.log(`🌐 KPI API Call: GET ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    });
-    
-    console.log(`📡 KPI Response: ${response.status}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
-    }
-    
-    const data = await response.json();
-    console.log(`📊 KPI Recepcion Data received: ${Array.isArray(data) ? data.length : 0} records`);
-    return data;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      console.log(`📡 KPI Response: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+      }
+      const data = await response.json();
+      console.log(`📊 KPI Recepcion Data received: ${Array.isArray(data) ? data.length : 0} records`);
+      return data;
+    } catch (e: any) {
+      if (e.name === 'AbortError') throw new Error('TIMEOUT: La consulta tardó más de 90 segundos. Reduzca el rango de fechas.');
+      throw e;
+    } finally { clearTimeout(timer); }
   },
 
   async getDespacho(from: string, to: string): Promise<KpiDespachoItem[]> {
     const url = `${KPI_BASE}/Kpi/despacho?from=${from}&to=${to}`;
-    
     console.log(`🌐 KPI API Call: GET ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    });
-    
-    console.log(`📡 KPI Response: ${response.status}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
-    }
-    
-    const data = await response.json();
-    console.log(`📊 KPI Despacho Data received: ${Array.isArray(data) ? data.length : 0} records`);
-    return data;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      console.log(`📡 KPI Response: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+      }
+      const data = await response.json();
+      console.log(`📊 KPI Despacho Data received: ${Array.isArray(data) ? data.length : 0} records`);
+      return data;
+    } catch (e: any) {
+      if (e.name === 'AbortError') throw new Error('TIMEOUT: La consulta tardó más de 90 segundos. Reduzca el rango de fechas.');
+      throw e;
+    } finally { clearTimeout(timer); }
   },
 
   async getTendenciasDespacho(from: string, to: string): Promise<KpiTendenciaDespachoItem[]> {
     const url = `${KPI_BASE}/Kpi/tendencias/despacho?from=${from}&to=${to}`;
-    
     console.log(`🌐 KPI API Call: GET ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    });
-    
-    console.log(`📡 KPI Response: ${response.status}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
-    }
-    
-    const data = await response.json();
-    console.log(`📊 KPI Tendencias Despacho Data received: ${Array.isArray(data) ? data.length : 0} records`);
-    return data;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 90000);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      console.log(`📡 KPI Response: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+      }
+      const data = await response.json();
+      console.log(`📊 KPI Tendencias Despacho Data received: ${Array.isArray(data) ? data.length : 0} records`);
+      return data;
+    } catch (e: any) {
+      if (e.name === 'AbortError') throw new Error('TIMEOUT: La consulta tardó más de 90 segundos. Reduzca el rango de fechas.');
+      throw e;
+    } finally { clearTimeout(timer); }
   },
 
   async getHeatmapDiaHora(from: string, to: string): Promise<KpiHeatmapItem[]> {
     const url = `${KPI_BASE}/Kpi/tendencias/operacion/heatmap-diahora?from=${from}&to=${to}`;
-    
     console.log(`🌐 KPI API Call: GET ${url}`);
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Accept': 'application/json',
-      },
-    });
-    
-    console.log(`📡 KPI Response: ${response.status}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
-    }
-    
-    const data = await response.json();
-    console.log(`📊 KPI Heatmap Data received: ${Array.isArray(data) ? data.length : 0} records`);
-    return data;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 30000);
+    try {
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        signal: controller.signal,
+      });
+      console.log(`📡 KPI Response: ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`KPI API Error: ${response.status} - ${errorText}`);
+      }
+      const data = await response.json();
+      console.log(`📊 KPI Heatmap Data received: ${Array.isArray(data) ? data.length : 0} records`);
+      return data;
+    } catch (e: any) {
+      if (e.name === 'AbortError') throw new Error('TIMEOUT: La consulta tardó más de 30 segundos.');
+      throw e;
+    } finally { clearTimeout(timer); }
   },
 
   async getBodegas(): Promise<{ idBodega: number; nombre: string }[]> {

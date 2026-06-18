@@ -38,9 +38,10 @@ function KPITendencias() {
   const [vistaActiva, setVistaActiva] = useState<'tendencias' | 'heatmap'>('tendencias');
 
   const today = new Date();
-  const threeMonthsAgo = new Date(today.getFullYear(), today.getMonth() - 3, 1);
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
   
-  const [fechaDesde, setFechaDesde] = useState<string>(threeMonthsAgo.toISOString().split('T')[0]);
+  const [fechaDesde, setFechaDesde] = useState<string>(thirtyDaysAgo.toISOString().split('T')[0]);
   const [fechaHasta, setFechaHasta] = useState<string>(today.toISOString().split('T')[0]);
 
   useEffect(() => {
@@ -174,6 +175,12 @@ function KPITendencias() {
       return;
     }
 
+    const diffDays = Math.ceil((new Date(fechaHasta).getTime() - new Date(fechaDesde).getTime()) / 86400000);
+    if (diffDays > 90) {
+      toast.error(`Rango máximo permitido: 90 días. El período seleccionado tiene ${diffDays} días. Reduzca el rango.`, { duration: 6000 });
+      return;
+    }
+
     setLoading(true);
     try {
       const [tendenciasData, heatmapData] = await Promise.all([
@@ -199,7 +206,8 @@ function KPITendencias() {
       }
     } catch (error) {
       console.error('Error al consultar KPI:', error);
-      toast.error('Error al consultar los indicadores');
+      const msg = error instanceof Error ? error.message : '';
+      toast.error(msg.startsWith('TIMEOUT') ? msg : 'Error al consultar los indicadores. Intente con un rango de fechas menor.', { duration: 6000 });
       setTendencias(null);
       setHeatmap(null);
     } finally {
