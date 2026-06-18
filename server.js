@@ -101,9 +101,11 @@ const apiProxy = createProxyMiddleware({
   }
 });
 
-// KPI API proxy middleware - For KPI endpoints on port 8091
+// KPI API proxy middleware - Points to port 8097 (main API)
+// NOTE: Port 8091 (dedicated KPI server) is DOWN (HTTP 500.30 - ASP.NET Core failed to start).
+// All KPI endpoints (Kpi/*, Bodegas/listar) are also served by the main API on 8097, which is healthy.
 const kpiApiProxy = createProxyMiddleware({
-  target: 'http://52.41.114.122:8091',
+  target: 'http://52.41.114.122:8097',
   changeOrigin: true,
   secure: false,
   ws: true,

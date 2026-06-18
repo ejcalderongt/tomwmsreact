@@ -1,0 +1,1 @@
+- [WMS API topology](wms-api-topology.md) — port 8097 live (serves KPI too), 8091 dead; `/kpi` proxy targets 8097; picking SP times out; AWS SQL DB not directly reachable from Replit.
