@@ -1,5 +1,7 @@
 # Portal TOMWMSUX: arquitectura, datos, repositorios y permisos
 
+> **Estado de este análisis:** describe la situación anterior a la publicación de permisos del 24/09/2026. Para la arquitectura y operación vigentes, consultar `brain/portal-operacion-permisos.md` en la rama `wms-brain` de `ejcalderongt/tomwms-replit-client-automate`.
+
 Verificado el 2026-09-24 en `cealsa-02-srv`. Este documento describe el estado observado; no contiene credenciales ni tokens.
 
 ## Flujo en ejecución
