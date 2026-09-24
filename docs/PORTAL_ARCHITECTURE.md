@@ -46,11 +46,11 @@ La conexión activa `CST` usa SQL Server local y la base `IMS4MB_CEALSA_QAS`. Pa
 
 ## Fuente de verdad y traslado a Azure DevOps
 
-- Fuente de verdad acordada para React hasta completar el traslado: GitHub `ejcalderongt/tomwmsreact`, rama `dev_replit`.
-- Checkout local: `TOMWMSReact` en `dev_replit`, siguiendo `github/dev_replit`. El remoto `origin` apunta al repositorio Azure DevOps `ejcalderon0892/TOMWMSReact`.
-- Antes de este documento, GitHub `dev_replit`, el checkout local y `origin/main` **local** apuntaban a `f7b247f`; la rama GitHub recibió 239 commits mediante avance rápido desde su ancestro `70a4b4a`.
-- La lectura del remoto Azure requiere autenticación en este equipo. Por ello no se ha comprobado su HEAD actual ni se puede declarar sincronizada la rama remota Azure. No hacer push forzado ni cambiar la fuente de verdad hasta leer sus ramas y comparar historias.
-- Secuencia de traslado: configurar acceso Git a Azure con permiso de lectura/escritura; `fetch origin`; comparar `origin/main`, `origin/dev_replit` (si existe) y `github/dev_replit`; resolver cualquier divergencia; publicar `dev_replit` en Azure sin forzar; verificar el SHA remoto; establecer el upstream de la rama local a Azure; decidir después si GitHub queda como espejo. El despliegue IIS requiere un paso separado de build, copia y validación.
+- Fuente de verdad acordada para el trabajo nuevo: Azure DevOps `ejcalderon0892/TOMWMSReact`, rama `dev_replit`. GitHub `ejcalderongt/tomwmsreact`, rama `dev_replit`, se conserva como espejo.
+- Checkout local: `TOMWMSReact` en `dev_replit`, siguiendo `origin/dev_replit` (Azure). `github` sigue disponible como remoto secundario.
+- Antes de este documento, GitHub `dev_replit`, el checkout local y Azure `main` apuntaban a `f7b247f`; la rama GitHub recibió 239 commits mediante avance rápido desde su ancestro `70a4b4a`.
+- Tras autenticar Azure, se comprobó que `main` remoto estaba en `f7b247f` y que `dev_replit` no existía. Se creó `dev_replit` en Azure sin forzar, a partir de GitHub, y se verificó el SHA remoto `edeab60`. `main` no se cambió.
+- Flujo de cambios: trabajar en la rama local `dev_replit`, revisar build y diff, publicar primero en Azure `origin`, verificar SHA y luego actualizar el espejo GitHub. No hacer push forzado. El despliegue IIS requiere un paso separado de build, copia y validación.
 - El repositorio versiona 2,678 archivos bajo `node_modules` y cinco bajo `dist`. Retirarlos requiere un cambio controlado posterior; no mezclar esa limpieza con el traslado inicial.
 
 ## Estado de roles y menús
