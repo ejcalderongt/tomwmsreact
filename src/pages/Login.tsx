@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from "@/api/api";
-import { saveUser, isAuthenticated } from "@/utils/auth";
+import { saveUser, isAuthenticated, getUser } from "@/utils/auth";
 import toast from "react-hot-toast";
+import { firstAllowedRoute } from '@/config/portalPermissions';
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -12,7 +13,7 @@ function Login() {
 
   useEffect(() => {
     if (isAuthenticated()) {
-      navigate("/dashboard", { replace: true });
+      navigate(firstAllowedRoute(getUser()), { replace: true });
     }
   }, [navigate]);
 
@@ -42,7 +43,7 @@ function Login() {
       setUsername("");
       setPassword("");
 
-      navigate("/dashboard", { replace: true });
+      navigate(firstAllowedRoute(user), { replace: true });
 
     } catch (error) {
       console.error("❌ Login error:", error);

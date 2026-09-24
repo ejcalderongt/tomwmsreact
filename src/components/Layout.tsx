@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useLocation, useNavigate, type LinkProps } from 'react-router-dom';
 import { 
   CubeIcon, 
   ArrowRightOnRectangleIcon,
@@ -24,12 +24,18 @@ import {
   SparklesIcon,
   BoltIcon
 } from '@heroicons/react/24/outline';
-import { logout } from '@/utils/auth';
+import { logout, getUser } from '@/utils/auth';
+import { canAccessPath } from '@/config/portalPermissions';
 import toast from 'react-hot-toast';
 
 interface LayoutProps {
   children: React.ReactNode;
   pageTitle?: string;
+}
+
+function Link(props: LinkProps) {
+  const path = typeof props.to === 'string' ? props.to : props.to.pathname || '/';
+  return canAccessPath(path, getUser()) ? <RouterLink {...props} /> : null;
 }
 
 const indicadoresRoutes = [
@@ -45,6 +51,8 @@ function Layout({ children, pageTitle }: LayoutProps) {
   const navigate = useNavigate();
 
   const isIndicadorActive = indicadoresRoutes.includes(location.pathname);
+  const visibleIndicadores = indicadoresRoutes.some(path => canAccessPath(path, getUser()));
+  const canManage = canAccessPath('/permisos', getUser());
 
   const handleLogout = () => {
     logout();
@@ -289,7 +297,7 @@ function Layout({ children, pageTitle }: LayoutProps) {
             </Link>
 
             {/* Indicadores - Menú colapsable */}
-            <div className="pt-2">
+            {visibleIndicadores && <div className="pt-2">
               <button
                 onClick={() => setIndicadoresOpen(!indicadoresOpen)}
                 className={`w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md ${
@@ -310,7 +318,8 @@ function Layout({ children, pageTitle }: LayoutProps) {
               </button>
               
               {indicadoresOpen && <IndicadoresSubmenu />}
-            </div>
+            </div>}
+            {canManage && <Link to="/permisos" className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50">Usuarios y permisos</Link>}
           </nav>
           <div className="border-t border-gray-200 p-4">
             <button
@@ -371,7 +380,7 @@ function Layout({ children, pageTitle }: LayoutProps) {
             </Link>
 
             {/* Indicadores - Menú colapsable */}
-            <div className="pt-2">
+            {visibleIndicadores && <div className="pt-2">
               <button
                 onClick={() => setIndicadoresOpen(!indicadoresOpen)}
                 className={`w-full flex items-center justify-between px-4 py-2 text-sm font-medium rounded-md ${
@@ -392,7 +401,8 @@ function Layout({ children, pageTitle }: LayoutProps) {
               </button>
               
               {indicadoresOpen && <IndicadoresSubmenu />}
-            </div>
+            </div>}
+            {canManage && <Link to="/permisos" className="flex items-center px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:bg-gray-50">Usuarios y permisos</Link>}
           </nav>
           <div className="border-t border-gray-200 p-4">
             <button

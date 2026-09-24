@@ -108,7 +108,8 @@ function Ingresos() {
       //   }, 1500);
       //   return;
       // }
-      const idPropietario = userData.propietario?.idPropietario || 1;
+      const idPropietario = userData.propietario?.idPropietario;
+      if (!token || !idPropietario) throw new Error('SesiÃ³n de propietario invÃ¡lida');
 
       const filtro: DocumentoIngresoFiltro = {
         fechaInicio,

@@ -1,7 +1,12 @@
-interface User {
+export interface User {
   username: string;
   token: string;
   propietario?: any;
+  permissions?: string[];
+  modules?: string[];
+  isAdmin?: boolean;
+  isSystemAdmin?: boolean;
+  portalUserId?: number | null;
 }
 
 const TOKEN_KEY = 'wms_token';
@@ -32,7 +37,13 @@ export const isAuthenticated = (): boolean => {
   const token = localStorage.getItem(TOKEN_KEY);
   const user = localStorage.getItem(USER_KEY);
 
-  return !!(token && user && token !== 'null' && user !== 'null');
+  if (!(token && user && token !== 'null' && user !== 'null')) return false;
+  try {
+    const parsed = JSON.parse(user) as User;
+    return !!(parsed.isSystemAdmin || Array.isArray(parsed.permissions));
+  } catch {
+    return false;
+  }
 };
 
 export const logout = () => {

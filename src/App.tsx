@@ -1,5 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Login from '@/pages/Login';
+import InternalLogin from '@/pages/InternalLogin';
+import AccessDenied from '@/pages/AccessDenied';
+import PortalPermissions from '@/pages/PortalPermissions';
 import Dashboard from '@/pages/Dashboard';
 import Existencias from '@/pages/Existencias';
 import ResumenExistencias from '@/pages/ResumenExistencias';
@@ -37,6 +40,11 @@ function App() {
       <AuthWatcher />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/acceso-interno" element={<InternalLogin />} />
+        <Route path="/sin-acceso" element={<AccessDenied />} />
+        <Route path="/permisos" element={<PrivateRoute />}>
+          <Route index element={<PortalPermissions />} />
+        </Route>
         <Route path="/session-expired" element={<SessionExpired />} />
         <Route path="/cambiar-password" element={<CambiarPassword />} />
         <Route path="/new-password" element={<NewPassword />} />

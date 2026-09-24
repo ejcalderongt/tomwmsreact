@@ -11,6 +11,11 @@ export interface User {
   username: string;
   token: string;
   propietario?: any;
+  permissions?: string[];
+  modules?: string[];
+  isAdmin?: boolean;
+  isSystemAdmin?: boolean;
+  portalUserId?: number | null;
 }
 
 export interface LoginCredentials {
@@ -124,7 +129,7 @@ export const authAPI = {
 
     try {
       // Use the working login endpoint with proper proxy path
-      const endpoint = '/Auth/login-propietario';
+      const endpoint = '/PortalAcceso/login';
       const baseUrl = getApiBaseUrl();
       const cleanEndpoint = endpoint.startsWith('/api') ? endpoint.substring(4) : endpoint;
       const fullUrl = `${baseUrl}${cleanEndpoint}`;
@@ -165,7 +170,7 @@ export const authAPI = {
       }
 
       const responseData = await response.json();
-      console.log('✅ Login successful:', responseData);
+      console.log('Login successful');
 
       if (!responseData.token) {
         console.error('❌ No token received from server:', responseData);
@@ -175,7 +180,11 @@ export const authAPI = {
       const user: User = {
         username: credentials.username,
         token: responseData.token,
-        propietario: responseData.propietario
+        propietario: responseData.propietario,
+        permissions: responseData.permisos || [],
+        modules: responseData.modulos || [],
+        isAdmin: !!responseData.esAdministrador,
+        portalUserId: responseData.idPortalUsuario ?? null
       };
 
       // Guardar ID del propietario si está disponible
