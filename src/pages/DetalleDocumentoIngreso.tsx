@@ -45,7 +45,7 @@ interface Poliza {
 }
 
 function DetalleDocumentoIngreso() {
-  const { IdOrdenCompraEnc } = useParams();
+  const { id: IdOrdenCompraEnc } = useParams();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
   const [detalleOC, setDetalleOC] = useState<DetalleOC[]>([]);

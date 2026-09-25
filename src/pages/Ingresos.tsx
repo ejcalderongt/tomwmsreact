@@ -159,7 +159,7 @@ function Ingresos() {
 
   const handleRowClick = (documento: DocumentoIngreso) => {
     if (documento.codigo) {
-      navigate(`/ingresos/detalle/${documento.codigo}`);
+      navigate(`/detalle-ingreso/${documento.codigo}`);
     } else {
       toast.error('ID no disponible');
     }

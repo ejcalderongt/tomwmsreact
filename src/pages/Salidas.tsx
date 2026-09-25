@@ -137,10 +137,9 @@ function Salidas() {
   };
 
   const handleRowClick = (documento: DocumentoSalida) => {
-    // Usar idDespachoEnc como identificador principal
-    const id = documento.idDespachoEnc;
+    const id = documento.correlativo;
     if (id) {
-      navigate(`/salidas/detalle/${id}`);
+      navigate(`/detalle-salida/${id}`);
     } else {
       toast.error('No se pudo obtener el ID del documento');
     }

@@ -51,7 +51,7 @@ interface Despacho {
 }
 
 function DetalleDocumentoSalida() {
-  const { IdDocumento } = useParams();
+  const { id: IdDocumento } = useParams();
   const navigate = useNavigate();
   const [selectedTab, setSelectedTab] = useState(0);
   const [detallePE, setDetallePE] = useState<DetallePE[]>([]);
